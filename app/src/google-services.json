@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "686398009761",
+    "project_id": "meuif-15823",
+    "storage_bucket": "meuif-15823.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:686398009761:android:b7921c461a05267ee15be0",
+        "android_client_info": {
+          "package_name": "com.example.meuif"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "686398009761-jump7ep2ru6kpshakvsn9qduqtbi5bo7.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA-3xM2q5qpr3HBNd8vYm4R6O_CTuobNvQ"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "686398009761-jump7ep2ru6kpshakvsn9qduqtbi5bo7.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
