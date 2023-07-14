@@ -17,6 +17,7 @@ import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -49,18 +50,18 @@ public class MainActivity extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                buscar();
+                buscar(view);
             }
         });
     }
 
-    public void buscar(){
+    public void buscar(View v){
         String matricula = entrada.getText().toString();
-        setGetInicial(matricula);
+        setGetInicial(matricula, v);
 
     }
 
-    public void setGetInicial(String nMatricula){
+    public void setGetInicial(String nMatricula, View v){
         DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("dados");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -74,9 +75,13 @@ public class MainActivity extends AppCompatActivity {
                         proximaTela(auxnome, nMatricula);
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
+                        progressBar.setVisibility(View.INVISIBLE);
+                        abrirSnakbar("Erro ao procurar matricula", v);
                     }
                 } else {
                     Log.d("TAGLER", "Falhou em ", task.getException());
+                    progressBar.setVisibility(View.INVISIBLE);
+                    abrirSnakbar("Erro tente novamente", v);
                 }
             }
         });
@@ -92,6 +97,13 @@ public class MainActivity extends AppCompatActivity {
 
         // Iniciar a atividade de destino
         startActivity(intent);
+    }
+
+    public void abrirSnakbar(String texto, View v){
+        Snackbar snackbar = Snackbar.make(v, texto, Snackbar.LENGTH_SHORT);
+        snackbar.setBackgroundTint(Color.WHITE);
+        snackbar.setTextColor(Color.BLACK);
+        snackbar.show();
     }
 
 }
