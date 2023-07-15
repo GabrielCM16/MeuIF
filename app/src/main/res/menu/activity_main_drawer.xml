@@ -10,8 +10,8 @@
             android:title="@string/menu_home" />
         <item
             android:id="@+id/nav_gallery"
-            android:icon="@drawable/ic_menu_gallery"
-            android:title="@string/menu_gallery" />
+            android:icon="@drawable/baseline_sensor_door_24"
+            android:title="Carteirinha" />
         <item
             android:id="@+id/nav_slideshow"
             android:icon="@drawable/baseline_logout_24"

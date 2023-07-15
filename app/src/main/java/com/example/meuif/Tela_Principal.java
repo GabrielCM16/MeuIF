@@ -58,7 +58,7 @@ public class Tela_Principal extends AppCompatActivity {
         updateNavHeader();
     }
 
-    private String recuperarDados(String chave){
+    public String recuperarDados(String chave){
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String aux = sharedPreferences.getString(chave, "");
         return aux;

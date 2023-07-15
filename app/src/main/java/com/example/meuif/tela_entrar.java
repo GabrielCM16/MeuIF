@@ -93,6 +93,7 @@ public class tela_entrar extends AppCompatActivity {
         String nome = recuperarDados("nome").toString();
         String[] primeiroNome = nome.split(" ");
         if (idUser != ""){
+            entradaSenha2.setVisibility(View.GONE);
             textViewOla.setText("Ola " + primeiroNome[0] + "! entre com seu email e senha");
         } else {
             entradaSenha2.setVisibility(View.VISIBLE);
@@ -123,6 +124,7 @@ public class tela_entrar extends AppCompatActivity {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()){
+                    salvarDados("email", email);
                     proximaTela();
                 } else{
                     String erro;
@@ -151,6 +153,7 @@ public class tela_entrar extends AppCompatActivity {
                         idUser = document.getString("idUser");
                         Log.d("TAGLER", "deu bom");
                         Log.d("TAGLER", idUser);
+                        getDadosExtras(nMatricula);
                         setarTela();
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
@@ -261,6 +264,34 @@ public class tela_entrar extends AppCompatActivity {
 
         // Iniciar a atividade de destino
         startActivity(intent);
+    }
+
+    public void getDadosExtras(String nMatricula){
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("dados");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String turma = document.getString("turma");
+                        salvarDados("turma", turma);
+                        String curso = turma.substring(1);
+                        if (curso.equals("INF")){
+                            salvarDados("curso", "Informatica");
+                        } else if (curso.equals("QUI")){
+                            salvarDados("curso", "Quimica");
+                        } else {
+                            salvarDados("curso", "Edificações");
+                        }
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
+                }
+            }
+        });
     }
 
 
