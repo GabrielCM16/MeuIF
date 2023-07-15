@@ -1,23 +1,14 @@
 package com.example.meuif;
 
-import android.util.Log;
+import android.content.Context;
+import android.content.SharedPreferences;
 
-import androidx.annotation.NonNull;
-
-import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.android.gms.tasks.Task;
-import com.google.firebase.firestore.DocumentReference;
-import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-import java.util.HashMap;
-import java.util.Map;
 
 public class Pessoa {
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String nome;
+    public static String nome;
     private String cpf;
     private String rg;
     private String turma;
@@ -64,12 +55,5 @@ public class Pessoa {
 
 
 
-    public void setNome(String name){
-        nome = name;
-    }
-
-    public String getNome(){
-        return nome;
-    }
 
 }

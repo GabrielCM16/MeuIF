@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -18,6 +20,8 @@ import android.widget.TextView;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -28,7 +32,7 @@ public class MainActivity extends AppCompatActivity {
     private ProgressBar progressBar;
     private TextView textView;
     public FirebaseFirestore db;
-    public Pessoa pessoa = new Pessoa();
+
     @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -45,7 +49,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
 
         //iniciando o botao e fazendo um onclick
-        Button botao = (Button) findViewById(R.id.botao);
+        Button botao = (Button) findViewById(R.id.meubotao);
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -53,6 +57,25 @@ public class MainActivity extends AppCompatActivity {
                 buscar(view);
             }
         });
+    }
+
+    public void salvarDados(String chave, String valor){
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(chave, valor);
+        editor.commit();
+    }
+
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+
+        FirebaseUser usuarioAtual = FirebaseAuth.getInstance().getCurrentUser();
+
+        if (usuarioAtual != null){
+            telaPrincipal();
+        }
     }
 
     public void buscar(View v){
@@ -70,9 +93,11 @@ public class MainActivity extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         String auxnome = document.getString("nome");
+                        salvarDados("nome", auxnome);
+                        salvarDados("matricula", nMatricula);
                         Log.d("TAGLER", "deu bom");
                         Log.d("TAGLER", auxnome);
-                        proximaTela(auxnome, nMatricula);
+                        proximaTela();
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
                         progressBar.setVisibility(View.INVISIBLE);
@@ -87,14 +112,9 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
-    public void proximaTela(String name, String matricula){
+    public void proximaTela(){
         // Criar a Intent
         Intent intent = new Intent(MainActivity.this, tela_entrar.class);
-
-        // Adicionar a string como um extra na Intent
-        intent.putExtra("nome", name);
-        intent.putExtra("matricula", matricula);
-
         // Iniciar a atividade de destino
         startActivity(intent);
     }
@@ -104,6 +124,14 @@ public class MainActivity extends AppCompatActivity {
         snackbar.setBackgroundTint(Color.WHITE);
         snackbar.setTextColor(Color.BLACK);
         snackbar.show();
+    }
+
+    public void telaPrincipal(){
+        // Criar a Intent
+        Intent intent = new Intent(MainActivity.this, Tela_Principal.class);
+
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
 }

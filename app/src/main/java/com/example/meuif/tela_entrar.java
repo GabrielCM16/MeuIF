@@ -4,7 +4,9 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -14,7 +16,6 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -54,16 +55,13 @@ public class tela_entrar extends AppCompatActivity {
         textViewOla = findViewById(R.id.textViewOla);
         db = FirebaseFirestore.getInstance();
 
-        //Recuperate a string do extra da Intent
-        Intent intent = getIntent();
-        nome = intent.getStringExtra("nome");
-        matricula = intent.getStringExtra("matricula");
         entradaEmail = findViewById(R.id.entradaEmail);
         entradaSenha = findViewById(R.id.entradaSenha);
         entradaSenha2 = findViewById(R.id.entradaSenha2);
         progressBar = findViewById(R.id.progressBar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-        botao = findViewById(R.id.botao);
+        botao = findViewById(R.id.meubotao);
+        matricula = recuperarDados("matricula");
         setGetIdUser(matricula);
 
         botao.setOnClickListener(new View.OnClickListener() {
@@ -72,22 +70,74 @@ public class tela_entrar extends AppCompatActivity {
                 progressBar.setVisibility(View.VISIBLE);
                 if (criar){
                     criarConta(view);
+                } else {
+                    logar(view);
                 }
             }
         });
     }
 
+    private String recuperarDados(String chave){
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String aux = sharedPreferences.getString(chave, "");
+        return aux;
+    }
+    public void salvarDados(String chave, String valor){
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString(chave, valor);
+        editor.commit();
+    }
+
     public void setarTela(){
-        String[] nomeCompleto = nome.split(" ");
-        nomeName = nomeCompleto[0];
+        String nome = recuperarDados("nome").toString();
+        String[] primeiroNome = nome.split(" ");
         if (idUser != ""){
-            textViewOla.setText("Ola " + nomeCompleto[0] + "! entre com seu email e senha");
+            textViewOla.setText("Ola " + primeiroNome[0] + "! entre com seu email e senha");
         } else {
-            textViewOla.setText("Olá " + nomeCompleto[0] + " foi verificado que você ainda não possui uma conta! crie uma agora mesmo" );
+            entradaSenha2.setVisibility(View.VISIBLE);
+            textViewOla.setText("Olá " + primeiroNome[0] + ", foi verificado que você ainda não possui uma conta! crie uma agora mesmo" );
             criar = true;
         }
 
 
+    }
+
+    private void logar(View v){
+        String email = entradaEmail.getText().toString();
+        String senha = entradaSenha.getText().toString();
+
+        if (email.isEmpty() || senha.isEmpty()){
+            abrirSnakbar(mensagens[0], v);
+            progressBar.setVisibility(View.INVISIBLE);
+        } else {
+            autenticarUsuario(v);
+        }
+    }
+
+    private void autenticarUsuario(View v){
+        String email = entradaEmail.getText().toString();
+        String senha = entradaSenha.getText().toString();
+
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, senha).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()){
+                    proximaTela();
+                } else{
+                    String erro;
+                    try {
+                        throw task.getException();
+                    } catch (FirebaseAuthInvalidCredentialsException e){
+                        erro = "E-mail e/ou senha invalido";
+                    } catch (Exception e){
+                        erro = "Erro ao logar usuario, tente novamente";
+                    }
+                    progressBar.setVisibility(View.INVISIBLE);
+                    abrirSnakbar(erro, v);
+                }
+            }
+        });
     }
 
     public void setGetIdUser(String nMatricula){
@@ -143,7 +193,7 @@ public class tela_entrar extends AppCompatActivity {
 
                     abrirSnakbar(mensagens[2], v);
                     abrirSnakbar("Bem vindo " + nomeName, v);
-
+                    proximaTela();
                     progressBar.setVisibility(View.INVISIBLE);
                 } else {
                     String erro;
@@ -174,6 +224,7 @@ public class tela_entrar extends AppCompatActivity {
         local.update("email", email).addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void aVoid) {
+                        salvarDados("email", email);
                         Log.d("db", "Sucesso ao salvar os dados");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -186,6 +237,7 @@ public class tela_entrar extends AppCompatActivity {
         local.update("idUser", usuarioID).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
+                salvarDados("idUser", usuarioID);
                 Log.d("db", "Sucesso ao salvar os dados");
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -201,6 +253,14 @@ public class tela_entrar extends AppCompatActivity {
         snackbar.setBackgroundTint(Color.WHITE);
         snackbar.setTextColor(Color.BLACK);
         snackbar.show();
+    }
+
+    public void proximaTela(){
+        // Criar a Intent
+        Intent intent = new Intent(tela_entrar.this, Tela_Principal.class);
+
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
 
