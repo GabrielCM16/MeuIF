@@ -90,6 +90,7 @@ public class GalleryFragment extends Fragment {
     }
 
 
+
     private void contador(long finalCont, long intervaloCont){
         new CountDownTimer(finalCont, intervaloCont) {
 

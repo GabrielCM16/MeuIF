@@ -259,6 +259,7 @@ public class tela_entrar extends AppCompatActivity {
     }
 
     public void proximaTela(){
+        atualizaPresenca(matricula);
         // Criar a Intent
         Intent intent = new Intent(tela_entrar.this, Tela_Principal.class);
 
@@ -274,6 +275,7 @@ public class tela_entrar extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
+                        Log.d("TAGLER", " chegou no getDadosExtras");
                         String turma = document.getString("turma");
                         salvarDados("turma", turma);
                         String curso = turma.substring(1);
@@ -284,6 +286,29 @@ public class tela_entrar extends AppCompatActivity {
                         } else {
                             salvarDados("curso", "Edificações");
                         }
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void atualizaPresenca(String nMatricula){
+
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("chamadaPessoal");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String ausencias = document.getString("faltas");
+                        String presencas = document.getString("presencas");
+                        salvarDados("ausencias", ausencias);
+                        salvarDados("presencas", presencas);
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
                     }
