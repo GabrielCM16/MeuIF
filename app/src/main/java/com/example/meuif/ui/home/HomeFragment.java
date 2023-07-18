@@ -19,6 +19,10 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.example.meuif.R;
 import com.example.meuif.databinding.FragmentHomeBinding;
+import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.data.PieData;
+import com.github.mikephil.charting.data.PieDataSet;
+import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -27,6 +31,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 
 public class HomeFragment extends Fragment {
@@ -42,6 +47,7 @@ public class HomeFragment extends Fragment {
     private TextView saidaNumAulas;
     private TextView saidaNumAusencias;
     private TextView saidaNumPresencas;
+    public PieChart pieChart;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -62,12 +68,12 @@ public class HomeFragment extends Fragment {
         saidaNumAusencias = root.findViewById(R.id.saidaNumAusencias);
         saidaNumPresencas = root.findViewById(R.id.saidaNumPresencas);
         nomeCompleto = recuperarDados("nome");
-
-
+        pieChart = root.findViewById(R.id.pie_chart);
 
 
         mostrarPresenca();
         setarBemVindo();
+        atualizarGrafico(presencas, ausencias);
         atualizaPresenca();
 
 
@@ -108,6 +114,46 @@ public class HomeFragment extends Fragment {
         String[] primeiroNome = nomeCompleto.split(" ");
 
         textViewBemVindo.setText(ola + primeiroNome[0] + "!");
+
+    }
+
+    private void atualizarGrafico(String pre, String au){
+        if (!TextUtils.isEmpty(pre) && !TextUtils.isEmpty(au)) {
+            int presen = Integer.parseInt(pre);
+            int ausen = Integer.parseInt(au);
+            ArrayList<PieEntry> entiers = new ArrayList<>();
+            entiers.add(new PieEntry(presen, "Presenças"));
+            entiers.add(new PieEntry(ausen, "Ausencias"));
+
+            // Configurar cores para cada fatia do gráfico
+            ArrayList<Integer> colors = new ArrayList<>();
+            colors.add(Color.GREEN);
+            colors.add(Color.RED);
+
+            PieDataSet pieDataSet = new PieDataSet(entiers, "");
+            pieDataSet.setColors(colors);
+
+            PieData pieData = new PieData(pieDataSet);
+            pieChart.setData(pieData);
+
+            pieData.setDrawValues(false); // Desabilitar valores nas fatias
+
+            // Desabilitar legenda em cima do grafico
+            //pieChart.setDrawEntryLabels(false);
+
+            // Desabilitar legenda completa
+            pieChart.getLegend().setEnabled(false);
+
+            //deixa o grafico completo
+            pieChart.setHoleRadius(0f);
+            pieChart.setTransparentCircleRadius(0f);
+
+
+            pieChart.getDescription().setEnabled(false);
+            pieChart.animateY(3000);
+            pieChart.setHoleColor(Color.parseColor("#2196F3"));
+            pieChart.invalidate();
+        }
 
     }
 

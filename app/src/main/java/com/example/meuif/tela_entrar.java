@@ -10,7 +10,10 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -40,6 +43,7 @@ public class tela_entrar extends AppCompatActivity {
     public String idUser;
     private EditText entradaEmail;
     private EditText entradaSenha;
+    private Boolean senha1Visivel = false;
     private EditText entradaSenha2;
     private Button botao;
     private Boolean criar = false;
@@ -73,6 +77,32 @@ public class tela_entrar extends AppCompatActivity {
                 } else {
                     logar(view);
                 }
+            }
+        });
+
+
+        entradaSenha.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                final int Right = 2;
+                if (event.getAction()==MotionEvent.ACTION_UP){
+                    if (event.getRawX()>=entradaSenha.getRight()-entradaSenha.getCompoundDrawables()[Right].getBounds().width()){
+                        int selection = entradaSenha.getSelectionEnd();
+                        if (senha1Visivel){
+                            entradaSenha.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.baseline_visibility_off_24,0);
+                            entradaSenha.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                            senha1Visivel=false;
+                        } else {
+                            entradaSenha.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.baseline_visibility_24,0);
+                            entradaSenha.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                            senha1Visivel=true;
+                        }
+                        entradaSenha.setSelection(selection);
+                        return true;
+                    }
+                }
+                return false;
             }
         });
     }
