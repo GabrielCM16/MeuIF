@@ -7,9 +7,12 @@ import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.Gallery;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -33,6 +36,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.Objects;
 
 public class HomeFragment extends Fragment {
 
@@ -48,6 +52,10 @@ public class HomeFragment extends Fragment {
     private TextView saidaNumAusencias;
     private TextView saidaNumPresencas;
     public PieChart pieChart;
+    private Button botaoChamada;
+    private String turma;
+    private String matricula;
+    private boolean LiderDeTurma = false;
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -67,14 +75,31 @@ public class HomeFragment extends Fragment {
         saidaNumAulas = root.findViewById(R.id.saidaNumAulas);
         saidaNumAusencias = root.findViewById(R.id.saidaNumAusencias);
         saidaNumPresencas = root.findViewById(R.id.saidaNumPresencas);
+        botaoChamada = root.findViewById(R.id.botaoChamda);
         nomeCompleto = recuperarDados("nome");
         pieChart = root.findViewById(R.id.pie_chart);
+
+        botaoChamada.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        botaoChamada.setPadding(30, botaoChamada.getPaddingTop(), 15, botaoChamada.getPaddingBottom());
+
+        turma = recuperarDados("turma");
+        matricula = recuperarDados("matricula");
 
 
         mostrarPresenca();
         setarBemVindo();
         atualizarGrafico(presencas, ausencias);
         atualizaPresenca();
+        if (!matricula.isEmpty()){
+            liderDeSala(matricula);
+        }
+
+        if (LiderDeTurma){
+            botaoChamada.setVisibility(View.VISIBLE);
+        } else {
+            botaoChamada.setVisibility(View.GONE);
+        }
+
 
 
         return root;
@@ -97,6 +122,34 @@ public class HomeFragment extends Fragment {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(chave, valor);
         editor.commit();
+    }
+
+    private void liderDeSala(String nMatricula){
+        turma = recuperarDados("turma");
+        DocumentReference docRef = db.collection("ChamadaTurma").document(turma);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String matriculaLider = document.getString("Lider");
+                        String matriculaViceLider = document.getString("ViceLider");
+
+                        assert matriculaLider != null;
+                        if (matriculaLider.equals(nMatricula) || Objects.equals(matriculaViceLider, nMatricula)){
+                            LiderDeTurma = true;
+                            salvarDados("lider", "sim");
+                        }
+
+                    } else {
+                        Log.d("TAGLERLIDER", "Documento de turma não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLERLIDER", "Falhou em ", task.getException());
+                }
+            }
+        });
     }
 
     private void setarBemVindo(){

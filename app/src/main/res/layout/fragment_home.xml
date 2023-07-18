@@ -133,5 +133,26 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <Button
+        android:id="@+id/botaoChamda"
+        android:layout_width="324dp"
+        android:layout_height="56dp"
+        android:background="@drawable/background_button"
+        android:drawableRight="@drawable/baseline_arrow_forward_ios_24"
+        android:fontFamily="@font/fira_mono_bold"
+        android:gravity="start"
+        android:paddingRight="15dp"
+        android:text="Chamada De Classe"
+        android:textAllCaps="false"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.495"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView8"
+        app:layout_constraintVertical_bias="0.061" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
