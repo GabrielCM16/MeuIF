@@ -1,6 +1,7 @@
 package com.example.meuif.ui.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -18,10 +19,15 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.ViewModelStoreOwner;
 
 import com.example.meuif.R;
+import com.example.meuif.Tela_Principal;
 import com.example.meuif.databinding.FragmentHomeBinding;
+import com.example.meuif.tela_chamada_dia;
+import com.example.meuif.tela_entrar;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -56,6 +62,8 @@ public class HomeFragment extends Fragment {
     private String turma;
     private String matricula;
     private boolean LiderDeTurma = false;
+
+
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
         HomeViewModel homeViewModel =
@@ -63,6 +71,8 @@ public class HomeFragment extends Fragment {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+
 
         progressBarCentral = root.findViewById(R.id.progressBarCentral);
         progressBarCentral.setVisibility(View.VISIBLE);
@@ -86,20 +96,12 @@ public class HomeFragment extends Fragment {
         matricula = recuperarDados("matricula");
 
 
+
         mostrarPresenca();
         setarBemVindo();
         atualizarGrafico(presencas, ausencias);
         atualizaPresenca();
-        if (!matricula.isEmpty()){
-            liderDeSala(matricula);
-        }
-
-        if (LiderDeTurma){
-            botaoChamada.setVisibility(View.VISIBLE);
-        } else {
-            botaoChamada.setVisibility(View.GONE);
-        }
-
+        botaoLider();
 
 
         return root;
@@ -109,6 +111,24 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void botaoLider(){
+        if (!matricula.isEmpty()){
+            liderDeSala(matricula);
+        }
+
+        if (LiderDeTurma){
+            botaoChamada.setVisibility(View.VISIBLE);
+            botaoChamada.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View view) {
+                    telaChamada();
+                }
+            });
+        } else {
+            botaoChamada.setVisibility(View.GONE);
+        }
     }
 
     public String recuperarDados(String chave){
@@ -252,6 +272,14 @@ public class HomeFragment extends Fragment {
                 }
             }
         });
+    }
+
+    private void telaChamada(){
+        // Criar a Intent
+        Intent intent = new Intent(getActivity(), tela_chamada_dia.class);
+
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
     private String getDateTime() {

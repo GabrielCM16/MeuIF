@@ -50,4 +50,5 @@ dependencies {
     implementation("com.google.firebase:firebase-auth")
     implementation 'com.journeyapps:zxing-android-embedded:4.3.0'
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
+    implementation 'androidx.preference:preference:1.2.0'
 }
