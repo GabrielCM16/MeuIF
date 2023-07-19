@@ -5,19 +5,38 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.Gravity;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.TextView;
 
 import com.example.meuif.ui.home.HomeFragment;
 
+import java.util.Calendar;
+import java.util.TimeZone;
+
 public class tela_chamada_dia extends AppCompatActivity {
+    private Button botaoDias;
+    private TextView saidaData;
+    private String diaAtual;
 
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tela_chamada_dia);
+
+        botaoDias = findViewById(R.id.botaoDias);
+        botaoDias.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        botaoDias.setPadding(30, botaoDias.getPaddingTop(), 15, botaoDias.getPaddingBottom());
+        saidaData = findViewById(R.id.saidaData);
+
+        diaAtual = diaAtual();
+        saidaData.setText(diaAtual);
 
         ActionBar actionBar = getSupportActionBar();
 
@@ -31,6 +50,17 @@ public class tela_chamada_dia extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
 
 
+    }
+
+    private String diaAtual(){
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
+
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        int mes = calendar.get(Calendar.MONTH) + 1;
+        int ano = calendar.get(Calendar.YEAR);
+
+        String data = "Hoje, " + dia + "/" + mes + "/" + ano;
+        return data;
     }
 
     @Override
@@ -50,7 +80,5 @@ public class tela_chamada_dia extends AppCompatActivity {
 
         // Iniciar a atividade de destino
         startActivity(intent);
-
-
     }
 }
