@@ -4,6 +4,9 @@ import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -15,6 +18,7 @@ import android.widget.TextView;
 
 import com.example.meuif.ui.home.HomeFragment;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.TimeZone;
 
@@ -22,6 +26,9 @@ public class tela_chamada_dia extends AppCompatActivity {
     private Button botaoDias;
     private TextView saidaData;
     private String diaAtual;
+    private RecyclerView recycler;
+    private nomesAdapter adapter;
+    private ArrayList<nomes> itens;
 
 
     @SuppressLint("MissingInflatedId")
@@ -50,6 +57,25 @@ public class tela_chamada_dia extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
 
 
+        setarrecylerView();
+
+
+
+
+    }
+
+    private void setarrecylerView(){
+        recycler = findViewById(R.id.recycler);
+        itens = new ArrayList<nomes>();
+        itens.add(new nomes("Gabriel"));
+        itens.add(new nomes("Heloisa"));
+        itens.add(new nomes("Pedro"));
+
+        adapter = new nomesAdapter(tela_chamada_dia.this , itens);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(tela_chamada_dia.this, LinearLayoutManager.VERTICAL, false);
+        recycler.setLayoutManager(layoutManager);
+        recycler.setItemAnimator(new DefaultItemAnimator());
+        recycler.setAdapter(adapter);
     }
 
     private String diaAtual(){
