@@ -22,6 +22,8 @@ import android.widget.TextView;
 
 import com.example.meuif.ui.home.HomeFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -29,6 +31,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -43,6 +46,7 @@ public class tela_chamada_dia extends AppCompatActivity {
     private ArrayList<nomes> itens;
     private String turma;
     private FirebaseFirestore db;
+    private String dataBDAtual;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -71,8 +75,73 @@ public class tela_chamada_dia extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
         actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
 
-        listarNomes();
+        realizarChamada();
 
+
+    }
+
+    private void realizarChamada(){
+        turma = recuperarDados("turma");
+        DocumentReference docRef = db.collection("ChamadaTurma").document(turma);
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+
+                        if (document.contains(dataBDAtual)) {
+                            Object fieldValue = document.get(dataBDAtual);
+                            if (fieldValue instanceof Map) {
+                                Map<String, Boolean> mapData = (Map<String, Boolean>) fieldValue;
+                                // Agora você tem o Map e pode fazer o que quiser com ele
+                                for (Map.Entry<String, Boolean> entry : mapData.entrySet()) {
+                                    String key = entry.getKey();
+                                    Boolean value = entry.getValue();
+                                    Log.d("TAG", "Key: " + key + ", Value: " + value);
+                                }
+                                //setarrecylerView();
+                            } else {
+                                Log.d("TAG", "O campo não contém um Map válido!");
+                            }
+                        } else {
+                            Log.d("TAG", "Campo com o Map da data não existe no documento!");
+                            listarNomes();
+                        }
+
+
+                        Log.d("TAGBUSCANOMES", " achou o ducumento");
+                    } else {
+                        Log.d("TAGBUSCANOMES", "Documento de turma não encontrado");
+                    }
+                } else {
+                    Log.d("TAGBUSCANOMES", "Falhou em ", task.getException());
+                }
+            }
+        });
+    }
+
+    public void criarChamada(String data, List<String> mapData){
+
+        Map<String, Boolean> mapDataChamada = new HashMap<>();
+        for (String stringValue : mapData) {
+            mapDataChamada.put(stringValue, true);
+        }
+
+
+        db.collection("ChamadaTurma").document(turma)
+                .update(data, mapDataChamada).addOnSuccessListener(new OnSuccessListener<Void>() {
+                    @Override
+                    public void onSuccess(Void unused) {
+                        Log.d("TAG", "Campo do tipo Map criado com sucesso!");
+                        setarrecylerView(mapData);
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        Log.w("TAG", "Erro ao criar o campo do tipo Map: " + e.getMessage());
+                    }
+                });
 
     }
 
@@ -95,11 +164,12 @@ public class tela_chamada_dia extends AppCompatActivity {
                         List<String> stringArray = (List<String>) document.get("nomesSala");
 
                         if (stringArray != null) {
+                            criarChamada(dataBDAtual, stringArray);
                             // Agora você tem a matriz de strings e pode fazer o que quiser com ela
                             for (String stringValue : stringArray) {
-                                Log.d("TAG", "String: " + stringValue); // Exibir no logcat
+                                Log.d("TAG", "String da chamda: " + stringValue); // Exibir no logcat
                             }
-                            setarrecylerView(stringArray);
+
                         } else {
                             Log.d("TAG", "Campo da matriz não encontrado no documento!");
                         }
@@ -141,7 +211,10 @@ public class tela_chamada_dia extends AppCompatActivity {
         int mes = calendar.get(Calendar.MONTH) + 1;
         int ano = calendar.get(Calendar.YEAR);
 
-        String data = "Hoje, " + dia + "/" + mes + "/" + ano;
+        dataBDAtual = String.format("%02d%02d%d", dia, mes, ano);
+
+
+        String data = "Hoje, " + String.format("%02d/%02d/%04d", dia, mes, ano);
         return data;
     }
 
