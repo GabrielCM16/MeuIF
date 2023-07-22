@@ -34,6 +34,7 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -41,8 +42,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.Objects;
+import java.util.TimeZone;
 
 public class HomeFragment extends Fragment {
 
@@ -61,6 +64,8 @@ public class HomeFragment extends Fragment {
     private Button botaoChamada;
     private String turma;
     private String matricula;
+    private String diaSemana;
+    private TextView saidaSemana;
     private boolean LiderDeTurma = false;
 
 
@@ -72,9 +77,25 @@ public class HomeFragment extends Fragment {
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-
-
         progressBarCentral = root.findViewById(R.id.progressBarCentral);
+
+        FloatingActionButton fabFragmentB = root.findViewById(R.id.fab_fragment_b);
+        fabFragmentB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                progressBarCentral.setVisibility(View.VISIBLE);
+                mostrarPresenca();
+                setarBemVindo();
+                atualizarGrafico(presencas, ausencias);
+                atualizaPresenca();
+                botaoLider();
+                diaSemana = diaAtual();
+                progressBarCentral.setVisibility(View.INVISIBLE);
+            }
+        });
+
+
+
         progressBarCentral.setVisibility(View.VISIBLE);
 
         //muda a cor do progressBar pra preto
@@ -88,6 +109,7 @@ public class HomeFragment extends Fragment {
         botaoChamada = root.findViewById(R.id.botaoChamda);
         nomeCompleto = recuperarDados("nome");
         pieChart = root.findViewById(R.id.pie_chart);
+        saidaSemana = root.findViewById(R.id.saidaSemana);
 
         botaoChamada.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         botaoChamada.setPadding(30, botaoChamada.getPaddingTop(), 15, botaoChamada.getPaddingBottom());
@@ -95,14 +117,12 @@ public class HomeFragment extends Fragment {
         turma = recuperarDados("turma");
         matricula = recuperarDados("matricula");
 
-
-
         mostrarPresenca();
         setarBemVindo();
         atualizarGrafico(presencas, ausencias);
         atualizaPresenca();
+        diaSemana = diaAtual();
         botaoLider();
-
 
         return root;
     }
@@ -111,6 +131,41 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private String diaAtual(){
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
+
+        int diaSemanaint = calendar.get(Calendar.DAY_OF_WEEK);
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        String data;
+        switch (diaSemanaint){
+            case 2:
+                data = "segunda";
+                break;
+            case 3:
+                data = "terca";
+                break;
+            case 4:
+                data = "quarta";
+                break;
+            case 5:
+                data = "quinta";
+                break;
+            case 6:
+                data = "sexta";
+                break;
+            case 7:
+                data = "sabado";
+                break;
+            default:
+                data = "domingo";
+                break;
+        }
+
+        diaSemana = data;
+        saidaSemana.setText(dia + ", " + data);
+        return data;
     }
 
     private void botaoLider(){
@@ -161,7 +216,6 @@ public class HomeFragment extends Fragment {
                             LiderDeTurma = true;
                             salvarDados("lider", "sim");
                         }
-
                     } else {
                         Log.d("TAGLERLIDER", "Documento de turma não encontrado");
                     }
@@ -185,7 +239,6 @@ public class HomeFragment extends Fragment {
         }
 
         String[] primeiroNome = nomeCompleto.split(" ");
-
         textViewBemVindo.setText(ola + primeiroNome[0] + "!");
 
     }
@@ -221,13 +274,11 @@ public class HomeFragment extends Fragment {
             pieChart.setHoleRadius(0f);
             pieChart.setTransparentCircleRadius(0f);
 
-
             pieChart.getDescription().setEnabled(false);
             pieChart.animateY(3000);
             pieChart.setHoleColor(Color.parseColor("#2196F3"));
             pieChart.invalidate();
         }
-
     }
 
     private void mostrarPresenca(){
@@ -277,7 +328,6 @@ public class HomeFragment extends Fragment {
     private void telaChamada(){
         // Criar a Intent
         Intent intent = new Intent(getActivity(), tela_chamada_dia.class);
-
         // Iniciar a atividade de destino
         startActivity(intent);
     }

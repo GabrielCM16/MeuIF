@@ -34,6 +34,18 @@ public class nomesAdapter extends RecyclerView.Adapter<ChamadaViewHolder> {
         nomes nomee = itens.get(position);
         ChamadaViewHolder.nome.setText(nomee.getNome());
 
+        if (nomee.getPresencaOUausencia()) {
+            ChamadaViewHolder.saidaPresenca.setImageResource(R.drawable.presenca);
+        } else {
+            ChamadaViewHolder.saidaPresenca.setImageResource(R.drawable.falta);
+        }
+
+        ChamadaViewHolder.saidaPresenca.setOnClickListener(v -> {
+            // Inverte o estado da imagem ao clicar
+            nomee.setPresencaOUausencia(!nomee.getPresencaOUausencia());
+            notifyDataSetChanged(); // Notifica a RecyclerView para atualizar as imagens
+        });
+
     }
 
     @Override

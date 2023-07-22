@@ -21,6 +21,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.example.meuif.R;
 import com.example.meuif.Tela_Principal;
 import com.example.meuif.databinding.FragmentGalleryBinding;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.zxing.BarcodeFormat;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
@@ -53,6 +54,7 @@ public class GalleryFragment extends Fragment {
 
         View root = binding.getRoot();
 
+
         saidaTempo = root.findViewById(R.id.saidaTempo);
         qrCode = root.findViewById(R.id.qrcode);
         textNome = root.findViewById(R.id.textNome);
@@ -61,6 +63,7 @@ public class GalleryFragment extends Fragment {
         botao = root.findViewById(R.id.button);
         qrCode.setVisibility(View.INVISIBLE);
         botao.setVisibility(View.VISIBLE);
+
 
         contex = root.getContext();
 
