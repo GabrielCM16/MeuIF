@@ -22,10 +22,17 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.Observer;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.ViewModelStoreOwner;
+import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
+import com.example.meuif.Aulas;
+import com.example.meuif.AulasAdapter;
 import com.example.meuif.R;
 import com.example.meuif.Tela_Principal;
 import com.example.meuif.databinding.FragmentHomeBinding;
+import com.example.meuif.nomes;
+import com.example.meuif.nomesAdapter;
 import com.example.meuif.tela_chamada_dia;
 import com.example.meuif.tela_entrar;
 import com.github.mikephil.charting.charts.PieChart;
@@ -44,12 +51,16 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 import java.util.Objects;
 import java.util.TimeZone;
 
 public class HomeFragment extends Fragment {
 
     private FragmentHomeBinding binding;
+    private RecyclerView recyclerAulas;
+    private AulasAdapter adapter;
+    private ArrayList<Aulas> itens;
     private TextView textViewBemVindo;
     private String nomeCompleto;
     private FirebaseFirestore db;
@@ -90,6 +101,7 @@ public class HomeFragment extends Fragment {
                 atualizaPresenca();
                 botaoLider();
                 diaSemana = diaAtual();
+                setarrecylerView();
                 progressBarCentral.setVisibility(View.INVISIBLE);
             }
         });
@@ -110,6 +122,7 @@ public class HomeFragment extends Fragment {
         nomeCompleto = recuperarDados("nome");
         pieChart = root.findViewById(R.id.pie_chart);
         saidaSemana = root.findViewById(R.id.saidaSemana);
+        recyclerAulas = root.findViewById(R.id.recycleAulas);
 
         botaoChamada.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         botaoChamada.setPadding(30, botaoChamada.getPaddingTop(), 15, botaoChamada.getPaddingBottom());
@@ -123,6 +136,7 @@ public class HomeFragment extends Fragment {
         atualizaPresenca();
         diaSemana = diaAtual();
         botaoLider();
+        setarrecylerView();
 
         return root;
     }
@@ -131,6 +145,29 @@ public class HomeFragment extends Fragment {
     public void onDestroyView() {
         super.onDestroyView();
         binding = null;
+    }
+
+    private void setarrecylerView(){
+        itens = new ArrayList<Aulas>();
+
+//        if (listaNomes != null) {
+//            for (String nome : listaNomes) {
+//                itens.add(new Aulas(nome));
+//            }
+//        }
+
+        itens.add(new Aulas("Topicos", "Ricardo", "7:30", "8:20"));
+        itens.add(new Aulas("Matematica", "Leandro", "7:30", "8:20"));
+        itens.add(new Aulas("sla", "def", "7:30", "8:20"));
+        itens.add(new Aulas("oq", "abc", "7:30", "8:20"));
+        itens.add(new Aulas("a", "nn", "7:30", "8:20"));
+        itens.add(new Aulas("Mateaamaaaaaaatica", "ss", "7:30", "8:20"));
+
+        adapter = new AulasAdapter(getContext() , itens);
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
+        recyclerAulas.setLayoutManager(layoutManager);
+        recyclerAulas.setItemAnimator(new DefaultItemAnimator());
+        recyclerAulas.setAdapter(adapter);
     }
 
     private String diaAtual(){

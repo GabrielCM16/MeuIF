@@ -9,7 +9,7 @@ public class nomes {
     public nomes(String strNome) {
 
         this.nome = strNome;
-        this.presencaOUausencia = true;
+        this.presencaOUausencia = false;
     }
 
 

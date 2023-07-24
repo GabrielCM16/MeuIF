@@ -164,7 +164,8 @@ public class tela_chamada_dia extends AppCompatActivity {
                         List<String> stringArray = (List<String>) document.get("nomesSala");
 
                         if (stringArray != null) {
-                            criarChamada(dataBDAtual, stringArray);
+                            setarrecylerView(stringArray);
+                            //criarChamada(dataBDAtual, stringArray);
                             // Agora você tem a matriz de strings e pode fazer o que quiser com ela
                             for (String stringValue : stringArray) {
                                 Log.d("TAG", "String da chamda: " + stringValue); // Exibir no logcat
