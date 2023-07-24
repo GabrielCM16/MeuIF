@@ -40,6 +40,8 @@ import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
@@ -52,6 +54,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
 
@@ -101,7 +104,7 @@ public class HomeFragment extends Fragment {
                 atualizaPresenca();
                 botaoLider();
                 diaSemana = diaAtual();
-                setarrecylerView();
+                getAulas(turma, "quinta");
                 progressBarCentral.setVisibility(View.INVISIBLE);
             }
         });
@@ -136,7 +139,7 @@ public class HomeFragment extends Fragment {
         atualizaPresenca();
         diaSemana = diaAtual();
         botaoLider();
-        setarrecylerView();
+        getAulas(turma, "quinta");
 
         return root;
     }
@@ -147,27 +150,58 @@ public class HomeFragment extends Fragment {
         binding = null;
     }
 
-    private void setarrecylerView(){
+    private void setarrecylerView(Map<String, Object> aulas){
         itens = new ArrayList<Aulas>();
 
-//        if (listaNomes != null) {
-//            for (String nome : listaNomes) {
-//                itens.add(new Aulas(nome));
-//            }
-//        }
+        if (aulas != null){
+            for (String key : aulas.keySet()) {
 
-        itens.add(new Aulas("Topicos", "Ricardo", "7:30", "8:20"));
-        itens.add(new Aulas("Matematica", "Leandro", "7:30", "8:20"));
-        itens.add(new Aulas("sla", "def", "7:30", "8:20"));
-        itens.add(new Aulas("oq", "abc", "7:30", "8:20"));
-        itens.add(new Aulas("a", "nn", "7:30", "8:20"));
-        itens.add(new Aulas("Mateaamaaaaaaatica", "ss", "7:30", "8:20"));
+                if (aulas.get(key) instanceof ArrayList) {
+
+                    ArrayList<Object> array = (ArrayList<Object>) aulas.get(key);
+
+                    String materia = (String) array.get(0);
+                    String horaComeco = (String) array.get(1);
+                    String horaFim = (String) array.get(2);
+                    String professor = (String) array.get(3);
+
+                    itens.add(new Aulas(materia, professor, horaComeco, horaFim));
+                }
+            }
+        }
+
 
         adapter = new AulasAdapter(getContext() , itens);
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getContext(), LinearLayoutManager.VERTICAL, false);
         recyclerAulas.setLayoutManager(layoutManager);
         recyclerAulas.setItemAnimator(new DefaultItemAnimator());
         recyclerAulas.setAdapter(adapter);
+    }
+
+    private void getAulas(String turma, String dia){
+        DocumentReference docRef = FirebaseFirestore.getInstance().collection("HorarioAulas").document(turma);
+        docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+            @Override
+            public void onSuccess(DocumentSnapshot documentSnapshot) {
+                if (documentSnapshot.exists()) {
+                    if (documentSnapshot.contains(dia)) {
+                        Map<String, Object> mapAulas = (Map<String, Object>) documentSnapshot.getData().get(dia);
+                        setarrecylerView(mapAulas);
+
+
+                    } else {
+                        Log.d("TAG", "O campo dia não existe no documento!");
+                    }
+                } else {
+                    Log.d("TAG", "O documento não existe!");
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("TAG", "Erro ao obter o documento: " + e.toString());
+            }
+        });
     }
 
     private String diaAtual(){
