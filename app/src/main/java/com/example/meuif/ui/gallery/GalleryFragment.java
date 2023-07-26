@@ -65,6 +65,7 @@ public class GalleryFragment extends Fragment {
         botao.setVisibility(View.VISIBLE);
 
 
+
         contex = root.getContext();
 
         nome = recuperarDados("nome");

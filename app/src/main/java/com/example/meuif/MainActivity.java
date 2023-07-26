@@ -9,7 +9,11 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -43,6 +47,8 @@ public class MainActivity extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textViewOla);
         db = FirebaseFirestore.getInstance();
+
+
 
 
         //muda a cor do progressBar pra preto
@@ -80,8 +86,11 @@ public class MainActivity extends AppCompatActivity {
 
     public void buscar(View v){
         String matricula = entrada.getText().toString();
-        setGetInicial(matricula, v);
-
+        if (matricula != null){
+            setGetInicial(matricula, v);
+        } else if (matricula.equals("")) {
+            abrirSnakbar("insira uma matricula", v);
+        }
     }
 
     public void setGetInicial(String nMatricula, View v){

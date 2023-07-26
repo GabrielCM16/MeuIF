@@ -239,7 +239,7 @@ public class tela_entrar extends AppCompatActivity {
                     } catch (FirebaseAuthInvalidCredentialsException e){
                         erro = "E-mail invalido";
                     } catch (Exception e){
-                      erro = "Erro ao cadastrar, tente novamente";
+                      erro = "Erro inesperado ao cadastrar, tente novamente";
                     }
                     progressBar.setVisibility(View.INVISIBLE);
                     abrirSnakbar(erro, v);
