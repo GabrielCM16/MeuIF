@@ -190,6 +190,21 @@ public class Informacoes_pessoais extends Fragment {
                     docRef.update(data, timestampsList)
                             .addOnSuccessListener(aVoid -> System.out.println("Timestamp adicionado com sucesso!"))
                             .addOnFailureListener(e -> System.out.println("Erro ao adicionar timestamp: " + e.getMessage()));
+
+                    if (task.getResult().exists() && task.getResult().contains("possivelStatus")){
+                        DocumentSnapshot document = task.getResult();
+                        String status = document.getString("possivelStatus");
+
+                        if (status.equals("Entrada")){
+                            docRef.update("possivelStatus", "Saida")
+                                    .addOnSuccessListener(aVoid -> System.out.println("Campo incrementado com sucesso!"))
+                                    .addOnFailureListener(e -> System.out.println("Erro ao incrementar campo: " + e.getMessage()));
+                        } else if (status.equals("Saida")){
+                            docRef.update("possivelStatus", "Entrada")
+                                    .addOnSuccessListener(aVoid -> System.out.println("Campo incrementado com sucesso!"))
+                                    .addOnFailureListener(e -> System.out.println("Erro ao incrementar campo: " + e.getMessage()));
+                        }
+                    }
                 } else {
                     System.out.println("Erro ao obter o documento: " + task.getException().getMessage());
                 }
