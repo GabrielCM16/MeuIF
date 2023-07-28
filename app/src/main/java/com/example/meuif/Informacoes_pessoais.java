@@ -1,9 +1,12 @@
 package com.example.meuif;
 
+import static com.google.common.collect.ComparisonChain.start;
+
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.media.MediaPlayer;
 import android.os.Bundle;
 
 import androidx.activity.result.ActivityResultLauncher;
@@ -46,6 +49,7 @@ public class Informacoes_pessoais extends Fragment {
     private FragmentInformacoesPessoaisBinding binding;
     private Button botao;
     private long tempoValidade = 30000;
+    private MediaPlayer mediaPlayer;
     TextView textView;
     final Informacoes_pessoais activity= this;
 
@@ -68,6 +72,11 @@ public class Informacoes_pessoais extends Fragment {
 
         teste = root.findViewById(R.id.testeaaa);
         botao = root.findViewById(R.id.botao);
+        // Inicialize o MediaPlayer com o arquivo de som do sucesso (success_sound.mp3 ou success_sound.wav)
+        mediaPlayer = MediaPlayer.create(getContext(), R.raw.error);
+
+
+
         teste.setText("ola");
         db = FirebaseFirestore.getInstance();
         botao.setOnClickListener(new View.OnClickListener() {
@@ -92,6 +101,22 @@ public class Informacoes_pessoais extends Fragment {
         return data;
     }
 
+    private void playSuccessSound() {
+        if (mediaPlayer != null) {
+            mediaPlayer.start();
+        }
+    }
+
+    @Override
+    public void onDestroy() {
+        super.onDestroy();
+        // Libere os recursos do MediaPlayer ao encerrar a atividade
+        if (mediaPlayer != null) {
+            mediaPlayer.release();
+            mediaPlayer = null;
+        }
+    }
+
     private void sCanCode(){
         ScanOptions options = new ScanOptions();
         options.setPrompt("Volume up to flash on");
@@ -113,6 +138,8 @@ public class Informacoes_pessoais extends Fragment {
                 if ( System.currentTimeMillis() - valorCurrent <= tempoValidade){
                     String data = diaAtual();
                     atualizarMatricula(aux[0], data);
+                } else {
+                    playSuccessSound();
                 }
 
                 sCanCode();
