@@ -17,7 +17,10 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.example.meuif.ui.home.HomeFragment;
@@ -41,12 +44,13 @@ public class tela_chamada_dia extends AppCompatActivity {
     private Button botaoDias;
     private TextView saidaData;
     private String diaAtual;
-    private RecyclerView recycler;
-    private nomesAdapter adapter;
-    private ArrayList<nomes> itens;
+    private ListView listView;
     private String turma;
     private FirebaseFirestore db;
     private String dataBDAtual;
+    List<String> nomesChamada;
+    List<Integer> chamdaImages;
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -58,6 +62,9 @@ public class tela_chamada_dia extends AppCompatActivity {
         botaoDias.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         botaoDias.setPadding(30, botaoDias.getPaddingTop(), 15, botaoDias.getPaddingBottom());
         saidaData = findViewById(R.id.saidaData);
+        listView = (ListView) findViewById(R.id.listViewChamada);
+        nomesChamada = new ArrayList<>();
+        chamdaImages = new ArrayList<>();
 
         diaAtual = diaAtual();
         saidaData.setText(diaAtual);
@@ -75,9 +82,28 @@ public class tela_chamada_dia extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
         actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
 
+        CustomChamadaAdapter customChamadaAdapter = new CustomChamadaAdapter(getApplicationContext(), nomesChamada, chamdaImages);
+        listView.setAdapter(customChamadaAdapter);
+        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+                if (chamdaImages.get(i) == R.drawable.falta){
+                    chamdaImages.set(i, R.drawable.presenca);
+                } else if (chamdaImages.get(i) == R.drawable.presenca ){
+                    chamdaImages.set(i, R.drawable.falta);
+                }
+                atualizarListView();
+            }
+        });
+
         realizarChamada();
 
 
+    }
+
+    private void atualizarListView(){
+        CustomChamadaAdapter customChamadaAdapter = new CustomChamadaAdapter(getApplicationContext(), nomesChamada, chamdaImages);
+        listView.setAdapter(customChamadaAdapter);
     }
 
     private void realizarChamada(){
@@ -100,7 +126,7 @@ public class tela_chamada_dia extends AppCompatActivity {
                                     Boolean value = entry.getValue();
                                     Log.d("TAG", "Key: " + key + ", Value: " + value);
                                 }
-                                //setarrecylerView();
+
                             } else {
                                 Log.d("TAG", "O campo não contém um Map válido!");
                             }
@@ -134,7 +160,7 @@ public class tela_chamada_dia extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         Log.d("TAG", "Campo do tipo Map criado com sucesso!");
-                        setarrecylerView(mapData);
+                        //setarrecylerView(mapData);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
@@ -151,6 +177,15 @@ public class tela_chamada_dia extends AppCompatActivity {
         return aux;
     }
 
+    private void atualizarListaNomes(List<String> nomes){
+        for (String stringValue : nomes) {
+            Log.d("TAG", "String da chamada list view: " + stringValue); // Exibir no logcat
+            nomesChamada.add(stringValue);
+            chamdaImages.add(R.drawable.presenca);
+        }
+        atualizarListView();
+    }
+
     private void listarNomes(){
         turma = recuperarDados("turma");
         DocumentReference docRef = db.collection("ChamadaTurma").document(turma);
@@ -164,9 +199,8 @@ public class tela_chamada_dia extends AppCompatActivity {
                         List<String> stringArray = (List<String>) document.get("nomesSala");
 
                         if (stringArray != null) {
-                            setarrecylerView(stringArray);
-                            //criarChamada(dataBDAtual, stringArray);
                             // Agora você tem a matriz de strings e pode fazer o que quiser com ela
+                            atualizarListaNomes(stringArray);
                             for (String stringValue : stringArray) {
                                 Log.d("TAG", "String da chamda: " + stringValue); // Exibir no logcat
                             }
@@ -186,25 +220,6 @@ public class tela_chamada_dia extends AppCompatActivity {
         });
     }
 
-    private void setarrecylerView(List<String> listaNomes){
-        itens = new ArrayList<nomes>();
-
-        if (listaNomes != null) {
-            for (String nome : listaNomes) {
-                itens.add(new nomes(nome));
-            }
-        }
-
-        recycler = findViewById(R.id.recycler);
-
-
-        adapter = new nomesAdapter(tela_chamada_dia.this , itens);
-        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(tela_chamada_dia.this, LinearLayoutManager.VERTICAL, false);
-        recycler.setLayoutManager(layoutManager);
-        recycler.setItemAnimator(new DefaultItemAnimator());
-        recycler.setAdapter(adapter);
-    }
-
     private String diaAtual(){
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
 
@@ -219,16 +234,6 @@ public class tela_chamada_dia extends AppCompatActivity {
         return data;
     }
 
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()) {
-            case android.R.id.home:
-                telaVoltar();
-                return true;
-            default:
-                return super.onOptionsItemSelected(item);
-        }
-    }
 
     private void telaVoltar(){
         // Criar a Intent
