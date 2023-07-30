@@ -46,6 +46,7 @@ public class tela_chamada_dia extends AppCompatActivity {
     private String diaAtual;
     private ListView listView;
     private String turma;
+    private Button botaoSalvar;
     private FirebaseFirestore db;
     private String dataBDAtual;
     List<String> nomesChamada;
@@ -63,6 +64,7 @@ public class tela_chamada_dia extends AppCompatActivity {
         botaoDias.setPadding(30, botaoDias.getPaddingTop(), 15, botaoDias.getPaddingBottom());
         saidaData = findViewById(R.id.saidaData);
         listView = (ListView) findViewById(R.id.listViewChamada);
+        botaoSalvar = findViewById(R.id.botaoSalvar);
         nomesChamada = new ArrayList<>();
         chamdaImages = new ArrayList<>();
 
@@ -97,6 +99,15 @@ public class tela_chamada_dia extends AppCompatActivity {
         });
 
         realizarChamada();
+
+
+        botaoSalvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                diaAtual = diaAtual();
+                criarChamada(dataBDAtual, nomesChamada, chamdaImages);
+            }
+        });
 
 
     }
@@ -147,11 +158,16 @@ public class tela_chamada_dia extends AppCompatActivity {
         });
     }
 
-    public void criarChamada(String data, List<String> mapData){
+    public void criarChamada(String data, List<String> mapData, List<Integer> images){
 
         Map<String, Boolean> mapDataChamada = new HashMap<>();
-        for (String stringValue : mapData) {
-            mapDataChamada.put(stringValue, true);
+
+        for (int i = 0; i < mapData.size(); i++) {
+            if (images.get(i) == R.drawable.falta){
+                mapDataChamada.put(mapData.get(i), false);
+            } else if (images.get(i) == R.drawable.presenca){
+                mapDataChamada.put(mapData.get(i), true);
+            }
         }
 
 
