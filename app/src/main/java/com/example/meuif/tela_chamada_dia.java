@@ -13,6 +13,8 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -21,7 +23,9 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.meuif.ui.home.HomeFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,6 +47,7 @@ import java.util.TimeZone;
 public class tela_chamada_dia extends AppCompatActivity {
     private Button botaoDias;
     private TextView saidaData;
+    private ProgressBar progressBarChamada;
     private String diaAtual;
     private ListView listView;
     private String turma;
@@ -65,6 +70,13 @@ public class tela_chamada_dia extends AppCompatActivity {
         saidaData = findViewById(R.id.saidaData);
         listView = (ListView) findViewById(R.id.listViewChamada);
         botaoSalvar = findViewById(R.id.botaoSalvar);
+        progressBarChamada = findViewById(R.id.progressBarChamada);
+
+        progressBarChamada.setVisibility(View.VISIBLE);
+
+        //muda a cor do progressBar pra preto
+        progressBarChamada.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+
         nomesChamada = new ArrayList<>();
         chamdaImages = new ArrayList<>();
 
@@ -76,6 +88,7 @@ public class tela_chamada_dia extends AppCompatActivity {
         ActionBar actionBar = getSupportActionBar();
 
         setTitle("Chamada Diaria de Classe");
+        progressBarChamada.setVisibility(View.INVISIBLE);
 
         // Obtém uma referência para a ActionBar ou Toolbar
          // ou Toolbar toolbar = findViewById(R.id.toolbar);
@@ -117,7 +130,17 @@ public class tela_chamada_dia extends AppCompatActivity {
         listView.setAdapter(customChamadaAdapter);
     }
 
+    private void abrirToast(String texto){
+        Toast.makeText(
+                getApplicationContext(),
+                texto,
+                Toast.LENGTH_LONG
+        ).show();
+    }
+
+
     private void realizarChamada(){
+        progressBarChamada.setVisibility(View.VISIBLE);
         turma = recuperarDados("turma");
         DocumentReference docRef = db.collection("ChamadaTurma").document(turma);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -153,12 +176,14 @@ public class tela_chamada_dia extends AppCompatActivity {
                     }
                 } else {
                     Log.d("TAGBUSCANOMES", "Falhou em ", task.getException());
+                    abrirToast("Erro inesperado");
                 }
             }
         });
     }
 
     public void criarChamada(String data, List<String> mapData, List<Integer> images){
+        progressBarChamada.setVisibility(View.VISIBLE);
 
         Map<String, Boolean> mapDataChamada = new HashMap<>();
 
@@ -176,12 +201,15 @@ public class tela_chamada_dia extends AppCompatActivity {
                     @Override
                     public void onSuccess(Void unused) {
                         Log.d("TAG", "Campo do tipo Map criado com sucesso!");
-                        //setarrecylerView(mapData);
+                        abrirToast("Chamada Salva Com Sucesso");
+                        progressBarChamada.setVisibility(View.INVISIBLE);
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Log.w("TAG", "Erro ao criar o campo do tipo Map: " + e.getMessage());
+                        abrirToast("Erro ao Salvar");
+                        progressBarChamada.setVisibility(View.INVISIBLE);
                     }
                 });
 
@@ -194,15 +222,18 @@ public class tela_chamada_dia extends AppCompatActivity {
     }
 
     private void atualizarListaNomes(List<String> nomes){
+        progressBarChamada.setVisibility(View.VISIBLE);
         for (String stringValue : nomes) {
             Log.d("TAG", "String da chamada list view: " + stringValue); // Exibir no logcat
             nomesChamada.add(stringValue);
             chamdaImages.add(R.drawable.presenca);
         }
+        progressBarChamada.setVisibility(View.INVISIBLE);
         atualizarListView();
     }
 
     private void listarNomes(){
+        progressBarChamada.setVisibility(View.VISIBLE);
         turma = recuperarDados("turma");
         DocumentReference docRef = db.collection("ChamadaTurma").document(turma);
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -216,6 +247,7 @@ public class tela_chamada_dia extends AppCompatActivity {
 
                         if (stringArray != null) {
                             // Agora você tem a matriz de strings e pode fazer o que quiser com ela
+                            progressBarChamada.setVisibility(View.INVISIBLE);
                             atualizarListaNomes(stringArray);
                             for (String stringValue : stringArray) {
                                 Log.d("TAG", "String da chamda: " + stringValue); // Exibir no logcat
@@ -223,14 +255,20 @@ public class tela_chamada_dia extends AppCompatActivity {
 
                         } else {
                             Log.d("TAG", "Campo da matriz não encontrado no documento!");
+                            abrirToast("Erro ao encontrar nomes");
+                            progressBarChamada.setVisibility(View.INVISIBLE);
                         }
 
                         Log.d("TAGBUSCANOMES", " achou o ducumento");
                     } else {
                         Log.d("TAGBUSCANOMES", "Documento de turma não encontrado");
+                        abrirToast("Erro ao encontrar turma");
+                        progressBarChamada.setVisibility(View.INVISIBLE);
                     }
                 } else {
                     Log.d("TAGBUSCANOMES", "Falhou em ", task.getException());
+                    abrirToast("Erro");
+                    progressBarChamada.setVisibility(View.INVISIBLE);
                 }
             }
         });
