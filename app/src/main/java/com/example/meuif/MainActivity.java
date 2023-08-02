@@ -13,7 +13,10 @@ import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableString;
+import android.text.SpannableStringBuilder;
+import android.text.Spanned;
 import android.text.style.StyleSpan;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -35,6 +38,7 @@ public class MainActivity extends AppCompatActivity {
     private EditText entrada;
     private ProgressBar progressBar;
     private TextView textView;
+    private TextView textViewProfessor;
     public FirebaseFirestore db;
 
     @SuppressLint("MissingInflatedId")
@@ -46,7 +50,37 @@ public class MainActivity extends AppCompatActivity {
         entrada = findViewById(R.id.entradaMatricula);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textViewOla);
+        textViewProfessor = findViewById(R.id.textViewProfessor);
         db = FirebaseFirestore.getInstance();
+
+        // Obtenha o texto original do TextView
+        String textoOriginal = textViewProfessor.getText().toString();
+
+        // Crie um SpannableStringBuilder para aplicar estilos personalizados
+        SpannableStringBuilder spannable = new SpannableStringBuilder(textoOriginal);
+
+        StyleSpan italicSpan = new StyleSpan(Typeface.ITALIC);
+        spannable.setSpan(italicSpan,  0, textoOriginal.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+        // Aplicar sublinhado ao texto
+        UnderlineSpan underlineSpan = new UnderlineSpan();
+        spannable.setSpan(underlineSpan, 0, textoOriginal.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        // Defina o texto estilizado no TextView
+        textViewProfessor.setText(spannable);
+
+        // Obtenha o texto de hint original do EditText
+        String hintOriginal = entrada.getHint().toString();
+
+        // Crie um SpannableStringBuilder para aplicar estilos personalizados ao hint
+        SpannableStringBuilder spannableentrada = new SpannableStringBuilder(hintOriginal);
+
+        // Aplicar sublinhado ao hint
+        UnderlineSpan underlineSpanentrada = new UnderlineSpan();
+        spannableentrada.setSpan(underlineSpanentrada, 0, hintOriginal.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        spannableentrada.setSpan(italicSpan,  0, hintOriginal.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        // Defina o hint estilizado no EditText
+        entrada.setHint(spannableentrada);
 
 
 
@@ -128,7 +162,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, tela_entrar.class);
         // Iniciar a atividade de destino
         startActivity(intent);
-
+        progressBar.setVisibility(View.INVISIBLE);
     }
 
     public void abrirSnakbar(String texto, View v){

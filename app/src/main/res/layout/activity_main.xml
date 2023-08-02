@@ -35,7 +35,7 @@
         android:background="@drawable/edit_background"
         android:drawableLeft="@drawable/baseline_badge_24"
         android:ems="10"
-        android:fontFamily="@font/fira_mono_bold"
+        android:fontFamily="@font/fira_mono_medium"
         android:hint=" Número de Matrícula"
         android:inputType="number"
         android:paddingLeft="10dp"
@@ -78,5 +78,21 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.761" />
+
+    <TextView
+        android:id="@+id/textViewProfessor"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/fira_mono_medium"
+        android:text="Sou Professor/Agente SEPAE"
+        android:textAlignment="center"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.496"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.682" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
