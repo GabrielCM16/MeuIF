@@ -10,6 +10,7 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.meuif.MainActivity;
@@ -55,8 +56,10 @@ public class SlideshowFragment extends Fragment {
 
     private void sairConta(){
         FirebaseAuth.getInstance().signOut();
+
         Intent intent = new Intent(getActivity(), MainActivity.class);
         // Iniciar a atividade de destino
         startActivity(intent);
+
     }
 }

@@ -95,7 +95,8 @@ public class tela_chamada_dia extends AppCompatActivity {
 
         // Adiciona um ícone de ação à direita
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
-        actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
+        actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação coo
+
 
         CustomChamadaAdapter customChamadaAdapter = new CustomChamadaAdapter(getApplicationContext(), nomesChamada, chamdaImages);
         listView.setAdapter(customChamadaAdapter);
@@ -155,6 +156,7 @@ public class tela_chamada_dia extends AppCompatActivity {
                             if (fieldValue instanceof Map) {
                                 Map<String, Boolean> mapData = (Map<String, Boolean>) fieldValue;
                                 // Agora você tem o Map e pode fazer o que quiser com ele
+                                atualizarListaNomes(mapData);
                                 for (Map.Entry<String, Boolean> entry : mapData.entrySet()) {
                                     String key = entry.getKey();
                                     Boolean value = entry.getValue();
@@ -232,6 +234,25 @@ public class tela_chamada_dia extends AppCompatActivity {
         atualizarListView();
     }
 
+    private void atualizarListaNomes(Map<String, Boolean> mapData){
+        progressBarChamada.setVisibility(View.VISIBLE);
+        for (Map.Entry<String, Boolean> entry : mapData.entrySet()) {
+            String key = entry.getKey();
+            Boolean value = entry.getValue();
+            Log.d("TAG", "Key: " + key + ", Value: " + value);
+            nomesChamada.add(key);
+            if (value){
+                chamdaImages.add(R.drawable.presenca);
+            } else if (!value){
+                chamdaImages.add(R.drawable.falta);
+            }
+
+        }
+
+        progressBarChamada.setVisibility(View.INVISIBLE);
+        atualizarListView();
+    }
+
     private void listarNomes(){
         progressBarChamada.setVisibility(View.VISIBLE);
         turma = recuperarDados("turma");
@@ -286,6 +307,17 @@ public class tela_chamada_dia extends AppCompatActivity {
 
         String data = "Hoje, " + String.format("%02d/%02d/%04d", dia, mes, ano);
         return data;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Verifica se o item clicado é o botão do ActionBar
+        if (item.getItemId() == android.R.id.home) {
+            // Chame o método que você deseja executar quando o ActionBar for clicado
+            telaVoltar();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
 

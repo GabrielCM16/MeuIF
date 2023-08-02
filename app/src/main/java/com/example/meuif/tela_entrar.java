@@ -292,9 +292,9 @@ public class tela_entrar extends AppCompatActivity {
         atualizaPresenca(matricula);
         // Criar a Intent
         Intent intent = new Intent(tela_entrar.this, Tela_Principal.class);
-
         // Iniciar a atividade de destino
         startActivity(intent);
+        finish();
     }
 
     public void getDadosExtras(String nMatricula){

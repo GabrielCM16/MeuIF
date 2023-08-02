@@ -86,11 +86,13 @@ public class MainActivity extends AppCompatActivity {
 
     public void buscar(View v){
         String matricula = entrada.getText().toString();
-        if (matricula != null){
+        if (!matricula.isEmpty()){
             setGetInicial(matricula, v);
-        } else if (matricula.equals("")) {
+        } else if (matricula.isEmpty()) {
             abrirSnakbar("insira uma matricula", v);
+            progressBar.setVisibility(View.INVISIBLE);
         }
+
     }
 
     public void setGetInicial(String nMatricula, View v){
@@ -126,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
         Intent intent = new Intent(MainActivity.this, tela_entrar.class);
         // Iniciar a atividade de destino
         startActivity(intent);
+
     }
 
     public void abrirSnakbar(String texto, View v){
@@ -138,9 +141,9 @@ public class MainActivity extends AppCompatActivity {
     public void telaPrincipal(){
         // Criar a Intent
         Intent intent = new Intent(MainActivity.this, Tela_Principal.class);
-
         // Iniciar a atividade de destino
         startActivity(intent);
+        finish();
     }
 
 }

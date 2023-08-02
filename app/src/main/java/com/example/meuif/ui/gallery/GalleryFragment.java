@@ -48,6 +48,7 @@ public class GalleryFragment extends Fragment {
     private TextView textMatricula;
     private TextView textCurso;
     private Context contex;
+    private CountDownTimer countDownTimer;
     private long auxVerificarQR;
     private String possivelStatus;
     private Notification notification;
@@ -119,13 +120,13 @@ public class GalleryFragment extends Fragment {
 
 
     private void contador(long finalCont, long intervaloCont){
-        new CountDownTimer(finalCont, intervaloCont) {
+        countDownTimer = new CountDownTimer(finalCont, intervaloCont) {
 
             public void onTick(long millisUntilFinished) {
                 long segundos = millisUntilFinished / 1000;
                 long minutos = millisUntilFinished / 60000;
                 auxVerificarQR = segundos;
-                if (auxVerificarQR >= 5){
+                if (auxVerificarQR >= 10){
                     String auxStatus = possivelStatus;
                     atualizarStatus();
                     possivelStatus = recuperarDados("possivelStatus");
@@ -144,7 +145,23 @@ public class GalleryFragment extends Fragment {
                 apertado = false;
             }
         }.start();
+
     }
+
+    private void stopContador() {
+        if (countDownTimer != null) {
+            countDownTimer.cancel();
+        }
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        // Interrompa o contador quando o fragmento estiver em pausa
+        stopContador();
+    }
+
+
 
     private void atualizarStatus(){
         String nMatricula = recuperarDados("matricula");
