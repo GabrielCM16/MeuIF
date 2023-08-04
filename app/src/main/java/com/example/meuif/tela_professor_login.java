@@ -2,6 +2,7 @@ package com.example.meuif;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -99,6 +100,7 @@ public class tela_professor_login extends Activity {
                         String auxnome = document.getString("nome");
                         salvarDados("nome", auxnome);
                         salvarDados("siape", siape);
+                        proximaTela();
                         progressBar.setVisibility(View.INVISIBLE);
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
@@ -126,5 +128,13 @@ public class tela_professor_login extends Activity {
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(chave, valor);
         editor.commit();
+    }
+
+    public void proximaTela(){
+        // Criar a Intent
+        Intent intent = new Intent(tela_professor_login.this, tela_professor_entrar.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
+        progressBar.setVisibility(View.INVISIBLE);
     }
 }
