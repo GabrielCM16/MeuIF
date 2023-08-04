@@ -12,7 +12,6 @@ import android.graphics.PorterDuff;
 import android.graphics.Typeface;
 import android.os.Bundle;
 import android.text.Spannable;
-import android.text.SpannableString;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.StyleSpan;
@@ -47,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        entrada = findViewById(R.id.entradaMatricula);
+        entrada = findViewById(R.id.entradaSIAPE);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textViewOla);
         textViewProfessor = findViewById(R.id.textViewProfessor);
@@ -95,6 +94,14 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
                 buscar(view);
+            }
+        });
+
+
+        textViewProfessor.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                telaProfessor();
             }
         });
     }
@@ -178,6 +185,13 @@ public class MainActivity extends AppCompatActivity {
         // Iniciar a atividade de destino
         startActivity(intent);
         finish();
+    }
+
+    public void telaProfessor(){
+        // Criar a Intent
+        Intent intent = new Intent(MainActivity.this, tela_professor_login.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
 }

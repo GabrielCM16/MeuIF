@@ -27,6 +27,9 @@
             android:name=".tela_entrar"
             android:exported="false" />
         <activity
+            android:name=".tela_professor_login"
+            android:exported="false" />
+        <activity
             android:name=".MainActivity"
             android:exported="true">
             <intent-filter>

@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/azulFundo"
-    tools:context=".MainActivity">
+    tools:context=".tela_professor_login">
 
     <TextView
         android:id="@+id/textViewOla"
@@ -16,7 +16,7 @@
         android:elegantTextHeight="true"
         android:fontFamily="@font/fira_mono_bold"
         android:freezesText="false"
-        android:text="Ola! para começar insira seu número de matricula"
+        android:text="Ola! para começar insira sua identificação SIAPE"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="24sp"
@@ -36,7 +36,7 @@
         android:drawableLeft="@drawable/baseline_badge_24"
         android:ems="10"
         android:fontFamily="@font/fira_mono_medium"
-        android:hint=" Número de Matrícula"
+        android:hint=" Número SIAPE"
         android:inputType="number"
         android:paddingLeft="10dp"
         android:textColor="@color/black"
@@ -77,22 +77,6 @@
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.789" />
-
-    <TextView
-        android:id="@+id/textViewProfessor"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/fira_mono_medium"
-        android:text="Sou Professor/Agente SEPAE"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.496"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.682" />
+        app:layout_constraintVertical_bias="0.757" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

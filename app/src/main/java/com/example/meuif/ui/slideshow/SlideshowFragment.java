@@ -1,6 +1,8 @@
 package com.example.meuif.ui.slideshow;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -57,9 +59,19 @@ public class SlideshowFragment extends Fragment {
     private void sairConta(){
         FirebaseAuth.getInstance().signOut();
 
+        limparDados();
+
         Intent intent = new Intent(getActivity(), MainActivity.class);
         // Iniciar a atividade de destino
         startActivity(intent);
 
+    }
+
+    public void limparDados(){
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        // Limpando todos os dados armazenados no SharedPreferences
+        editor.clear();
+        editor.commit();
     }
 }
