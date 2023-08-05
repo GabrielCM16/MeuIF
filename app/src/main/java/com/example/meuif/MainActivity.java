@@ -112,6 +112,11 @@ public class MainActivity extends AppCompatActivity {
         editor.putString(chave, valor);
         editor.commit();
     }
+    private String recuperarDados(String chave){
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String aux = sharedPreferences.getString(chave, "");
+        return aux;
+    }
 
 
     @Override
@@ -119,9 +124,18 @@ public class MainActivity extends AppCompatActivity {
         super.onStart();
 
         FirebaseUser usuarioAtual = FirebaseAuth.getInstance().getCurrentUser();
+        String siape = recuperarDados("siape");
+        String SEPAE = recuperarDados("SEPAE");
+        String matricula = recuperarDados("matricula");
 
-        if (usuarioAtual != null){
+        if (usuarioAtual != null && !matricula.equals("")){
             telaPrincipal();
+        } else if (usuarioAtual != null && !siape.equals("")){
+            if (!SEPAE.equals("")){
+                //tela sepae
+            } else {
+                //tela professor
+            }
         }
     }
 

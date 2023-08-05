@@ -3,12 +3,16 @@ package com.example.meuif;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -16,8 +20,15 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
+import com.google.firebase.auth.AuthResult;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseAuthInvalidCredentialsException;
+import com.google.firebase.auth.FirebaseAuthUserCollisionException;
+import com.google.firebase.auth.FirebaseAuthWeakPasswordException;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -48,13 +59,45 @@ public class tela_professor_entrar extends AppCompatActivity {
         progressBar.setVisibility(View.VISIBLE);
         siape = recuperarDados("siape");
         verificarConta(siape);
+        verificarSEPAE();
         setarTela();
         progressBar.setVisibility(View.INVISIBLE);
 
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                if (criar){
+                    progressBar.setVisibility(View.VISIBLE);
+                    criarConta(view);
+                } else {
+                    progressBar.setVisibility(View.VISIBLE);
+                    logarUsuario(view);
+                }
+            }
+        });
 
+        entradaSenha.setOnTouchListener(new View.OnTouchListener() {
+            @SuppressLint("ClickableViewAccessibility")
+            @Override
+            public boolean onTouch(View view, MotionEvent event) {
+                final int Right = 2;
+                if (event.getAction()==MotionEvent.ACTION_UP){
+                    if (event.getRawX()>=entradaSenha.getRight()-entradaSenha.getCompoundDrawables()[Right].getBounds().width()){
+                        int selection = entradaSenha.getSelectionEnd();
+                        if (senha1Visivel){
+                            entradaSenha.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.baseline_visibility_off_24,0);
+                            entradaSenha.setTransformationMethod(PasswordTransformationMethod.getInstance());
+                            senha1Visivel=false;
+                        } else {
+                            entradaSenha.setCompoundDrawablesRelativeWithIntrinsicBounds(0,0,R.drawable.baseline_visibility_24,0);
+                            entradaSenha.setTransformationMethod(HideReturnsTransformationMethod.getInstance());
+                            senha1Visivel=true;
+                        }
+                        entradaSenha.setSelection(selection);
+                        return true;
+                    }
+                }
+                return false;
             }
         });
     }
@@ -70,6 +113,139 @@ public class tela_professor_entrar extends AppCompatActivity {
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         botao = findViewById(R.id.meubotao);
         siape = recuperarDados("siape");
+    }
+
+    private void verificarSEPAE(){
+        siape = recuperarDados("siape");
+        DocumentReference docRef = db.collection("Usuarios").document("Professores").collection(siape).document("professor");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String SEPAE = document.getString("SEPAE");
+                        salvarDados("SEPAE", SEPAE);
+
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void logarUsuario(View v){
+        String email = entradaEmail.getText().toString();
+        String senha = entradaSenha.getText().toString();
+
+        FirebaseAuth.getInstance().signInWithEmailAndPassword(email, senha).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()){
+                    salvarDados("email", email);
+                    abrirSnakbar("login efetuado", v);
+                    progressBar.setVisibility(View.INVISIBLE);
+                } else{
+                    String erro;
+                    try {
+                        throw task.getException();
+                    } catch (FirebaseAuthInvalidCredentialsException e){
+                        erro = "E-mail e/ou senha invalido";
+                    } catch (Exception e){
+                        erro = "Erro ao logar usuario, tente novamente";
+                    }
+                    progressBar.setVisibility(View.INVISIBLE);
+                    abrirSnakbar(erro, v);
+                }
+            }
+        });
+    }
+
+    public void criarConta(View v){
+        String email = entradaEmail.getText().toString();
+        String senha1 = entradaSenha.getText().toString();
+        String senha2 = entradaSenha2.getText().toString();
+
+        if (!senha1.equals(senha2)){
+            abrirSnakbar(mensagens[1], v);
+            progressBar.setVisibility(View.INVISIBLE);
+        } else if (email.isEmpty() || senha1.isEmpty() || senha2.isEmpty() ){
+            abrirSnakbar(mensagens[0], v);
+            progressBar.setVisibility(View.INVISIBLE);
+        } else {
+            cadastrarUsuario(v);
+        }
+
+
+    }
+
+    public void cadastrarUsuario(View v){
+        String email = entradaEmail.getText().toString();
+        String senha = entradaSenha.getText().toString();
+
+        FirebaseAuth.getInstance().createUserWithEmailAndPassword(email, senha).addOnCompleteListener(new OnCompleteListener<AuthResult>() {
+            @Override
+            public void onComplete(@NonNull Task<AuthResult> task) {
+                if (task.isSuccessful()){
+                    salvarDadosUsuario();
+
+                    abrirSnakbar(mensagens[2], v);
+                    abrirSnakbar("Bem vindo ", v);
+                    progressBar.setVisibility(View.INVISIBLE);
+                } else {
+                    String erro;
+                    try {
+                        throw task.getException();
+                    }catch (FirebaseAuthWeakPasswordException e){
+                        erro = "Digite uma senha com no minimo 6 caracteres";
+                    } catch (FirebaseAuthUserCollisionException e){
+                        erro = "Este E-mail já foi ultilizado";
+                    } catch (FirebaseAuthInvalidCredentialsException e){
+                        erro = "E-mail invalido";
+                    } catch (Exception e){
+                        erro = "Erro inesperado ao cadastrar, tente novamente";
+                    }
+                    progressBar.setVisibility(View.INVISIBLE);
+                    abrirSnakbar(erro, v);
+                }
+            }
+        });
+    }
+
+    public void salvarDadosUsuario(){
+        String email = entradaEmail.getText().toString();
+        String usuarioID = FirebaseAuth.getInstance().getCurrentUser().getUid();
+
+        DocumentReference local = db.collection("Usuarios").document("Professores").collection(siape).document("id");
+
+        local.update("email", email).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                salvarDados("email", email);
+                Log.d("db", "Sucesso ao salvar os dados");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("TAG", "Falhou ao atualizar", e);
+            }
+        });
+
+        local.update("idUser", usuarioID).addOnSuccessListener(new OnSuccessListener<Void>() {
+            @Override
+            public void onSuccess(Void aVoid) {
+                salvarDados("idUser", usuarioID);
+                Log.d("db", "Sucesso ao salvar os dados");
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                Log.d("TAG", "Falhou ao atualizar", e);
+            }
+        });
     }
 
     public void setarTela(){
