@@ -137,14 +137,14 @@ public class telaMerendaEscolar extends AppCompatActivity {
                 if (document.exists()) {
                     // O documento existe, atualize um campo nele
                     String turma = recuperarDados("turma");
-                    List<Map<String, Timestamp>> existingList = (List<Map<String, Timestamp>>) document.get("3INF");
+                    List<Map<String, Timestamp>> existingList = (List<Map<String, Timestamp>>) document.get("todos");
 
                     Map<String, Timestamp> aux = new HashMap<String, Timestamp>();
                     aux.put(matricula, novoTimestamp);
 
                     existingList.add(aux);
 
-                    docRef.update("3INF", existingList);
+                    docRef.update("todos", existingList);
                 } else {
                     // O documento não existe, crie-o
                     //Map<String, Object> data = new HashMap<>();
