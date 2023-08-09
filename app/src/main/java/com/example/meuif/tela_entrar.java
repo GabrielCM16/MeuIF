@@ -67,6 +67,7 @@ public class tela_entrar extends AppCompatActivity {
         botao = findViewById(R.id.meubotao);
         matricula = recuperarDados("matricula");
         setGetIdUser(matricula);
+        setarTela(matricula);
 
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -119,9 +120,10 @@ public class tela_entrar extends AppCompatActivity {
         editor.commit();
     }
 
-    public void setarTela(){
+    public void setarTela(String nMatricula){
         String nome = recuperarDados("nome").toString();
         String[] primeiroNome = nome.split(" ");
+        setGetIdUser(nMatricula);
         if (idUser != ""){
             entradaSenha2.setVisibility(View.GONE);
             textViewOla.setText("Ola " + primeiroNome[0] + "! entre com seu email e senha");
@@ -184,7 +186,7 @@ public class tela_entrar extends AppCompatActivity {
                         Log.d("TAGLER", "deu bom");
                         Log.d("TAGLER", idUser);
                         getDadosExtras(nMatricula);
-                        setarTela();
+
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
                     }

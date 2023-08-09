@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
@@ -19,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.meuif.sepae.telaPrincipalSepae;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -147,6 +149,7 @@ public class tela_professor_entrar extends AppCompatActivity {
                 if (task.isSuccessful()){
                     salvarDados("email", email);
                     abrirSnakbar("login efetuado", v);
+                    telaProfessor();
                     progressBar.setVisibility(View.INVISIBLE);
                 } else{
                     String erro;
@@ -162,6 +165,14 @@ public class tela_professor_entrar extends AppCompatActivity {
                 }
             }
         });
+    }
+
+    private void telaProfessor(){
+        // Criar a Intent
+        Intent intent = new Intent(tela_professor_entrar.this, telaPrincipalSepae.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
+        finish();
     }
 
     public void criarConta(View v){
@@ -251,6 +262,7 @@ public class tela_professor_entrar extends AppCompatActivity {
     public void setarTela(){
         String nome = recuperarDados("nome").toString();
         String[] primeiroNome = nome.split(" ");
+        verificarConta(siape);
         idUser = recuperarDados("idUser");
         if (idUser != ""){
             entradaSenha2.setVisibility(View.GONE);

@@ -23,6 +23,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.meuif.sepae.telaPrincipalSepae;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.android.material.snackbar.Snackbar;
@@ -133,10 +134,19 @@ public class MainActivity extends AppCompatActivity {
         } else if (usuarioAtual != null && !siape.equals("")){
             if (!SEPAE.equals("")){
                 //tela sepae
+                telaSepae();
             } else {
                 //tela professor
             }
         }
+    }
+
+    private void telaSepae(){
+        // Criar a Intent
+        Intent intent = new Intent(MainActivity.this, telaPrincipalSepae.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
+        finish();
     }
 
     public void buscar(View v){
