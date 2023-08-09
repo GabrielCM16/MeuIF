@@ -18,7 +18,6 @@ import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 
@@ -67,7 +66,7 @@ public class tela_professor_login extends Activity {
     private void carregarComponentes(){
         entrada = findViewById(R.id.entradaSIAPE);
         progressBar = findViewById(R.id.progressBar);
-        botao = findViewById(R.id.meubotao);
+        botao = findViewById(R.id.botaoMereda);
         //muda a cor do progressBar pra preto
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
     }

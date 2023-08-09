@@ -12,14 +12,11 @@ import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.example.meuif.MainActivity;
 import com.example.meuif.R;
-import com.example.meuif.Tela_Principal;
 import com.example.meuif.databinding.FragmentSlideshowBinding;
-import com.example.meuif.tela_entrar;
 import com.google.firebase.auth.FirebaseAuth;
 
 public class SlideshowFragment extends Fragment {
@@ -36,7 +33,7 @@ public class SlideshowFragment extends Fragment {
         binding = FragmentSlideshowBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        botao = root.findViewById(R.id.meubotao);
+        botao = root.findViewById(R.id.botaoMereda);
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
