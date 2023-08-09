@@ -64,7 +64,7 @@ public class tela_entrar extends AppCompatActivity {
         entradaSenha2 = findViewById(R.id.entradaSenha2);
         progressBar = findViewById(R.id.progressBar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-        botao = findViewById(R.id.botaoContinuar);
+        botao = findViewById(R.id.botaoContinuar2);
         matricula = recuperarDados("matricula");
         setGetIdUser(matricula);
         setarTela(matricula);
@@ -124,6 +124,7 @@ public class tela_entrar extends AppCompatActivity {
         String nome = recuperarDados("nome").toString();
         String[] primeiroNome = nome.split(" ");
         setGetIdUser(nMatricula);
+        idUser = recuperarDados("idUser");
         if (idUser != ""){
             entradaSenha2.setVisibility(View.GONE);
             textViewOla.setText("Ola " + primeiroNome[0] + "! entre com seu email e senha");
@@ -183,6 +184,7 @@ public class tela_entrar extends AppCompatActivity {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
                         idUser = document.getString("idUser");
+                        salvarDados("idUser", idUser);
                         Log.d("TAGLER", "deu bom");
                         Log.d("TAGLER", idUser);
                         getDadosExtras(nMatricula);

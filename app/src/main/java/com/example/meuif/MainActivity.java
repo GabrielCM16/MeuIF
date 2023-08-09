@@ -89,7 +89,7 @@ public class MainActivity extends AppCompatActivity {
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
 
         //iniciando o botao e fazendo um onclick
-        Button botao = (Button) findViewById(R.id.botaoSair);
+        Button botao = (Button) findViewById(R.id.botaoContinuar);
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
