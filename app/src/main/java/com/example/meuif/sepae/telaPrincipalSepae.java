@@ -15,7 +15,6 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.meuif.CRUD;
 import com.example.meuif.R;
-import com.example.meuif.tela_chamada_dia;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -47,7 +46,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
 
     private void inicializarComponentes(){
         textViewBemVindo = findViewById(R.id.textViewBemVindo);
-        botao = findViewById(R.id.botaoMereda);
+        botao = findViewById(R.id.botaoCamera);
     }
 
     private void telaMerenda(){

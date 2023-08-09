@@ -33,7 +33,7 @@ public class SlideshowFragment extends Fragment {
         binding = FragmentSlideshowBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        botao = root.findViewById(R.id.botaoMereda);
+        botao = root.findViewById(R.id.botaoCamera);
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {

@@ -113,7 +113,7 @@ public class tela_professor_entrar extends AppCompatActivity {
         entradaSenha2.setVisibility(View.GONE);
         progressBar = findViewById(R.id.progressBar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-        botao = findViewById(R.id.botaoMereda);
+        botao = findViewById(R.id.botaoCamera);
         siape = recuperarDados("siape");
     }
 
