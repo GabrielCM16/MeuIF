@@ -14,17 +14,17 @@
     <fragment
         android:id="@+id/nav_gallery"
         android:name="com.example.meuif.ui.gallery.GalleryFragment"
-        android:label="@string/menu_gallery"
+        android:label="Carteirinha"
         tools:layout="@layout/fragment_gallery" />
 
     <fragment
         android:id="@+id/nav_slideshow"
         android:name="com.example.meuif.ui.slideshow.SlideshowFragment"
-        android:label="@string/menu_slideshow"
+        android:label="Sair da Conta"
         tools:layout="@layout/fragment_slideshow" />
     <fragment
         android:id="@+id/informacoes_pessoais"
         android:name="com.example.meuif.Informacoes_pessoais"
-        android:label="fragment_informacoes_pessoais"
+        android:label="Informações pessoais"
         tools:layout="@layout/fragment_informacoes_pessoais" />
 </navigation>
