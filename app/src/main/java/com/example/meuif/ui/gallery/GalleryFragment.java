@@ -200,7 +200,7 @@ public class GalleryFragment extends Fragment {
     public String stringQRcode(){
         long currentAtual = System.currentTimeMillis();
         String saidaQR = matricula + "/" + String.valueOf(currentAtual);
-        return saidaQR;
+        return matricula;
     }
 
     public void gerarQR(String gerar){

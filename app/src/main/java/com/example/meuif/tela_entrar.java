@@ -64,7 +64,7 @@ public class tela_entrar extends AppCompatActivity {
         entradaSenha2 = findViewById(R.id.entradaSenha2);
         progressBar = findViewById(R.id.progressBar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-        botao = findViewById(R.id.botaoCamera);
+        botao = findViewById(R.id.botaoSair);
         matricula = recuperarDados("matricula");
         setGetIdUser(matricula);
         setarTela(matricula);

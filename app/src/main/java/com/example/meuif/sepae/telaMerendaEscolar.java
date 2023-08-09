@@ -1,12 +1,14 @@
 package com.example.meuif.sepae;
 
-import static java.security.AccessController.getContext;
+import static android.app.PendingIntent.getActivity;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -15,17 +17,16 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.meuif.CaptureAct;
+import com.example.meuif.MainActivity;
 import com.example.meuif.R;
-import com.example.meuif.databinding.FragmentInformacoesPessoaisBinding;
 import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.CollectionReference;
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -39,13 +40,17 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private long tempoValidade = 30000;
     private MediaPlayer mediaPlayer;
 
+    @SuppressLint("MissingInflatedId")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tela_merenda_escolar);
 
         botao = findViewById(R.id.botaoCamera);
+
         db = FirebaseFirestore.getInstance();
+
+
 
         ActionBar actionBar = getSupportActionBar();
         setTitle("Lista Merenda");
@@ -55,6 +60,8 @@ public class telaMerendaEscolar extends AppCompatActivity {
 
         carregarCamera();
     }
+
+
 
     private void playSuccessSound() {
         if (mediaPlayer != null) {
@@ -97,20 +104,18 @@ public class telaMerendaEscolar extends AppCompatActivity {
     {
         if(result.getContents() !=null)
         {
-            if (result.getContents().contains("/")) {
-                String[] aux = result.getContents().split("/");
 
-                long valorCurrent = Long.parseLong(aux[1]);
+                String aux = result.getContents();
 
-                if ( System.currentTimeMillis() - valorCurrent <= tempoValidade){
+                if ( aux.length() == 11){
                     String data = diaAtual();
-                    atualizarMatricula(aux[0], data);
+                    atualizarMerenda(aux, data);
                 } else {
                     playSuccessSound();
                 }
 
                 sCanCode();
-            }
+
         }
     });
 
@@ -125,7 +130,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
         return data;
     }
 
-    private void atualizarMatricula(String matricula, String data){
+    private void atualizarMerenda(String matricula, String data){
 
         Timestamp novoTimestamp = Timestamp.now();
 

@@ -24,7 +24,7 @@
         app:layout_constraintTop_toTopOf="parent" />
 
     <Button
-        android:id="@+id/botaoCamera"
+        android:id="@+id/botaoSair"
         android:layout_width="323dp"
         android:layout_height="54dp"
         android:layout_marginBottom="16dp"

@@ -14,7 +14,9 @@ import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.meuif.CRUD;
+import com.example.meuif.MainActivity;
 import com.example.meuif.R;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -24,6 +26,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
 
     private CRUD crud = new CRUD();
     private TextView textViewBemVindo;
+    private Button botaosair;
     private Button botao;
 
     @SuppressLint("MissingInflatedId")
@@ -42,12 +45,37 @@ public class telaPrincipalSepae extends AppCompatActivity {
             }
         });
 
+        botaosair.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                FirebaseAuth.getInstance().signOut();
+
+                limparDados();
+
+                Intent intent = new Intent(telaPrincipalSepae.this, MainActivity.class);
+                // Iniciar a atividade de destino
+                startActivity(intent);
+                finish();
+            }
+        });
+
     }
 
     private void inicializarComponentes(){
         textViewBemVindo = findViewById(R.id.textViewBemVindo);
-        botao = findViewById(R.id.botaoCamera);
+        botao = findViewById(R.id.botaoMerenda);
+        botaosair = findViewById(R.id.botaoSair);
     }
+
+    public void limparDados(){
+        SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        // Limpando todos os dados armazenados no SharedPreferences
+        editor.clear();
+        editor.commit();
+    }
+
+
 
     private void telaMerenda(){
         // Criar a Intent

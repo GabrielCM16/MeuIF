@@ -33,7 +33,7 @@ public class SlideshowFragment extends Fragment {
         binding = FragmentSlideshowBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
 
-        botao = root.findViewById(R.id.botaoCamera);
+        botao = root.findViewById(R.id.botaoSair);
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -61,6 +61,7 @@ public class SlideshowFragment extends Fragment {
         Intent intent = new Intent(getActivity(), MainActivity.class);
         // Iniciar a atividade de destino
         startActivity(intent);
+
 
     }
 
