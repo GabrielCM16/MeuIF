@@ -62,6 +62,7 @@ public class tela_professor_entrar extends AppCompatActivity {
         siape = recuperarDados("siape");
         verificarConta(siape);
         verificarSEPAE();
+        verificarConta(siape);
         setarTela();
         progressBar.setVisibility(View.INVISIBLE);
 
@@ -113,7 +114,7 @@ public class tela_professor_entrar extends AppCompatActivity {
         entradaSenha2.setVisibility(View.GONE);
         progressBar = findViewById(R.id.progressBar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-        botao = findViewById(R.id.botaoSair);
+        botao = findViewById(R.id.botaoEntrarProfessor);
         siape = recuperarDados("siape");
     }
 
@@ -205,6 +206,7 @@ public class tela_professor_entrar extends AppCompatActivity {
 
                     abrirSnakbar(mensagens[2], v);
                     abrirSnakbar("Bem vindo ", v);
+                    telaProfessor();
                     progressBar.setVisibility(View.INVISIBLE);
                 } else {
                     String erro;
@@ -263,8 +265,9 @@ public class tela_professor_entrar extends AppCompatActivity {
         String nome = recuperarDados("nome").toString();
         String[] primeiroNome = nome.split(" ");
         verificarConta(siape);
-        idUser = recuperarDados("idUser");
-        if (idUser != ""){
+        String iduser = recuperarDados("idUser");
+        iduser = recuperarDados("idUser");
+        if (iduser != ""){
             entradaSenha2.setVisibility(View.GONE);
             textViewOla.setText("Ola " + primeiroNome[0] + "! entre com seu email e senha");
         } else {

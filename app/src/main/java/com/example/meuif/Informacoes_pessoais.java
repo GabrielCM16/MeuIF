@@ -72,12 +72,13 @@ public class Informacoes_pessoais extends Fragment {
 
         teste = root.findViewById(R.id.testeaaa);
         botao = root.findViewById(R.id.botao);
+        botao.setVisibility(View.GONE);
         // Inicialize o MediaPlayer com o arquivo de som do sucesso (success_sound.mp3 ou success_sound.wav)
         mediaPlayer = MediaPlayer.create(getContext(), R.raw.error);
 
 
 
-        teste.setText("ola");
+        teste.setText("Ola!\n Esta é a primeira versão do aplicativo MeuIF. Caso encontre erros, falhas ou queira deixar sugestões/feedback, agradecemos!\n\n entre em contato pelo email:");
         db = FirebaseFirestore.getInstance();
         botao.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -48,7 +48,7 @@
         app:layout_constraintVertical_bias="0.499" />
 
     <Button
-        android:id="@+id/botaoSair"
+        android:id="@+id/botaoContinuarProfessor"
         android:layout_width="323dp"
         android:layout_height="54dp"
         android:background="@drawable/background_button"

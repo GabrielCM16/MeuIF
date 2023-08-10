@@ -66,7 +66,7 @@ public class tela_professor_login extends Activity {
     private void carregarComponentes(){
         entrada = findViewById(R.id.entradaSIAPE);
         progressBar = findViewById(R.id.progressBar);
-        botao = findViewById(R.id.botaoSair);
+        botao = findViewById(R.id.botaoContinuarProfessor);
         //muda a cor do progressBar pra preto
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
     }
@@ -99,6 +99,7 @@ public class tela_professor_login extends Activity {
                         String auxnome = document.getString("nome");
                         salvarDados("nome", auxnome);
                         salvarDados("siape", siape);
+                        verificarConta(siape);
                         proximaTela();
                         progressBar.setVisibility(View.INVISIBLE);
                     } else {
@@ -110,6 +111,30 @@ public class tela_professor_login extends Activity {
                     Log.d("TAGLER", "Falhou em ", task.getException());
                     progressBar.setVisibility(View.INVISIBLE);
                     abrirSnakbar("Erro tente novamente", v);
+                }
+            }
+        });
+    }
+
+    private void verificarConta(String sipae){
+        DocumentReference docRef = db.collection("Usuarios").document("Professores").collection(sipae).document("id");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String idUser = document.getString("idUser");
+                        Log.d("TAGLER", "deu bom");
+                        Log.d("TAGLER", idUser);
+                        salvarDados("idUser", idUser);
+
+
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
                 }
             }
         });
