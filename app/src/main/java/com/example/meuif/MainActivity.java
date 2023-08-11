@@ -47,6 +47,7 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+
         entrada = findViewById(R.id.entradaSIAPE);
         progressBar = findViewById(R.id.progressBar);
         textView = findViewById(R.id.textViewOla);

@@ -168,6 +168,18 @@ public class tela_professor_entrar extends AppCompatActivity {
         });
     }
 
+    @Override
+    protected void onStart() {
+        super.onStart();
+        progressBar.setVisibility(View.VISIBLE);
+        siape = recuperarDados("siape");
+        verificarConta(siape);
+        verificarSEPAE();
+        verificarConta(siape);
+        setarTela();
+        progressBar.setVisibility(View.INVISIBLE);
+    }
+
     private void telaProfessor(){
         // Criar a Intent
         Intent intent = new Intent(tela_professor_entrar.this, telaPrincipalSepae.class);
@@ -269,7 +281,7 @@ public class tela_professor_entrar extends AppCompatActivity {
         iduser = recuperarDados("idUser");
         if (iduser != ""){
             entradaSenha2.setVisibility(View.GONE);
-            textViewOla.setText("Ola " + primeiroNome[0] + "! entre com seu email e senha");
+            textViewOla.setText("Olá " + primeiroNome[0] + "! entre com seu email e senha");
         } else {
             entradaSenha2.setVisibility(View.VISIBLE);
             textViewOla.setText("Olá " + primeiroNome[0] + ", foi verificado que você ainda não possui uma conta! crie uma agora mesmo" );

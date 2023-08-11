@@ -142,6 +142,13 @@ public class HomeFragment extends Fragment {
         super.onStart();
 
         botaoLider();
+        mostrarPresenca();
+        setarBemVindo();
+        atualizarGrafico(presencas, ausencias);
+        atualizaPresenca();
+        diaSemana = diaAtual();
+        botaoLider();
+        getAulas(turma, "quinta");
 
 
     }

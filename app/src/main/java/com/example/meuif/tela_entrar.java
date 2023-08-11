@@ -108,6 +108,14 @@ public class tela_entrar extends AppCompatActivity {
         });
     }
 
+    protected void onStart() {
+
+        super.onStart();
+        matricula = recuperarDados("matricula");
+        setGetIdUser(matricula);
+        setarTela(matricula);
+    }
+
     private String recuperarDados(String chave){
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String aux = sharedPreferences.getString(chave, "");
