@@ -105,6 +105,8 @@ public class GalleryFragment extends Fragment {
         return root;
     }
 
+
+
     public String recuperarDados(String chave){
         SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String aux = sharedPreferences.getString(chave, "");

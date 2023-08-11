@@ -137,6 +137,18 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    public void onStart() {
+
+        super.onStart();
+
+        botaoLider();
+
+
+    }
+
+
+
+
     @Override
     public void onDestroyView() {
         super.onDestroyView();
