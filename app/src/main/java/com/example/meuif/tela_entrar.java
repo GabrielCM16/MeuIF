@@ -68,8 +68,13 @@ public class tela_entrar extends AppCompatActivity {
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         botao = findViewById(R.id.botaoContinuar2);
         matricula = recuperarDados("matricula");
-        setGetIdUser(matricula);
-        setarTela(matricula);
+        setGetIdUser(matricula, new Callback() {
+            @Override
+            public void onComplete() {
+                setarTela(matricula);
+            }
+        });
+
 
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,8 +132,18 @@ public class tela_entrar extends AppCompatActivity {
         super.onStart();
         matricula = recuperarDados("matricula");
         salvarDados("criar", "");
-        setGetIdUser(matricula);
-        setarTela(matricula);
+        setGetIdUser(matricula, new Callback() {
+            @Override
+            public void onComplete() {
+                setarTela(matricula);
+            }
+        });
+
+    }
+
+    // Defina a interface de Callback
+    private interface Callback {
+        void onComplete();
     }
 
     private String recuperarDados(String chave){
@@ -146,18 +161,23 @@ public class tela_entrar extends AppCompatActivity {
     public void setarTela(String nMatricula){
         String nome = recuperarDados("nome").toString();
         String[] primeiroNome = nome.split(" ");
-        setGetIdUser(nMatricula);
-        salvarDados("criar", "");
-        idUser = recuperarDados("idUser");
-        Log.d("TAGLER", "esta no setar tela" + idUser);
-        if (!idUser.isEmpty()){
-            entradaSenha2.setVisibility(View.GONE);
-            textViewOla.setText("Ola " + primeiroNome[0] + "! entre com seu email e senha");
-        } else {
-            entradaSenha2.setVisibility(View.VISIBLE);
-            textViewOla.setText("Olá " + primeiroNome[0] + ", foi verificado que você ainda não possui uma conta! crie uma agora mesmo" );
-            salvarDados("criar", "criar");
-        }
+        setGetIdUser(nMatricula, new Callback() {
+            @Override
+            public void onComplete() {
+                salvarDados("criar", "");
+                idUser = recuperarDados("idUser");
+                Log.d("TAGLER", "esta no setar tela" + idUser);
+                if (!idUser.isEmpty()){
+                    entradaSenha2.setVisibility(View.GONE);
+                    textViewOla.setText("Ola " + primeiroNome[0] + "! entre com seu email e senha");
+                } else {
+                    entradaSenha2.setVisibility(View.VISIBLE);
+                    textViewOla.setText("Olá " + primeiroNome[0] + ", foi verificado que você ainda não possui uma conta! crie uma agora mesmo" );
+                    salvarDados("criar", "criar");
+                }
+            }
+        });
+
     }
 
     private Boolean criarContaOuNao(){
@@ -207,7 +227,7 @@ public class tela_entrar extends AppCompatActivity {
         });
     }
 
-    public void setGetIdUser(String nMatricula){
+    public void setGetIdUser(String nMatricula, Callback callback){
         DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("id");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -219,13 +239,24 @@ public class tela_entrar extends AppCompatActivity {
                         salvarDados("idUser", idUser);
                         Log.d("TAGLER", "deu bom");
                         Log.d("TAGLER", idUser);
-                        getDadosExtras(nMatricula);
+                        getDadosExtras(nMatricula, new Callback() {
+                            @Override
+                            public void onComplete() {
+
+                            }
+                        });
+                        // Após a conclusão, chame o callback
+                        callback.onComplete();
 
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
+                        // Após a conclusão, chame o callback
+                        callback.onComplete();
                     }
                 } else {
                     Log.d("TAGLER", "Falhou em ", task.getException());
+                    // Após a conclusão, chame o callback
+                    callback.onComplete();
                 }
             }
         });
@@ -333,7 +364,7 @@ public class tela_entrar extends AppCompatActivity {
         finish();
     }
 
-    public void getDadosExtras(String nMatricula){
+    public void getDadosExtras(String nMatricula, Callback callback){
         DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("dados");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -360,6 +391,9 @@ public class tela_entrar extends AppCompatActivity {
                 }
             }
         });
+
+        // Após a conclusão, chame o callback
+        callback.onComplete();
     }
 
     private void atualizaPresenca(String nMatricula){
