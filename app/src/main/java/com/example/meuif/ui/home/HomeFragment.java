@@ -142,13 +142,22 @@ public class HomeFragment extends Fragment {
         super.onStart();
 
         botaoLider();
+        Log.d("TAGLER", "APOS BOTAO LIDER");
         mostrarPresenca();
+        Log.d("TAGLER", "APOS MOSTRAR PRESENCA");
         setarBemVindo();
-        atualizarGrafico(presencas, ausencias);
+        Log.d("TAGLER", "APOS SETAR");
         atualizaPresenca();
+        Log.d("TAGLER", "APOS ATUALIZAR PRESENCA 1");
+        atualizarGrafico(presencas, ausencias);
+        Log.d("TAGLER", "APOS ATUALIZAR GRAFICO");
+        atualizaPresenca();
+        Log.d("TAGLER", "APOS ATUALIZAR PRESENCA 2");
         diaSemana = diaAtual();
         botaoLider();
+        Log.d("TAGLER", "APOS BOTAO LIDER");
         getAulas(turma, "quinta");
+        Log.d("TAGLER", "APOS GETAULAS");
 
 
     }
@@ -294,8 +303,8 @@ public class HomeFragment extends Fragment {
                         String matriculaLider = document.getString("Lider");
                         String matriculaViceLider = document.getString("ViceLider");
 
-                        assert matriculaLider != null;
-                        if (matriculaLider.equals(nMatricula) || Objects.equals(matriculaViceLider, nMatricula)){
+
+                        if (matriculaLider.equals(nMatricula) || matriculaViceLider.equals( nMatricula)){
                             LiderDeTurma = true;
                             salvarDados("lider", "sim");
                         }

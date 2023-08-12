@@ -20,6 +20,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.example.meuif.recuperacaoDados.RecuperarSenha;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -46,7 +47,7 @@ public class tela_entrar extends AppCompatActivity {
     private Boolean senha1Visivel = false;
     private EditText entradaSenha2;
     private Button botao;
-    private Boolean criar = false;
+    private TextView recuperarSenha;
     private ProgressBar progressBar;
     private String nomeName;
     String[] mensagens = {"Preencha todos os campos", "As senhas devem ser iguais" ,"Cadastro realizado com sucesso!"};
@@ -62,6 +63,7 @@ public class tela_entrar extends AppCompatActivity {
         entradaEmail = findViewById(R.id.entradaEmail);
         entradaSenha = findViewById(R.id.entradaSenha);
         entradaSenha2 = findViewById(R.id.entradaSenha2);
+        recuperarSenha = findViewById(R.id.esqueceuSenhaAluno);
         progressBar = findViewById(R.id.progressBar);
         progressBar.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         botao = findViewById(R.id.botaoContinuar2);
@@ -73,11 +75,23 @@ public class tela_entrar extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 progressBar.setVisibility(View.VISIBLE);
-                if (criar){
+                if (criarContaOuNao()){
+                    Log.d("TAGLER", "criar true");
                     criarConta(view);
                 } else {
+                    Log.d("TAGLER", "criar false");
                     logar(view);
                 }
+            }
+        });
+
+        recuperarSenha.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Criar a Intent
+                Intent intent = new Intent(tela_entrar.this, RecuperarSenha.class);
+                // Iniciar a atividade de destino
+                startActivity(intent);
             }
         });
 
@@ -112,6 +126,7 @@ public class tela_entrar extends AppCompatActivity {
 
         super.onStart();
         matricula = recuperarDados("matricula");
+        salvarDados("criar", "");
         setGetIdUser(matricula);
         setarTela(matricula);
     }
@@ -132,17 +147,26 @@ public class tela_entrar extends AppCompatActivity {
         String nome = recuperarDados("nome").toString();
         String[] primeiroNome = nome.split(" ");
         setGetIdUser(nMatricula);
+        salvarDados("criar", "");
         idUser = recuperarDados("idUser");
-        if (idUser != ""){
+        Log.d("TAGLER", "esta no setar tela" + idUser);
+        if (!idUser.isEmpty()){
             entradaSenha2.setVisibility(View.GONE);
             textViewOla.setText("Ola " + primeiroNome[0] + "! entre com seu email e senha");
         } else {
             entradaSenha2.setVisibility(View.VISIBLE);
             textViewOla.setText("Olá " + primeiroNome[0] + ", foi verificado que você ainda não possui uma conta! crie uma agora mesmo" );
-            criar = true;
+            salvarDados("criar", "criar");
         }
+    }
 
-
+    private Boolean criarContaOuNao(){
+        String aux = recuperarDados("criar");
+        if (aux.equals("criar")){
+            return true;
+        } else {
+            return false;
+        }
     }
 
     private void logar(View v){
