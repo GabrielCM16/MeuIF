@@ -134,6 +134,8 @@ public class HomeFragment extends Fragment {
         botaoLider();
         getAulas(turma, "quinta");
 
+        progressBarCentral.setVisibility(View.INVISIBLE);
+
         return root;
     }
 
@@ -158,6 +160,7 @@ public class HomeFragment extends Fragment {
         Log.d("TAGLER", "APOS BOTAO LIDER");
         getAulas(turma, "quinta");
         Log.d("TAGLER", "APOS GETAULAS");
+        progressBarCentral.setVisibility(View.INVISIBLE);
 
 
     }
@@ -214,7 +217,7 @@ public class HomeFragment extends Fragment {
                         Log.d("TAG", "O campo dia não existe no documento!");
                     }
                 } else {
-                    Log.d("TAG", "O documento não existe!");
+                    Log.d("TAG", "O documento da turma das aulas não existe!");
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -304,7 +307,7 @@ public class HomeFragment extends Fragment {
                         String matriculaViceLider = document.getString("ViceLider");
 
 
-                        if (matriculaLider.equals(nMatricula) || matriculaViceLider.equals( nMatricula)){
+                        if (nMatricula.equals(matriculaLider) || nMatricula.equals(matriculaViceLider)){
                             LiderDeTurma = true;
                             salvarDados("lider", "sim");
                         }
