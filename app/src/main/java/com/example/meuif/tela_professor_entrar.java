@@ -35,6 +35,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import org.checkerframework.checker.units.qual.C;
+
 public class tela_professor_entrar extends AppCompatActivity {
 
     private TextView textViewOla;
@@ -60,9 +62,20 @@ public class tela_professor_entrar extends AppCompatActivity {
         inicarComponentes();
         progressBar.setVisibility(View.VISIBLE);
         siape = recuperarDados("siape");
-        verificarConta(siape);
+        verificarConta(siape, new Callback() {
+            @Override
+            public void onComplete() {
+                setarTela();
+                verificarSEPAE();
+            }
+        });
         verificarSEPAE();
-        verificarConta(siape);
+        verificarConta(siape, new Callback() {
+            @Override
+            public void onComplete() {
+                setarTela();
+            }
+        });
         setarTela();
         progressBar.setVisibility(View.INVISIBLE);
 
@@ -103,6 +116,11 @@ public class tela_professor_entrar extends AppCompatActivity {
                 return false;
             }
         });
+    }
+
+    // Defina a interface de Callback
+    private interface Callback {
+        void onComplete();
     }
 
     private void inicarComponentes(){
@@ -173,10 +191,20 @@ public class tela_professor_entrar extends AppCompatActivity {
         super.onStart();
         progressBar.setVisibility(View.VISIBLE);
         siape = recuperarDados("siape");
-        verificarConta(siape);
-        verificarSEPAE();
-        verificarConta(siape);
-        setarTela();
+        verificarConta(siape, new Callback() {
+            @Override
+            public void onComplete() {
+                verificarSEPAE();
+            }
+        });
+
+        verificarConta(siape, new Callback() {
+            @Override
+            public void onComplete() {
+                setarTela();
+            }
+        });
+
         progressBar.setVisibility(View.INVISIBLE);
     }
 
@@ -276,10 +304,10 @@ public class tela_professor_entrar extends AppCompatActivity {
     public void setarTela(){
         String nome = recuperarDados("nome").toString();
         String[] primeiroNome = nome.split(" ");
-        verificarConta(siape);
         String iduser = recuperarDados("idUser");
+        criar = criar();
         iduser = recuperarDados("idUser");
-        if (iduser != ""){
+        if (!criar){
             entradaSenha2.setVisibility(View.GONE);
             textViewOla.setText("Olá " + primeiroNome[0] + "! entre com seu email e senha");
         } else {
@@ -287,11 +315,18 @@ public class tela_professor_entrar extends AppCompatActivity {
             textViewOla.setText("Olá " + primeiroNome[0] + ", foi verificado que você ainda não possui uma conta! crie uma agora mesmo" );
             criar = true;
         }
-
-
     }
 
-    private void verificarConta(String sipae){
+    private boolean criar(){
+        String aux = recuperarDados("criar");
+        if (aux.equals("criar")){
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    private void verificarConta(String sipae, Callback callback){
         DocumentReference docRef = db.collection("Usuarios").document("Professores").collection(sipae).document("id");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -303,20 +338,25 @@ public class tela_professor_entrar extends AppCompatActivity {
                         Log.d("TAGLER", "deu bom");
                         Log.d("TAGLER", idUser);
                         salvarDados("idUser", idUser);
-                        if (idUser != ""){
-                            criar = false;
+
+                        if (!idUser.equals("")){
+                            salvarDados("criar", "false");
                         } else {
-                            criar = true;
+                            salvarDados("criar", "criar");
                         }
+                        callback.onComplete();
 
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
+                        callback.onComplete();
                     }
                 } else {
                     Log.d("TAGLER", "Falhou em ", task.getException());
+                    callback.onComplete();
                 }
             }
         });
+        callback.onComplete();
     }
 
     public void abrirSnakbar(String texto, View v){
