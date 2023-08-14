@@ -6,6 +6,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -20,6 +22,7 @@ import android.widget.Button;
 import com.example.meuif.CaptureAct;
 import com.example.meuif.MainActivity;
 import com.example.meuif.R;
+import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -32,6 +35,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
@@ -43,6 +47,9 @@ public class telaMerendaEscolar extends AppCompatActivity {
 
     private FirebaseFirestore db;
     private Button botao;
+    private AdapterMerenda adapter;
+    private RecyclerView recyclerMerenda;
+    private List<String> stringList = new ArrayList<>();
     private long tempoValidade = 30000;
     private MediaPlayer mediaPlayer;
 
@@ -53,6 +60,8 @@ public class telaMerendaEscolar extends AppCompatActivity {
         setContentView(R.layout.activity_tela_merenda_escolar);
 
         botao = findViewById(R.id.botaoCamera);
+        recyclerMerenda = findViewById(R.id.recyclerMerenda);
+        recyclerMerenda.setLayoutManager(new LinearLayoutManager(this));
 
         db = FirebaseFirestore.getInstance();
 
@@ -70,7 +79,19 @@ public class telaMerendaEscolar extends AppCompatActivity {
     protected void onStart() {
 
         super.onStart();
-        listarDiasMerendados();
+        listarDiasMerendados(new Callback() {
+            @Override
+            public void onComplete() {
+                Log.d("TAG", stringList.toString());
+                adapter = new AdapterMerenda(stringList);
+                recyclerMerenda.setAdapter(adapter);
+            }
+        });
+
+    }
+
+    private interface Callback {
+        void onComplete();
     }
 
 
@@ -182,7 +203,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
         return aux;
     }
 
-    private void listarDiasMerendados(){
+    private void listarDiasMerendados(Callback callback){
         CollectionReference colecRef = db.collection("MerendaEscolar");
 
         // Recuperar o documento do Firestore
@@ -213,18 +234,24 @@ public class telaMerendaEscolar extends AppCompatActivity {
                                             Timestamp timestamp = entry.getValue();
 
                                             Log.d("TAG", "Matrícula: " + matricula + ", Timestamp: " + timestamp.toString() + existingList.size());
+                                            stringList.add(matricula);
                                         }
                                     }
                                 }
 
+                                callback.onComplete();
+
 
                             } else {
                                 Log.d("TAG", "Documento não existe");
+                                callback.onComplete();
                             }
                         } else {
                             Log.d("TAG", "Erro ao recuperar documento: ", task.getException());
+                            callback.onComplete();
                         }
                     }
                 });
+        callback.onComplete();
     }
 }
