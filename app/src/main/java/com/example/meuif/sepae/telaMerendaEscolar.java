@@ -177,6 +177,8 @@ public class telaMerendaEscolar extends AppCompatActivity {
                     String turma = recuperarDados("turma");
                     List<Map<String, Timestamp>> existingList = (List<Map<String, Timestamp>>) document.get("todos");
 
+                    Log.d("TAG", existingList.toString());
+
                     Map<String, Timestamp> aux = new HashMap<String, Timestamp>();
                     aux.put(matricula, novoTimestamp);
 
