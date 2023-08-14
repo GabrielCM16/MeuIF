@@ -3,6 +3,7 @@ package com.example.meuif.sepae;
 import static android.app.PendingIntent.getActivity;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -19,8 +20,12 @@ import android.widget.Button;
 import com.example.meuif.CaptureAct;
 import com.example.meuif.MainActivity;
 import com.example.meuif.R;
+import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -31,6 +36,7 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
 public class telaMerendaEscolar extends AppCompatActivity {
@@ -59,6 +65,12 @@ public class telaMerendaEscolar extends AppCompatActivity {
         actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
 
         carregarCamera();
+    }
+
+    protected void onStart() {
+
+        super.onStart();
+        listarDiasMerendados();
     }
 
 
@@ -168,5 +180,51 @@ public class telaMerendaEscolar extends AppCompatActivity {
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String aux = sharedPreferences.getString(chave, "");
         return aux;
+    }
+
+    private void listarDiasMerendados(){
+        CollectionReference colecRef = db.collection("MerendaEscolar");
+
+        // Recuperar o documento do Firestore
+        db.collection("MerendaEscolar")
+                .document("10082023")
+                .get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+                            DocumentSnapshot document = task.getResult();
+                            if (document.exists()) {
+                                Log.d("TAG", "Documento recuperado: " + document.getData());
+
+                                // Iterar sobre todos os campos do documento
+                                for (String campo : document.getData().keySet()) {
+                                    Log.d("TAG", "Campo: " + campo + ", Valor: " + document.get(campo));
+
+                                }
+
+                                List<HashMap<String, Timestamp>> existingList = (List<HashMap<String, Timestamp>>) document.get("todos");
+
+
+                                if (existingList != null) {
+                                    for (HashMap<String, Timestamp> map : existingList) {
+                                        for (Map.Entry<String, Timestamp> entry : map.entrySet()) {
+                                            String matricula = entry.getKey();
+                                            Timestamp timestamp = entry.getValue();
+
+                                            Log.d("TAG", "Matrícula: " + matricula + ", Timestamp: " + timestamp.toString() + existingList.size());
+                                        }
+                                    }
+                                }
+
+
+                            } else {
+                                Log.d("TAG", "Documento não existe");
+                            }
+                        } else {
+                            Log.d("TAG", "Erro ao recuperar documento: ", task.getException());
+                        }
+                    }
+                });
     }
 }
