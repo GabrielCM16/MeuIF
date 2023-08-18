@@ -127,8 +127,10 @@ public class tela_chamada_dia extends AppCompatActivity {
     }
 
     private void atualizarListView(){
+        int firstVisibleItemPosition = listView.getFirstVisiblePosition();
         CustomChamadaAdapter customChamadaAdapter = new CustomChamadaAdapter(getApplicationContext(), nomesChamada, chamdaImages);
         listView.setAdapter(customChamadaAdapter);
+        listView.setSelection(firstVisibleItemPosition);
     }
 
     private void abrirToast(String texto){
