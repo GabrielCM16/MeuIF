@@ -15,6 +15,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
@@ -42,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.regex.Pattern;
 
 public class telaMerendaEscolar extends AppCompatActivity {
 
@@ -51,7 +53,12 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private RecyclerView recyclerMerenda;
     private List<String> stringList = new ArrayList<>();
     private long tempoValidade = 30000;
-    private MediaPlayer mediaPlayer;
+    private MediaPlayer somErro;
+    private static Pattern p = Pattern.compile("[0-9]+");
+    private MediaPlayer somSucess;
+    private String ultimaMatricula = " ";
+    private Boolean isNumeric;
+
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -96,25 +103,39 @@ public class telaMerendaEscolar extends AppCompatActivity {
 
 
 
-    private void playSuccessSound() {
-        if (mediaPlayer != null) {
-            mediaPlayer.start();
+    private void playErrorSound() {
+        if (somErro != null) {
+            somErro.start();
         }
     }
+
+    private void playSucessSound() {
+        if (somSucess != null) {
+            somSucess.start();
+        }
+    }
+
+
 
     @Override
     public void onDestroy() {
         super.onDestroy();
         // Libere os recursos do MediaPlayer ao encerrar a atividade
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
+        if (somErro != null) {
+            somErro.release();
+            somErro = null;
+        }
+
+        if (somSucess != null) {
+            somSucess.release();
+            somSucess = null;
         }
     }
 
     private void carregarCamera(){
         // Inicialize o MediaPlayer com o arquivo de som do sucesso (success_sound.mp3 ou success_sound.wav)
-        mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.error);
+        somErro = MediaPlayer.create(getApplicationContext(), R.raw.error);
+        somSucess = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
 
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -127,7 +148,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private void sCanCode(){
         ScanOptions options = new ScanOptions();
         options.setPrompt("Volume up to flash on");
-        options.setBeepEnabled(true);
+        options.setBeepEnabled(false);
         options.setOrientationLocked(true);
         options.setCaptureActivity(CaptureAct.class);
         barLaucher.launch(options);
@@ -137,20 +158,32 @@ public class telaMerendaEscolar extends AppCompatActivity {
     {
         if(result.getContents() !=null)
         {
-
                 String aux = result.getContents();
+                isNumeric = (aux != null && p.matcher(aux).find());
 
-                if ( aux.length() == 11){
-                    String data = diaAtual();
-                    atualizarMerenda(aux, data);
+                if ( aux.length() == 11 && isNumeric){
+                    if (!ultimaMatricula.equals(aux)){
+                        String data = diaAtual();
+                        atualizarMerenda(aux, data, new Callback() {
+                            @Override
+                            public void onComplete() {
+                                playSucessSound();
+                                ultimaMatricula = aux;
+                            }
+                        });
+                    } else{
+                        playErrorSound();
+                    }
                 } else {
-                    playSuccessSound();
+                    playErrorSound();
                 }
 
                 sCanCode();
 
         }
     });
+
+
 
     private String diaAtual(){
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
@@ -163,7 +196,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
         return data;
     }
 
-    private void atualizarMerenda(String matricula, String data){
+    private void atualizarMerenda(String matricula, String data, Callback callback){
 
         Timestamp novoTimestamp = Timestamp.now();
 
@@ -185,15 +218,18 @@ public class telaMerendaEscolar extends AppCompatActivity {
                     existingList.add(aux);
 
                     docRef.update("todos", existingList);
+                    callback.onComplete();
                 } else {
                     // O documento não existe, crie-o
                     //Map<String, Object> data = new HashMap<>();
                     //data.put("campoASerCriado", valorInicial);
                     //docRef.set(data);
+                    callback.onComplete();
                 }
             } else {
                 // Houve um erro ao buscar o documento
                 Log.d("Firestore", "Erro: " + task.getException());
+                callback.onComplete();
             }
         });
 
