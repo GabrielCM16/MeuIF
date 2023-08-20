@@ -12,6 +12,7 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.meuif.CRUD;
 import com.example.meuif.MainActivity;
@@ -27,7 +28,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
     private CRUD crud = new CRUD();
     private TextView textViewBemVindo;
     private Button botaosair;
-    private Button botao;
+    private ConstraintLayout merenda;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -38,7 +39,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
         inicializarComponentes();
         setarBemVindo();
 
-        botao.setOnClickListener(new View.OnClickListener() {
+        merenda.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 telaMerenda();
@@ -63,7 +64,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
 
     private void inicializarComponentes(){
         textViewBemVindo = findViewById(R.id.textViewBemVindo);
-        botao = findViewById(R.id.botaoMerenda);
+        merenda = findViewById(R.id.constraintMerenda);
         botaosair = findViewById(R.id.botaoSair);
     }
 

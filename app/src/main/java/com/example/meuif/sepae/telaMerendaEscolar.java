@@ -17,13 +17,16 @@ import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 
 import com.example.meuif.CaptureAct;
 import com.example.meuif.MainActivity;
 import com.example.meuif.R;
+import com.example.meuif.Tela_Principal;
 import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
+import com.example.meuif.tela_chamada_dia;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
@@ -95,6 +98,26 @@ public class telaMerendaEscolar extends AppCompatActivity {
             }
         });
 
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Verifica se o item clicado é o botão do ActionBar
+        if (item.getItemId() == android.R.id.home) {
+            // Chame o método que você deseja executar quando o ActionBar for clicado
+            telaVoltar();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+
+    private void telaVoltar(){
+        // Criar a Intent
+        Intent intent = new Intent(getApplicationContext(), telaPrincipalSepae.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
+        finish();
     }
 
     private interface Callback {
