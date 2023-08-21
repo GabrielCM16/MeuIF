@@ -17,6 +17,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.meuif.CRUD;
 import com.example.meuif.MainActivity;
 import com.example.meuif.R;
+import com.example.meuif.sepae.chamada.TelaChamadaLideres;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.DateFormat;
@@ -29,6 +30,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
     private TextView textViewBemVindo;
     private Button botaosair;
     private ConstraintLayout merenda;
+    private ConstraintLayout chamada;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -43,6 +45,13 @@ public class telaPrincipalSepae extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 telaMerenda();
+            }
+        });
+
+        chamada.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                telaChamada();
             }
         });
 
@@ -66,6 +75,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
         textViewBemVindo = findViewById(R.id.textViewBemVindo);
         merenda = findViewById(R.id.constraintMerenda);
         botaosair = findViewById(R.id.botaoSair);
+        chamada = findViewById(R.id.constraintChamada);
     }
 
     public void limparDados(){
@@ -74,6 +84,13 @@ public class telaPrincipalSepae extends AppCompatActivity {
         // Limpando todos os dados armazenados no SharedPreferences
         editor.clear();
         editor.commit();
+    }
+
+    private void telaChamada(){
+        // Criar a Intent
+        Intent intent = new Intent(telaPrincipalSepae.this, TelaChamadaLideres.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
 
