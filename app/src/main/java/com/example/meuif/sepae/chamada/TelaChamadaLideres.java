@@ -95,16 +95,33 @@ public class TelaChamadaLideres extends AppCompatActivity {
     }
 
     private void setarRecyclerView(String diaSelecionado){
-        nomesChamadas.add("gabe");
-        chamdaImages.add(R.drawable.presenca);
+        nomesChamadas.clear();
+        chamdaImages.clear();
 
-        Log.d("TAG", dataGlobal.toString());
+        Log.d("TAG", "dataglobal " + dataGlobal.toString());
 
-        Log.d("TAG", "sla get" + dataGlobal.get(diaSelecionado));
+        Map<String, Object> aux = (Map<String, Object>) dataGlobal.get(diaSelecionado);
 
-        for(int i = 0; i < dias.size(); i++){
+        Log.d("TAG", "sla get" + aux);
 
+        if (aux != null){
+            for (Map.Entry<String, Object> entry : aux.entrySet()) {
+                String chave = entry.getKey();
+                Object valor = entry.getValue();
+
+                nomesChamadas.add(chave);
+                if ((boolean) valor){
+                    chamdaImages.add(R.drawable.presenca);
+                } else if (!(boolean) valor){
+                    chamdaImages.add(R.drawable.falta);
+                }
+
+
+                Log.d("TAG", "Chave: " + chave + ", Valor: " + valor);
+            }
         }
+
+
 
         AdapterChamadaSepae adapter = new AdapterChamadaSepae(nomesChamadas, chamdaImages);
 
@@ -267,10 +284,11 @@ public class TelaChamadaLideres extends AppCompatActivity {
                 for(int i = 0; i< dias.size(); i++){
                     if (selectedDia.equals(dias.get(i).substring(0, 2))){
                         diaSelecionado = dias.get(i);
+                        setarRecyclerView(diaSelecionado);
                         break;
                     }
 
-                    setarRecyclerView(diaSelecionado);
+
                 }
 
                 Log.d("TAG", "dia selecionado" + diaSelecionado);
