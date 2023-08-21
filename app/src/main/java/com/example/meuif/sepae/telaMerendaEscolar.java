@@ -1,13 +1,10 @@
 package com.example.meuif.sepae;
 
-import static android.app.PendingIntent.getActivity;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.recyclerview.widget.LinearLayoutManager;
-import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -15,27 +12,25 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.Spinner;
 
 import com.example.meuif.CaptureAct;
-import com.example.meuif.MainActivity;
 import com.example.meuif.R;
-import com.example.meuif.Tela_Principal;
 import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
-import com.example.meuif.tela_chamada_dia;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
-import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
@@ -44,7 +39,6 @@ import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
@@ -53,7 +47,6 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private FirebaseFirestore db;
     private Button botao;
     private AdapterMerenda adapter;
-    private RecyclerView recyclerMerenda;
     private List<String> stringList = new ArrayList<>();
     private long tempoValidade = 30000;
     private MediaPlayer somErro;
@@ -61,6 +54,15 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private MediaPlayer somSucess;
     private String ultimaMatricula = " ";
     private Boolean isNumeric;
+    private Spinner spinnerMesesMerenda;
+    private Spinner spinnerDiasMerenda;
+    private Spinner spinnerTurmasMerenda;
+    private List<String> dias = new ArrayList<>();
+    private List<String> meses = new ArrayList<>();
+    private String turma = "";
+    private Map<String, Object> dataGlobal = new HashMap<>();
+    private Map<String, String> mesesAno = new HashMap<>();
+    private String diaSelecionado;
 
 
     @SuppressLint("MissingInflatedId")
@@ -69,12 +71,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tela_merenda_escolar);
 
-        botao = findViewById(R.id.botaoCamera);
-        recyclerMerenda = findViewById(R.id.recyclerMerenda);
-        recyclerMerenda.setLayoutManager(new LinearLayoutManager(this));
-
-        db = FirebaseFirestore.getInstance();
-
+        carregarComponentes();
 
 
         ActionBar actionBar = getSupportActionBar();
@@ -86,18 +83,46 @@ public class telaMerendaEscolar extends AppCompatActivity {
         carregarCamera();
     }
 
+    private void carregarComponentes(){
+        botao = findViewById(R.id.botaoCamera);
+        db = FirebaseFirestore.getInstance();
+        spinnerDiasMerenda = findViewById(R.id.spinnerDiasMerenda);
+        spinnerMesesMerenda = findViewById(R.id.spinnerMesesMerenda);
+        spinnerTurmasMerenda = findViewById(R.id.spinnerTurmasMerenda);
+    }
+
     protected void onStart() {
 
         super.onStart();
-        listarDiasMerendados(new Callback() {
+        setarSpinnerTurmas(new Callback() {
             @Override
             public void onComplete() {
-                Log.d("TAG", stringList.toString());
-                adapter = new AdapterMerenda(stringList);
-                recyclerMerenda.setAdapter(adapter);
+
             }
         });
+        listarDiasMerendados();
+    }
 
+    private void setarSpinnerTurmas(Callback callback){
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.turmas, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerTurmasMerenda.setAdapter(adapter);
+
+        spinnerTurmasMerenda.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                dias.clear();
+                String selectedTurma = parent.getItemAtPosition(position).toString();
+
+                turma = selectedTurma;
+                callback.onComplete();
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Ação a ser tomada quando nada é selecionado (opcional)
+            }
+        });
     }
 
     @Override
@@ -264,55 +289,76 @@ public class telaMerendaEscolar extends AppCompatActivity {
         return aux;
     }
 
-    private void listarDiasMerendados(Callback callback){
-        CollectionReference colecRef = db.collection("MerendaEscolar");
+    private void listarDiasMerendados(){
 
-        // Recuperar o documento do Firestore
         db.collection("MerendaEscolar")
-                .document("10082023")
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-                            DocumentSnapshot document = task.getResult();
-                            if (document.exists()) {
-                                Log.d("TAG", "Documento recuperado: " + document.getData());
+                .addOnCompleteListener(task -> {
+                    if (task.isSuccessful()) {
+                        for (QueryDocumentSnapshot document : task.getResult()) {
+                            // Obter um mapa de campos e valores do documento
+                            Map<String, Object> data = document.getData();
 
-                                // Iterar sobre todos os campos do documento
-                                for (String campo : document.getData().keySet()) {
-                                    Log.d("TAG", "Campo: " + campo + ", Valor: " + document.get(campo));
+                            // Percorrer todas as chaves e valores do mapa
+                            for (Map.Entry<String, Object> entry : data.entrySet()) {
+                                String chave = entry.getKey();
+                                Object valor = entry.getValue();
 
-                                }
-
-                                List<HashMap<String, Timestamp>> existingList = (List<HashMap<String, Timestamp>>) document.get("todos");
-
-
-                                if (existingList != null) {
-                                    for (HashMap<String, Timestamp> map : existingList) {
-                                        for (Map.Entry<String, Timestamp> entry : map.entrySet()) {
-                                            String matricula = entry.getKey();
-                                            Timestamp timestamp = entry.getValue();
-
-                                            Log.d("TAG", "Matrícula: " + matricula + ", Timestamp: " + timestamp.toString() + existingList.size());
-                                            stringList.add(matricula);
-                                        }
-                                    }
-                                }
-
-                                callback.onComplete();
-
-
-                            } else {
-                                Log.d("TAG", "Documento não existe");
-                                callback.onComplete();
+                                Log.d("TAG", "onde = " + document.getId()+ " " + "Chave: " + chave + ", Valor: " + valor);
                             }
-                        } else {
-                            Log.d("TAG", "Erro ao recuperar documento: ", task.getException());
-                            callback.onComplete();
                         }
+                    } else {
+                        // Tratar erro aqui, se necessário
                     }
                 });
-        callback.onComplete();
     }
+
+        // Recuperar o documento do Firestore
+//        db.collection("MerendaEscolar")
+//                .document("10082023")
+//                .get()
+//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+//                    @Override
+//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+//                        if (task.isSuccessful()) {
+//                            DocumentSnapshot document = task.getResult();
+//                            if (document.exists()) {
+//                                Log.d("TAG", "Documento recuperado: " + document.getData());
+//
+//                                // Iterar sobre todos os campos do documento
+//                                for (String campo : document.getData().keySet()) {
+//                                    Log.d("TAG", "Campo: " + campo + ", Valor: " + document.get(campo));
+//
+//                                }
+//
+//                                List<HashMap<String, Timestamp>> existingList = (List<HashMap<String, Timestamp>>) document.get("todos");
+//
+//
+//                                if (existingList != null) {
+//                                    for (HashMap<String, Timestamp> map : existingList) {
+//                                        for (Map.Entry<String, Timestamp> entry : map.entrySet()) {
+//                                            String matricula = entry.getKey();
+//                                            Timestamp timestamp = entry.getValue();
+//
+//                                            Log.d("TAG", "Matrícula: " + matricula + ", Timestamp: " + timestamp.toString() + existingList.size());
+//                                            stringList.add(matricula);
+//                                        }
+//                                    }
+//                                }
+//
+//                                callback.onComplete();
+//
+//
+//                            } else {
+//                                Log.d("TAG", "Documento não existe");
+//                                callback.onComplete();
+//                            }
+//                        } else {
+//                            Log.d("TAG", "Erro ao recuperar documento: ", task.getException());
+//                            callback.onComplete();
+//                        }
+//                    }
+//                });
+//        callback.onComplete();
+//    }
 }
