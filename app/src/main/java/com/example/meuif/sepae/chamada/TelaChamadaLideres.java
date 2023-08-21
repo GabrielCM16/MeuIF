@@ -3,6 +3,9 @@ package com.example.meuif.sepae.chamada;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -11,21 +14,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.example.meuif.R;
-import com.example.meuif.sepae.telaMerendaEscolar;
 import com.example.meuif.sepae.telaPrincipalSepae;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.firebase.Timestamp;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,7 +38,12 @@ public class TelaChamadaLideres extends AppCompatActivity {
     private List<String> dias = new ArrayList<>();
     private List<String> meses = new ArrayList<>();
     private String turma = "";
+    private Map<String, Object> dataGlobal = new HashMap<>();
     private Map<String, String> mesesAno = new HashMap<>();
+    private RecyclerView recyclerViewChamadaSepae;
+    private String diaSelecionado;
+    private List<String> nomesChamadas;
+    private List<Integer> chamdaImages;
 
 
     @Override
@@ -83,10 +86,34 @@ public class TelaChamadaLideres extends AppCompatActivity {
                     public void onComplete() {
                         setarSpinnerMeses();
                         setarSpinnerDias();
+                        setarRecyclerView(diaSelecionado);
                     }
                 });
             }
         });
+
+    }
+
+    private void setarRecyclerView(String diaSelecionado){
+        nomesChamadas.add("gabe");
+        chamdaImages.add(R.drawable.presenca);
+
+        Log.d("TAG", dataGlobal.toString());
+
+        Log.d("TAG", "sla get" + dataGlobal.get(diaSelecionado));
+
+        for(int i = 0; i < dias.size(); i++){
+
+        }
+
+        AdapterChamadaSepae adapter = new AdapterChamadaSepae(nomesChamadas, chamdaImages);
+
+        //Configurar RecyclerView
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerViewChamadaSepae.setLayoutManager(layoutManager);
+        recyclerViewChamadaSepae.setHasFixedSize(true);
+        recyclerViewChamadaSepae.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
+        recyclerViewChamadaSepae.setAdapter(adapter); //criar adapter
 
     }
 
@@ -110,6 +137,10 @@ public class TelaChamadaLideres extends AppCompatActivity {
         spinnerMeses = findViewById(R.id.spinnerMeses);
         spinnerDias = findViewById(R.id.spinnerDias);
         spinnerTurmas = findViewById(R.id.spinnerTurmas);
+        recyclerViewChamadaSepae = findViewById(R.id.recyclerViewChamadaSepae);
+
+        nomesChamadas = new ArrayList<>();
+        chamdaImages = new ArrayList<>();
 
         ActionBar actionBar = getSupportActionBar();
         setTitle("Chamada Líderes");
@@ -182,6 +213,10 @@ public class TelaChamadaLideres extends AppCompatActivity {
                         // Obtendo todos os campos do documento
                         Map<String, Object> data = document.getData();
 
+                        dataGlobal = data;
+
+                        Log.d("TAG", "dataGlobal = " + dataGlobal.toString());
+
                         Log.d("TAG", "completo "+data.toString());
 
                         if (data != null) {
@@ -211,7 +246,7 @@ public class TelaChamadaLideres extends AppCompatActivity {
     }
 
     private void setarSpinnerDias(){
-        Log.d("TAG", dias.toString());
+        Log.d("TAG", " dias = " + dias.toString());
 
         // Converter a List<String> em um array de strings simples
         String[] dataArray = new String[dias.size()];
@@ -223,6 +258,29 @@ public class TelaChamadaLideres extends AppCompatActivity {
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, dataArray);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerDias.setAdapter(adapter);
+
+        spinnerDias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedDia = parent.getItemAtPosition(position).toString();
+
+                for(int i = 0; i< dias.size(); i++){
+                    if (selectedDia.equals(dias.get(i).substring(0, 2))){
+                        diaSelecionado = dias.get(i);
+                        break;
+                    }
+
+                    setarRecyclerView(diaSelecionado);
+                }
+
+                Log.d("TAG", "dia selecionado" + diaSelecionado);
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Ação a ser tomada quando nada é selecionado (opcional)
+            }
+        });
     }
 
     private interface Callback {
