@@ -5,6 +5,8 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
@@ -19,11 +21,13 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 
 import com.example.meuif.CaptureAct;
 import com.example.meuif.R;
 import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
+import com.example.meuif.sepae.recyclerMerenda.AlunoMerenda;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
@@ -69,6 +73,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private List<String> listDias = new ArrayList<>();
     private Map<String, Object> listar = new HashMap<>();
     private RecyclerView listardiasMerenda;
+    private List<AlunoMerenda> alunosList = new ArrayList<>();
 
 
     @SuppressLint("MissingInflatedId")
@@ -95,6 +100,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
         spinnerDiasMerenda = findViewById(R.id.spinnerDiasMerenda);
         spinnerMesesMerenda = findViewById(R.id.spinnerMesesMerenda);
         spinnerTurmasMerenda = findViewById(R.id.spinnerTurmasMerenda);
+        listardiasMerenda = findViewById(R.id.listardiasMerenda);
     }
 
     protected void onStart() {
@@ -174,6 +180,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
     }
 
     private void atualizarRecycler(String dia){
+        alunosList.clear();
         Log.d("TAG", "naos sei mais" + dia);
         Object objeto = listar.get(dia);
         if (objeto != null) {
@@ -194,15 +201,32 @@ public class telaMerendaEscolar extends AppCompatActivity {
                         String dataFormatada = sdf.format(timestamp.toDate());
 
                         Log.d("TAG", "Chave obj: " + chave + "Timestamp obj: " + dataFormatada);
+                        AlunoMerenda aluno = new AlunoMerenda("nomeeeeeeeeee", chave, dataFormatada);
+                        alunosList.add(aluno);
 
                     }
                 }
             } else {
                 Log.d("TAG", "Nao é um obj");
             }
+
+            //seta recycler
+            AdapterMerenda adapter = new AdapterMerenda(alunosList);
+
+
+            //Configurar RecyclerView
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+            listardiasMerenda.setLayoutManager(layoutManager);
+            listardiasMerenda.setHasFixedSize(true);
+            listardiasMerenda.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
+            listardiasMerenda.setAdapter(adapter); //criar adapter
+
+
         } else{
             Log.d("TAG", "nullo");
         }
+
+
     }
 
     @Override

@@ -240,7 +240,7 @@ public class TelaChamadaLideres extends AppCompatActivity {
                             // Iterando pelos campos e imprimindo seus nomes
                             for (String fieldName : data.keySet()) {
                                 Log.d("TAG", "Campo: " + fieldName);
-                                if (!fieldName.equals("Lider") && !fieldName.equals("nomesSala")){
+                                if (!fieldName.equals("Lider") && !fieldName.equals("nomesSala") && !fieldName.equals("ViceLider")){
                                     if (!dias.contains(fieldName)){
                                         dias.add(fieldName);
                                     }

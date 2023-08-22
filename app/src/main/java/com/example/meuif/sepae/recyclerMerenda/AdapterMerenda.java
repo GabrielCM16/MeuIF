@@ -12,9 +12,10 @@ import java.util.List;
 
 public class AdapterMerenda extends RecyclerView.Adapter<AdapterMerenda.ViewHolder> {
 
-    private List<String> stringList;
+    private List<AlunoMerenda> stringList;
 
-    public AdapterMerenda(List<String> stringList) {
+    public AdapterMerenda(List<AlunoMerenda> stringList) {
+
         this.stringList = stringList;
     }
 
@@ -22,14 +23,16 @@ public class AdapterMerenda extends RecyclerView.Adapter<AdapterMerenda.ViewHold
     @Override
     public ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.item_lista_alunos_merenda, parent, false);
+                .inflate(R.layout.lister_alunos_merenda, parent, false);
         return new ViewHolder(view);
     }
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        String text = stringList.get(position);
-        holder.textViewItem.setText(text);
+        AlunoMerenda aluno = stringList.get(position);
+        holder.nomeMerenda.setText(aluno.getNome());
+        holder.matriculaMerenda.setText(aluno.getMatricula());
+        holder.horaMerenda.setText(aluno.getHora());
     }
 
     @Override
@@ -38,11 +41,15 @@ public class AdapterMerenda extends RecyclerView.Adapter<AdapterMerenda.ViewHold
     }
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
-        TextView textViewItem;
+        TextView nomeMerenda;
+        TextView matriculaMerenda;
+        TextView horaMerenda;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
-            textViewItem = itemView.findViewById(R.id.textTeste);
+            nomeMerenda = itemView.findViewById(R.id.nomeMerenda);
+            matriculaMerenda = itemView.findViewById(R.id.matriculaMerenda);
+            horaMerenda = itemView.findViewById(R.id.horaMerenda);
         }
     }
 }
