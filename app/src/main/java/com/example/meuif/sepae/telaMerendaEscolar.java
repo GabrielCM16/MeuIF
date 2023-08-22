@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -34,8 +35,10 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -63,6 +66,9 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private Map<String, Object> dataGlobal = new HashMap<>();
     private Map<String, String> mesesAno = new HashMap<>();
     private String diaSelecionado;
+    private List<String> listDias = new ArrayList<>();
+    private Map<String, Object> listar = new HashMap<>();
+    private RecyclerView listardiasMerenda;
 
 
     @SuppressLint("MissingInflatedId")
@@ -100,7 +106,14 @@ public class telaMerendaEscolar extends AppCompatActivity {
 
             }
         });
-        listarDiasMerendados();
+        listarDiasMerendados(new Callback() {
+            @Override
+            public void onComplete() {
+
+                Log.d("TAG", "data" + dataGlobal.toString());
+
+            }
+        });
     }
 
     private void setarSpinnerTurmas(Callback callback){
@@ -123,6 +136,73 @@ public class telaMerendaEscolar extends AppCompatActivity {
                 // Ação a ser tomada quando nada é selecionado (opcional)
             }
         });
+    }
+
+    private void setarSpinnerDias(List<String> lista){
+        // Converter a List<String> em um array de strings simples
+        Log.d("TAG", "lista por agrs" + lista.toString());
+        String[] dataArray = new String[listDias.size()];
+        listDias.toArray(dataArray);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, dataArray);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerDiasMerenda.setAdapter(adapter);
+
+        spinnerDiasMerenda.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                //dias.clear();
+                String selectedDia = parent.getItemAtPosition(position).toString();
+
+                diaSelecionado = selectedDia;
+                Log.d("TAG", "dia sim " + diaSelecionado + lista.toString());
+                for (int i = 0; i<listDias.size(); i++){
+                    if (diaSelecionado.equals(dias.get(i).substring(0,2))){
+                        Log.d("TAG", "dia" + lista.get(i));
+                        atualizarRecycler(lista.get(i));
+                        break;
+                    }
+                }
+
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Ação a ser tomada quando nada é selecionado (opcional)
+            }
+        });
+    }
+
+    private void atualizarRecycler(String dia){
+        Log.d("TAG", "naos sei mais" + dia);
+        Object objeto = listar.get(dia);
+        if (objeto != null) {
+            Log.d("TAG", "teste22" + objeto.toString());
+            if (objeto instanceof List) {
+                // Defina o fuso horário UTC-3
+                TimeZone timeZone = TimeZone.getTimeZone("GMT-3");
+
+                // Crie um SimpleDateFormat usando o fuso horário definido
+                SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+                sdf.setTimeZone(timeZone);
+                List<Map<String, Timestamp>> listaDeMapas = (List<Map<String, Timestamp>>) objeto;
+
+                for (Map<String, Timestamp> mapa : listaDeMapas) {
+                    for (Map.Entry<String, Timestamp> entry : mapa.entrySet()) {
+                        String chave = entry.getKey();
+                        Timestamp timestamp = entry.getValue();
+                        String dataFormatada = sdf.format(timestamp.toDate());
+
+                        Log.d("TAG", "Chave obj: " + chave + "Timestamp obj: " + dataFormatada);
+
+                    }
+                }
+            } else {
+                Log.d("TAG", "Nao é um obj");
+            }
+        } else{
+            Log.d("TAG", "nullo");
+        }
     }
 
     @Override
@@ -289,7 +369,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
         return aux;
     }
 
-    private void listarDiasMerendados(){
+    private void listarDiasMerendados(Callback callback){
 
         db.collection("MerendaEscolar")
                 .get()
@@ -299,66 +379,37 @@ public class telaMerendaEscolar extends AppCompatActivity {
                             // Obter um mapa de campos e valores do documento
                             Map<String, Object> data = document.getData();
 
+                            dataGlobal = data;
+
+                            String diaCompleto = document.getId();
+                            dias.add(diaCompleto);
+                            listDias.add(diaCompleto.substring(0, 2));
+
+
                             // Percorrer todas as chaves e valores do mapa
                             for (Map.Entry<String, Object> entry : data.entrySet()) {
                                 String chave = entry.getKey();
                                 Object valor = entry.getValue();
 
+                                listar.put(document.getId(), valor);
+
                                 Log.d("TAG", "onde = " + document.getId()+ " " + "Chave: " + chave + ", Valor: " + valor);
                             }
+
                         }
+                        Log.d("TAG", "listar listar" + listar.toString());
+                        Log.d("TAG", "diaslist" + listDias.toString());
+                        Log.d("TAG", "teste dia" + listar.get("14082023"));
+                        Log.d("TAG", "todos os dias = " + dias.toString());
+
+                        setarSpinnerDias(dias);
+
+
+                        callback.onComplete();
                     } else {
                         // Tratar erro aqui, se necessário
+                        callback.onComplete();
                     }
                 });
     }
-
-        // Recuperar o documento do Firestore
-//        db.collection("MerendaEscolar")
-//                .document("10082023")
-//                .get()
-//                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-//                    @Override
-//                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-//                        if (task.isSuccessful()) {
-//                            DocumentSnapshot document = task.getResult();
-//                            if (document.exists()) {
-//                                Log.d("TAG", "Documento recuperado: " + document.getData());
-//
-//                                // Iterar sobre todos os campos do documento
-//                                for (String campo : document.getData().keySet()) {
-//                                    Log.d("TAG", "Campo: " + campo + ", Valor: " + document.get(campo));
-//
-//                                }
-//
-//                                List<HashMap<String, Timestamp>> existingList = (List<HashMap<String, Timestamp>>) document.get("todos");
-//
-//
-//                                if (existingList != null) {
-//                                    for (HashMap<String, Timestamp> map : existingList) {
-//                                        for (Map.Entry<String, Timestamp> entry : map.entrySet()) {
-//                                            String matricula = entry.getKey();
-//                                            Timestamp timestamp = entry.getValue();
-//
-//                                            Log.d("TAG", "Matrícula: " + matricula + ", Timestamp: " + timestamp.toString() + existingList.size());
-//                                            stringList.add(matricula);
-//                                        }
-//                                    }
-//                                }
-//
-//                                callback.onComplete();
-//
-//
-//                            } else {
-//                                Log.d("TAG", "Documento não existe");
-//                                callback.onComplete();
-//                            }
-//                        } else {
-//                            Log.d("TAG", "Erro ao recuperar documento: ", task.getException());
-//                            callback.onComplete();
-//                        }
-//                    }
-//                });
-//        callback.onComplete();
-//    }
 }
