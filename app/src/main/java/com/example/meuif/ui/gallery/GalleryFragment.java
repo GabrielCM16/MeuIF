@@ -51,6 +51,7 @@ public class GalleryFragment extends Fragment {
     private CountDownTimer countDownTimer;
     private long auxVerificarQR;
     private String possivelStatus;
+    private Boolean flag;
     private Notification notification;
     public String matricula;
     public String nome;
