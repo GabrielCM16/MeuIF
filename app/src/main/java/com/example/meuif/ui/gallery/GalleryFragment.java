@@ -51,7 +51,7 @@ public class GalleryFragment extends Fragment {
     private CountDownTimer countDownTimer;
     private long auxVerificarQR;
     private String possivelStatus;
-    private Boolean flag;
+    private Boolean flag = true;
     private Notification notification;
     public String matricula;
     public String nome;
@@ -88,6 +88,7 @@ public class GalleryFragment extends Fragment {
         curso = recuperarDados("curso");
         atualizarStatus();
         possivelStatus = recuperarDados("possivelStatus");
+        flag = Boolean.parseBoolean(recuperarDados("flag"));
 
         textNome.setText("Nome: " + nome);
         textMatricula.setText("Matrícula: " + matricula);
@@ -129,12 +130,18 @@ public class GalleryFragment extends Fragment {
                 long segundos = millisUntilFinished / 1000;
                 long minutos = millisUntilFinished / 60000;
                 auxVerificarQR = segundos;
-                if (auxVerificarQR >= 10){
+                if (auxVerificarQR >= 1){
                     String auxStatus = possivelStatus;
+                    Boolean auxFlag = flag;
                     atualizarStatus();
                     possivelStatus = recuperarDados("possivelStatus");
-                    if (possivelStatus != auxStatus){
+                    flag = Boolean.parseBoolean(recuperarDados("flag"));
+                    Log.d("flag", "a" + flag + " b "+ auxFlag);
+                    if (!possivelStatus.equals(auxStatus)){
                          notification.showNotification(getContext(), "Ola! " + nome, "Passe Realizado");
+                    }
+                    if (flag != auxFlag){
+                        notification.showNotification(getContext(), "Ola! " + nome, "Passe da Merenda Realizado, Bom Lanche!");
                     }
                     auxVerificarQR = 0;
                 }
@@ -178,6 +185,24 @@ public class GalleryFragment extends Fragment {
                     if (document.exists()) {
                         String possivelStatus = document.getString("possivelStatus");
                         salvarDados("possivelStatus", possivelStatus);
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
+                }
+            }
+        });
+
+        DocumentReference docRefec = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("merendaPessoal");
+        docRefec.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Boolean flag = document.getBoolean("flag");
+                        salvarDados("flag", String.valueOf(flag));
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
                     }

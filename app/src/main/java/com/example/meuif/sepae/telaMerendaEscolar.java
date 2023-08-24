@@ -385,6 +385,50 @@ public class telaMerendaEscolar extends AppCompatActivity {
             }
         });
 
+
+        //atualizar aluno agora
+        DocumentReference usuarioDocRef = db.collection("Usuarios").document("Alunos").collection(matricula).document("merendaPessoal");
+
+        usuarioDocRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    boolean flagAtual = document.getBoolean("flag");
+
+                    // Criar um novo valor para a flag (inverter o valor booleano)
+                    boolean novoValorFlag = !flagAtual;
+
+                    // Atualizar a flag no documento
+                    usuarioDocRef.update("flag", novoValorFlag)
+                            .addOnSuccessListener(aVoid -> {
+                                // Sucesso ao atualizar a flag
+                                Log.d("Firestore", "Flag atualizada com sucesso");
+                            })
+                            .addOnFailureListener(e -> {
+                                // Falha ao atualizar a flag
+                                Log.e("Firestore", "Erro ao atualizar a flag", e);
+                            });
+
+                    // Adicionar um timestamp ao array "passes"
+                    List<String> passes = (List<String>) document.get("passes");
+                    passes.add(String.valueOf(novoTimestamp)); // Adiciona um timestamp em milissegundos
+                    usuarioDocRef.update("passes", passes)
+                            .addOnSuccessListener(aVoid -> {
+                                // Sucesso ao adicionar o timestamp
+                                Log.d("Firestore", "Timestamp adicionado com sucesso");
+                            })
+                            .addOnFailureListener(e -> {
+                                // Falha ao adicionar o timestamp
+                                Log.e("Firestore", "Erro ao adicionar o timestamp", e);
+                            });
+                } else {
+                    Log.d("Firestore", "Documento não encontrado");
+                }
+            } else {
+                Log.d("Firestore", "Falha em obter o documento", task.getException());
+            }
+        });
+
     }
 
     private String recuperarDados(String chave){
