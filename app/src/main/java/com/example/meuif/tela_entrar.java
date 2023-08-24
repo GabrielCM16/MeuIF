@@ -375,6 +375,7 @@ public class tela_entrar extends AppCompatActivity {
                         Log.d("TAGLER", " chegou no getDadosExtras");
                         String turma = document.getString("turma");
                         salvarDados("turma", turma);
+                        salvarDados("flag","true");
                         String curso = turma.substring(1);
                         if (curso.equals("INF")){
                             salvarDados("curso", "Informatica");

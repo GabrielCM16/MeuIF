@@ -23,6 +23,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 
 import com.example.meuif.CaptureAct;
 import com.example.meuif.R;
@@ -54,6 +55,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private FirebaseFirestore db;
     private Button botao;
     private AdapterMerenda adapter;
+    private TextView saidaNumero;
     private List<String> stringList = new ArrayList<>();
     private long tempoValidade = 30000;
     private MediaPlayer somErro;
@@ -97,6 +99,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private void carregarComponentes(){
         botao = findViewById(R.id.botaoCamera);
         db = FirebaseFirestore.getInstance();
+        saidaNumero = findViewById(R.id.saidaNumero);
         spinnerDiasMerenda = findViewById(R.id.spinnerDiasMerenda);
         spinnerMesesMerenda = findViewById(R.id.spinnerMesesMerenda);
         spinnerTurmasMerenda = findViewById(R.id.spinnerTurmasMerenda);
@@ -211,6 +214,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
             }
 
             //seta recycler
+            saidaNumero.setText(String.valueOf("Total de registros: " + alunosList.size()));
             AdapterMerenda adapter = new AdapterMerenda(alunosList);
 
 
