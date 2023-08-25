@@ -40,6 +40,7 @@ import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.example.meuif.MostrarAtualizacoes;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -73,6 +74,7 @@ public class HomeFragment extends Fragment {
     private String matricula;
     private String diaSemana;
     private TextView saidaSemana;
+    private String versao = "";
     private boolean LiderDeTurma = false;
 
 
@@ -139,9 +141,15 @@ public class HomeFragment extends Fragment {
         return root;
     }
 
+    private interface Callback {
+        void onComplete();
+    }
+
     public void onStart() {
 
         super.onStart();
+
+        String vc = recuperarDados("versao");
 
         botaoLider();
         Log.d("TAGLER", "APOS BOTAO LIDER");
@@ -160,9 +168,48 @@ public class HomeFragment extends Fragment {
         Log.d("TAGLER", "APOS BOTAO LIDER");
         getAulas(turma, "quinta");
         Log.d("TAGLER", "APOS GETAULAS");
+
+        getVersao(new Callback() {
+            @Override
+            public void onComplete() {
+                Log.d("TAGG", "versao app = " + versao + "versao versao " + vc);
+                if (!versao.equals(vc)){
+                    String[] primeiroNome = nomeCompleto.split(" ");
+                    MostrarAtualizacoes mostrarAtualizacoes = new MostrarAtualizacoes();
+                    mostrarAtualizacoes.abrirDialogAtualizacoes(getContext(), primeiroNome[0]);
+                }
+            }
+        });
+
+
         progressBarCentral.setVisibility(View.INVISIBLE);
 
 
+    }
+
+    public void getVersao(Callback callback){
+        DocumentReference docRef = db.collection("MaisInformacoes").document("atualizacoes");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String versaoAux = document.getString("versao");
+                        Log.d("TAGG", "versao no obj = " + versaoAux);
+                        versao = versaoAux;
+                        salvarDados("versao", versaoAux);
+                        callback.onComplete();
+                    } else {
+                        Log.d("TAGG", "Documento de turma não encontrado");
+                        callback.onComplete();
+                    }
+                } else {
+                    Log.d("TAGG", "Falhou em ", task.getException());
+                    callback.onComplete();
+                }
+            }
+        });
     }
 
 
