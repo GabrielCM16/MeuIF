@@ -86,9 +86,20 @@ public class GalleryFragment extends Fragment {
         nome = recuperarDados("nome");
         matricula = recuperarDados("matricula");
         curso = recuperarDados("curso");
-        atualizarStatus();
-        possivelStatus = recuperarDados("possivelStatus");
-        flag = Boolean.parseBoolean(recuperarDados("flag"));
+        atualizarStatus(new Callback() {
+            @Override
+            public void onComplete() {
+                possivelStatus = recuperarDados("possivelStatus");
+
+            }
+        });
+
+        atualizarFlag(matricula ,new Callback() {
+            @Override
+            public void onComplete() {
+                flag = Boolean.parseBoolean(recuperarDados("flag"));
+            }
+        });
 
         textNome.setText("Nome: " + nome);
         textMatricula.setText("Matrícula: " + matricula);
@@ -97,9 +108,19 @@ public class GalleryFragment extends Fragment {
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                atualizarStatus();
-                possivelStatus = recuperarDados("possivelStatus");
-                iniciarTempo(view);
+                atualizarStatus(new Callback() {
+                    @Override
+                    public void onComplete() {
+                        atualizarFlag(matricula ,new Callback() {
+                            @Override
+                            public void onComplete() {
+                                possivelStatus = recuperarDados("possivelStatus");
+                                iniciarTempo(view);
+                            }
+                        });
+                    }
+                });
+
             }
         });
 
@@ -133,17 +154,26 @@ public class GalleryFragment extends Fragment {
                 if (auxVerificarQR >= 1){
                     String auxStatus = possivelStatus;
                     Boolean auxFlag = flag;
-                    atualizarStatus();
-                    possivelStatus = recuperarDados("possivelStatus");
-                    flag = Boolean.parseBoolean(recuperarDados("flag"));
-                    Log.d("flag", "a" + flag + " b "+ auxFlag);
-                    if (!possivelStatus.equals(auxStatus)){
-                         notification.showNotification(getContext(), "Ola! " + nome, "Passe Realizado");
-                    }
-                    if (flag != auxFlag){
-                        notification.showNotification(getContext(), "Ola! " + nome, "Passe da Merenda Realizado, Bom Lanche!");
-                    }
-                    auxVerificarQR = 0;
+                    atualizarStatus(new Callback() {
+                        @Override
+                        public void onComplete() {
+                            possivelStatus = recuperarDados("possivelStatus");
+                            if (!possivelStatus.equals(auxStatus)){
+                                notification.showNotification(getContext(), "Ola! " + nome, "Passe Realizado");
+                            }
+                        }
+                    });
+
+                    atualizarFlag(matricula ,new Callback() {
+                        @Override
+                        public void onComplete() {
+                            flag = Boolean.parseBoolean(recuperarDados("flag"));
+                            Log.d("flag", "a" + flag + " b "+ auxFlag);
+                            if (flag != auxFlag){
+                                notification.showNotification(getContext(), "Ola! " + nome, "Passe da Merenda Realizado, Bom Lanche!");
+                            }
+                        }
+                    });
                 }
                 saidaTempo.setText("tempo restante: " + minutos + ":" + segundos);
             }
@@ -156,6 +186,10 @@ public class GalleryFragment extends Fragment {
             }
         }.start();
 
+    }
+
+    private interface Callback {
+        void onComplete();
     }
 
     private void stopContador() {
@@ -173,7 +207,7 @@ public class GalleryFragment extends Fragment {
 
 
 
-    private void atualizarStatus(){
+    private void atualizarStatus(Callback callback){
         String nMatricula = recuperarDados("matricula");
 
         DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("chamadaPessoal");
@@ -185,15 +219,22 @@ public class GalleryFragment extends Fragment {
                     if (document.exists()) {
                         String possivelStatus = document.getString("possivelStatus");
                         salvarDados("possivelStatus", possivelStatus);
+                        callback.onComplete();
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
+                        callback.onComplete();
                     }
                 } else {
                     Log.d("TAGLER", "Falhou em ", task.getException());
+                    callback.onComplete();
                 }
             }
         });
 
+
+    }
+
+    private void atualizarFlag(String nMatricula, Callback callback ){
         DocumentReference docRefec = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("merendaPessoal");
         docRefec.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -203,11 +244,14 @@ public class GalleryFragment extends Fragment {
                     if (document.exists()) {
                         Boolean flag = document.getBoolean("flag");
                         salvarDados("flag", String.valueOf(flag));
+                        callback.onComplete();
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
+                        callback.onComplete();
                     }
                 } else {
                     Log.d("TAGLER", "Falhou em ", task.getException());
+                    callback.onComplete();
                 }
             }
         });

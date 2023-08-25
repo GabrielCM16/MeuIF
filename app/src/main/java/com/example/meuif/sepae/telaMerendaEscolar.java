@@ -76,6 +76,8 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private Map<String, Object> listar = new HashMap<>();
     private RecyclerView listardiasMerenda;
     private List<AlunoMerenda> alunosList = new ArrayList<>();
+    private final Map<String, String> nomesAlunos = new HashMap<>();
+    private final Map<String, String> turmasAlunos = new HashMap<>();
 
 
     @SuppressLint("MissingInflatedId")
@@ -109,18 +111,98 @@ public class telaMerendaEscolar extends AppCompatActivity {
     protected void onStart() {
 
         super.onStart();
-        setarSpinnerTurmas(new Callback() {
+        pegarNomesAlunos(new Callback() {
             @Override
             public void onComplete() {
+                pegarTurmaAlunos(new Callback() {
+                    @Override
+                    public void onComplete() {
+                        setarSpinnerTurmas(new Callback() {
+                            @Override
+                            public void onComplete() {
+                                listarDiasMerendados(new Callback() {
+                                    @Override
+                                    public void onComplete() {
 
+                                        Log.d("TAG", "data" + dataGlobal.toString());
+
+                                    }
+                                });
+                            }
+                        });
+                    }
+                });
             }
         });
-        listarDiasMerendados(new Callback() {
+
+
+    }
+
+    private void pegarNomesAlunos(Callback callback){
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos");
+
+// Obtém os dados do documento
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
-            public void onComplete() {
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // Obtém o campo "NomesAlunos" como um Map<String, String>
+                        Map<String, String> nomesaux = (Map<String, String>) document.get("NomesAlunos");
 
-                Log.d("TAG", "data" + dataGlobal.toString());
+                        // Agora você pode iterar sobre o Map e acessar os nomes dos alunos
+                        for (Map.Entry<String, String> entry : nomesaux.entrySet()) {
+                            String matricula = entry.getKey();
+                            String nome = entry.getValue();
+                            // Faça algo com as informações...
+                            nomesAlunos.put(matricula, nome);
+                        }
+                        Log.d("TAG", "nomes alunos ==== " + nomesAlunos.toString());
+                        callback.onComplete();
 
+                    } else {
+                        // O documento não existe
+                        callback.onComplete();
+                    }
+                } else {
+                    // Falha ao obter o documento
+                    callback.onComplete();
+                }
+            }
+        });
+    }
+
+    private void pegarTurmaAlunos(Callback callback){
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos");
+
+// Obtém os dados do documento
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Map<String, String> turmaAux = (Map<String, String>) document.get("TurmasAlunos");
+
+                        // Agora você pode iterar sobre o Map e acessar os nomes dos alunos
+                        for (Map.Entry<String, String> entry : turmaAux.entrySet()) {
+                            String matricula = entry.getKey();
+                            String turma = entry.getValue();
+                            // Faça algo com as informações...
+                            turmasAlunos.put(matricula, turma);
+                        }
+                        Log.d("TAG", "turmas alunos ==== " + turmasAlunos.toString());
+                        callback.onComplete();
+
+                    } else {
+                        // O documento não existe
+                        callback.onComplete();
+                    }
+                } else {
+                    // Falha ao obter o documento
+                    callback.onComplete();
+                }
             }
         });
     }
@@ -203,8 +285,11 @@ public class telaMerendaEscolar extends AppCompatActivity {
                         Timestamp timestamp = entry.getValue();
                         String dataFormatada = sdf.format(timestamp.toDate());
 
-                        Log.d("TAG", "Chave obj: " + chave + "Timestamp obj: " + dataFormatada);
-                        AlunoMerenda aluno = new AlunoMerenda("nomeeeeeeeeee", chave, dataFormatada);
+                        Log.d("TAG", "Chave obj: " + chave + "Timestamp obj: " + dataFormatada + " nome na lista " + nomesAlunos.get(chave));
+                        String nome = nomesAlunos.getOrDefault(chave, "Erro em nome");
+                        String turmaAux = turmasAlunos.getOrDefault(chave, "Erro Turma");
+                        String aux = chave + " - " + turmaAux;
+                        AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada);
                         alunosList.add(aluno);
 
                     }

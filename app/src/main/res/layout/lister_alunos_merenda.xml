@@ -10,6 +10,8 @@
         android:id="@+id/nomeMerenda"
         android:layout_width="206dp"
         android:layout_height="27dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="nome aluno completo esperança de fulano"
         android:textColor="@color/black"
         android:textSize="16sp"
