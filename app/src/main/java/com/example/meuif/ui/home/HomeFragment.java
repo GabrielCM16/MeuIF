@@ -15,8 +15,10 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.DefaultItemAnimator;
@@ -69,13 +71,15 @@ public class HomeFragment extends Fragment {
     private TextView saidaNumAusencias;
     private TextView saidaNumPresencas;
     public PieChart pieChart;
-    private Button botaoChamada;
+    private ConstraintLayout botaoChamada;
     private String turma;
     private String matricula;
     private String diaSemana;
     private TextView saidaSemana;
     private String versao = "";
     private boolean LiderDeTurma = false;
+    private ConstraintLayout layoutAulas;
+    private ConstraintLayout layoutFaltas;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -99,7 +103,7 @@ public class HomeFragment extends Fragment {
                 atualizaPresenca();
                 botaoLider();
                 diaSemana = diaAtual();
-                getAulas(turma, "quinta");
+                //getAulas(turma, "quinta");
                 progressBarCentral.setVisibility(View.INVISIBLE);
             }
         });
@@ -114,16 +118,18 @@ public class HomeFragment extends Fragment {
         db = FirebaseFirestore.getInstance();
         textViewBemVindo = root.findViewById(R.id.textViewBemVindo);
         saidaNumAulas = root.findViewById(R.id.saidaNumAulas);
+        layoutAulas = root.findViewById(R.id.constraintVerAulas);
+        layoutFaltas = root.findViewById(R.id.constraintVerFaltas);
         saidaNumAusencias = root.findViewById(R.id.saidaNumAusencias);
         saidaNumPresencas = root.findViewById(R.id.saidaNumPresencas);
-        botaoChamada = root.findViewById(R.id.botaoChamda);
+        botaoChamada = root.findViewById(R.id.constraintChamadaAluno);
         nomeCompleto = recuperarDados("nome");
         pieChart = root.findViewById(R.id.pie_chart);
-        saidaSemana = root.findViewById(R.id.saidaSemana);
-        recyclerAulas = root.findViewById(R.id.recycleAulas);
+        //saidaSemana = root.findViewById(R.id.saidaSemana);
+        //recyclerAulas = root.findViewById(R.id.recycleAulas);
 
-        botaoChamada.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
-        botaoChamada.setPadding(30, botaoChamada.getPaddingTop(), 15, botaoChamada.getPaddingBottom());
+        //botaoChamada.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
+        //botaoChamada.setPadding(30, botaoChamada.getPaddingTop(), 15, botaoChamada.getPaddingBottom());
 
         turma = recuperarDados("turma");
         matricula = recuperarDados("matricula");
@@ -134,9 +140,23 @@ public class HomeFragment extends Fragment {
         atualizaPresenca();
         diaSemana = diaAtual();
         botaoLider();
-        getAulas(turma, "quinta");
+        //getAulas(turma, "quinta");
 
         progressBarCentral.setVisibility(View.INVISIBLE);
+
+        layoutAulas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Função em desenvolvimento", Toast.LENGTH_LONG).show();
+            }
+        });
+
+        layoutFaltas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Toast.makeText(getContext(), "Função em desenvolvimento", Toast.LENGTH_LONG).show();
+            }
+        });
 
         return root;
     }
@@ -257,7 +277,7 @@ public class HomeFragment extends Fragment {
                 if (documentSnapshot.exists()) {
                     if (documentSnapshot.contains(dia)) {
                         Map<String, Object> mapAulas = (Map<String, Object>) documentSnapshot.getData().get(dia);
-                        setarrecylerView(mapAulas);
+                        //setarrecylerView(mapAulas);
 
 
                     } else {
@@ -306,7 +326,7 @@ public class HomeFragment extends Fragment {
         }
 
         diaSemana = data;
-        saidaSemana.setText(dia + ", " + data);
+        //saidaSemana.setText(dia + ", " + data);
         return data;
     }
 
