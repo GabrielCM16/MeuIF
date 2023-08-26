@@ -22,10 +22,11 @@ import java.util.List;
 public class MostrarAtualizacoes {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     List<String> atualizacoesNovas = new ArrayList<>();
+    List<String> atualizacoesCarpio = new ArrayList<>();
 
     public void abrirDialogAtualizacoes(Context context, String nome){
         StringBuilder builder = new StringBuilder();
-        getAtualiza(new Callback() {
+        getAtualizaVersao(new Callback() {
             @Override
             public void onComplete() {
                 for (Object item : atualizacoesNovas) {
@@ -59,7 +60,7 @@ public class MostrarAtualizacoes {
         });
     }
 
-    public void getAtualiza(Callback callback){
+    public void getAtualizaVersao(Callback callback){
         DocumentReference docRef = db.collection("MaisInformacoes").document("atualizacoes");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -88,6 +89,76 @@ public class MostrarAtualizacoes {
             }
         });
     }
+
+    public void getAtualizaCardapio(Callback callback){
+        DocumentReference docRef = db.collection("MaisInformacoes").document("cardapio");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        List<Object> arrayCampo = (List<Object>) document.get("itens");
+
+                        // Agora você pode percorrer o array e fazer o que precisa com os dados
+                        for (Object item : arrayCampo) {
+                            // Faça algo com o item do array
+                            Log.d("Firestore", "Item do array: " + item.toString());
+                            atualizacoesCarpio.add(item.toString());
+                        }
+
+                        callback.onComplete();
+                    } else {
+                        Log.d("TAGG", "Documento de turma não encontrado");
+                        callback.onComplete();
+                    }
+                } else {
+                    Log.d("TAGG", "Falhou em ", task.getException());
+                    callback.onComplete();
+                }
+            }
+        });
+    }
+
+    public void abrirDialogCardapio(Context context, String dia){
+        StringBuilder builder = new StringBuilder();
+
+        builder.append("De 12:00 até 13:00\n\n");
+        getAtualizaCardapio(new Callback() {
+            @Override
+            public void onComplete() {
+                for (Object item : atualizacoesCarpio) {
+                    builder.append(item.toString()).append("\n\n");
+                }
+
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(context);
+
+                //configurar titulo e mensagem
+                dialog.setTitle("Cardapio de " + dia );
+                dialog.setMessage(builder.toString());
+
+                //configurar cancelamento do alert dialog
+                dialog.setCancelable(false);
+
+                //configurar icone
+                //dialog.setIcon(android.R.drawable.ic_btn_speak_now);
+
+                //configurar açoes para sim e nâo
+                dialog.setPositiveButton("Fechar", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        Toast.makeText(context, "Lembre-se não será possivel pegar depois do horário de termino " , Toast.LENGTH_SHORT).show();
+                    }
+                });
+
+                dialog.create();
+                dialog.show();
+            }
+        });
+    }
+
+
 
     private interface Callback {
         void onComplete();

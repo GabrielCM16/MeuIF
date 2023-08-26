@@ -28,6 +28,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.meuif.Aulas;
 import com.example.meuif.AulasAdapter;
 import com.example.meuif.R;
+import com.example.meuif.TelaMerendaPessoal;
+import com.example.meuif.Tela_Principal;
 import com.example.meuif.databinding.FragmentHomeBinding;
 import com.example.meuif.tela_chamada_dia;
 import com.github.mikephil.charting.charts.PieChart;
@@ -80,6 +82,7 @@ public class HomeFragment extends Fragment {
     private boolean LiderDeTurma = false;
     private ConstraintLayout layoutAulas;
     private ConstraintLayout layoutFaltas;
+    private ConstraintLayout layoutMerenda;
 
 
     public View onCreateView(@NonNull LayoutInflater inflater,
@@ -120,6 +123,7 @@ public class HomeFragment extends Fragment {
         saidaNumAulas = root.findViewById(R.id.saidaNumAulas);
         layoutAulas = root.findViewById(R.id.constraintVerAulas);
         layoutFaltas = root.findViewById(R.id.constraintVerFaltas);
+        layoutMerenda = root.findViewById(R.id.constraintMerendaAluno);
         saidaNumAusencias = root.findViewById(R.id.saidaNumAusencias);
         saidaNumPresencas = root.findViewById(R.id.saidaNumPresencas);
         botaoChamada = root.findViewById(R.id.constraintChamadaAluno);
@@ -158,7 +162,22 @@ public class HomeFragment extends Fragment {
             }
         });
 
+        layoutMerenda.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                telaMerendaPessoal();
+            }
+        });
+
         return root;
+    }
+
+    private void telaMerendaPessoal(){
+        // Criar a Intent
+        Intent intent = new Intent(getContext(), TelaMerendaPessoal.class);
+
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
     private interface Callback {
