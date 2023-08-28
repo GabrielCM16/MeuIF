@@ -12,6 +12,8 @@
         android:layout_width="295dp"
         android:layout_height="30dp"
         android:layout_marginStart="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
         android:text="TextView"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"

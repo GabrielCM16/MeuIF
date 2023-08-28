@@ -38,7 +38,10 @@ import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
@@ -128,7 +131,15 @@ public class tela_chamada_dia extends AppCompatActivity {
 
     private void atualizarListView(){
         int firstVisibleItemPosition = listView.getFirstVisiblePosition();
-        CustomChamadaAdapter customChamadaAdapter = new CustomChamadaAdapter(getApplicationContext(), nomesChamada, chamdaImages);
+        Log.d("TAGGG", nomesChamada.toString());
+        List<String> nomesComPrefixo = new ArrayList<>();
+        for (int i = 0; i < nomesChamada.size(); i++) {
+            String nome = nomesChamada.get(i);
+            String nomeComPrefixo = (i + 1) + " - " + nome;
+            nomesComPrefixo.add(nomeComPrefixo);
+        }
+        Log.d("TAGGG", nomesComPrefixo.toString());
+        CustomChamadaAdapter customChamadaAdapter = new CustomChamadaAdapter(getApplicationContext(), nomesComPrefixo, chamdaImages);
         listView.setAdapter(customChamadaAdapter);
         listView.setSelection(firstVisibleItemPosition);
     }
@@ -192,10 +203,12 @@ public class tela_chamada_dia extends AppCompatActivity {
         Map<String, Boolean> mapDataChamada = new HashMap<>();
 
         for (int i = 0; i < mapData.size(); i++) {
+            //String nomeAux = mapData.get(i).substring(4);
+            String nomeAux = mapData.get(i);
             if (images.get(i) == R.drawable.falta){
-                mapDataChamada.put(mapData.get(i), false);
+                mapDataChamada.put(nomeAux, false);
             } else if (images.get(i) == R.drawable.presenca){
-                mapDataChamada.put(mapData.get(i), true);
+                mapDataChamada.put(nomeAux, true);
             }
         }
 
@@ -227,7 +240,9 @@ public class tela_chamada_dia extends AppCompatActivity {
 
     private void atualizarListaNomes(List<String> nomes){
         progressBarChamada.setVisibility(View.VISIBLE);
+        int cont = 0;
         for (String stringValue : nomes) {
+            cont += 1;
             Log.d("TAG", "String da chamada list view: " + stringValue); // Exibir no logcat
             nomesChamada.add(stringValue);
             chamdaImages.add(R.drawable.presenca);
@@ -238,17 +253,38 @@ public class tela_chamada_dia extends AppCompatActivity {
 
     private void atualizarListaNomes(Map<String, Boolean> mapData){
         progressBarChamada.setVisibility(View.VISIBLE);
-        for (Map.Entry<String, Boolean> entry : mapData.entrySet()) {
+        Log.d("ATU", "antes de atu" + mapData);
+
+        List<Map.Entry<String, Boolean>> sortedEntries = new ArrayList<>(mapData.entrySet());
+
+        Collections.sort(sortedEntries, new Comparator<Map.Entry<String, Boolean>>() {
+            @Override
+            public int compare(Map.Entry<String, Boolean> entry1, Map.Entry<String, Boolean> entry2) {
+                return entry1.getKey().compareTo(entry2.getKey());
+            }
+        });
+
+        Map<String, Boolean> sortedMap = new LinkedHashMap<>();
+        for (Map.Entry<String, Boolean> entry : sortedEntries) {
+            sortedMap.put(entry.getKey(), entry.getValue());
+        }
+
+        Log.d("ATU", "depois de atu" + sortedMap);
+
+        int cont = 1;
+
+        for (Map.Entry<String, Boolean> entry : sortedMap.entrySet()) {
             String key = entry.getKey();
             Boolean value = entry.getValue();
             Log.d("TAG", "Key: " + key + ", Value: " + value);
-            nomesChamada.add(key);
+            String nomeAux = key;
+            nomesChamada.add(nomeAux);
             if (value){
                 chamdaImages.add(R.drawable.presenca);
             } else if (!value){
                 chamdaImages.add(R.drawable.falta);
             }
-
+            cont++;
         }
 
         progressBarChamada.setVisibility(View.INVISIBLE);
