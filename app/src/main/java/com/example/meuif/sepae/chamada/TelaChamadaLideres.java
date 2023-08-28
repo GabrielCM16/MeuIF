@@ -26,7 +26,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -105,20 +108,39 @@ public class TelaChamadaLideres extends AppCompatActivity {
         Log.d("TAG", "sla get" + aux);
 
         if (aux != null){
-            for (Map.Entry<String, Object> entry : aux.entrySet()) {
+
+            List<Map.Entry<String, Object>> sortedEntries = new ArrayList<>(aux.entrySet());
+
+            Collections.sort(sortedEntries, new Comparator<Map.Entry<String, Object>>() {
+                @Override
+                public int compare(Map.Entry<String, Object> entry1, Map.Entry<String, Object> entry2) {
+                    return entry1.getKey().compareTo(entry2.getKey());
+                }
+            });
+
+            Map<String, Object> sortedMap = new LinkedHashMap<>();
+            for (Map.Entry<String, Object> entry : sortedEntries) {
+                sortedMap.put(entry.getKey(), entry.getValue());
+            }
+
+            int cont = 1;
+            for (Map.Entry<String, Object> entry : sortedMap.entrySet()) {
                 String chave = entry.getKey();
                 Object valor = entry.getValue();
 
-                nomesChamadas.add(chave);
+                nomesChamadas.add(cont + " - " + chave);
                 if ((boolean) valor){
                     chamdaImages.add(R.drawable.presenca);
                 } else if (!(boolean) valor){
                     chamdaImages.add(R.drawable.falta);
                 }
 
+                cont += 1;
+
 
                 Log.d("TAG", "Chave: " + chave + ", Valor: " + valor);
             }
+
         }
 
 
