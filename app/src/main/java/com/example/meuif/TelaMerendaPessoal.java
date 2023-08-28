@@ -109,6 +109,7 @@ public class TelaMerendaPessoal extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
+                        int auxNumero = 0;
                        List<String> aux = (List<String>) document.get("passes");
                         for (String item : aux) {
                             // Definir padrões de expressões regulares para extrair segundos e nanossegundos
@@ -131,9 +132,11 @@ public class TelaMerendaPessoal extends AppCompatActivity {
                                 SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
                                 sdf.setTimeZone(TimeZone.getTimeZone("GMT-3"));
 
+                                auxNumero += 1;
+
                                 // Formatar a data para exibição
                                 String dataFormatada = sdf.format(date);
-                                AlunoMerenda eu = new AlunoMerenda(nome, matricula, dataFormatada);
+                                AlunoMerenda eu = new AlunoMerenda(nome, matricula, dataFormatada, String.valueOf(auxNumero));
                                 diasMerendados.add(eu);
                             }
                         }

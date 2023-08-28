@@ -33,6 +33,7 @@ public class AdapterMerenda extends RecyclerView.Adapter<AdapterMerenda.ViewHold
         holder.nomeMerenda.setText(aluno.getNome());
         holder.matriculaMerenda.setText(aluno.getMatricula());
         holder.horaMerenda.setText(aluno.getHora());
+        holder.numeroMerenda.setText(aluno.getNumero());
     }
 
     @Override
@@ -44,12 +45,14 @@ public class AdapterMerenda extends RecyclerView.Adapter<AdapterMerenda.ViewHold
         TextView nomeMerenda;
         TextView matriculaMerenda;
         TextView horaMerenda;
+        TextView numeroMerenda;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             nomeMerenda = itemView.findViewById(R.id.nomeMerenda);
             matriculaMerenda = itemView.findViewById(R.id.matriculaMerenda);
             horaMerenda = itemView.findViewById(R.id.horaMerenda);
+            numeroMerenda = itemView.findViewById(R.id.numeroMerenda);
         }
     }
 }

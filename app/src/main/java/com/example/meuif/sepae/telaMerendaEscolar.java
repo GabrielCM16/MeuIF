@@ -35,6 +35,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
@@ -279,17 +280,21 @@ public class telaMerendaEscolar extends AppCompatActivity {
                 sdf.setTimeZone(timeZone);
                 List<Map<String, Timestamp>> listaDeMapas = (List<Map<String, Timestamp>>) objeto;
 
+                int auxNumero = 0;
+
                 for (Map<String, Timestamp> mapa : listaDeMapas) {
                     for (Map.Entry<String, Timestamp> entry : mapa.entrySet()) {
                         String chave = entry.getKey();
                         Timestamp timestamp = entry.getValue();
                         String dataFormatada = sdf.format(timestamp.toDate());
 
+                        auxNumero += 1;
+
                         Log.d("TAG", "Chave obj: " + chave + "Timestamp obj: " + dataFormatada + " nome na lista " + nomesAlunos.get(chave));
                         String nome = nomesAlunos.getOrDefault(chave, "Erro em nome");
                         String turmaAux = turmasAlunos.getOrDefault(chave, "Erro Turma");
                         String aux = chave + " - " + turmaAux;
-                        AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada);
+                        AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
                         alunosList.add(aluno);
 
                     }
@@ -462,9 +467,25 @@ public class telaMerendaEscolar extends AppCompatActivity {
                     callback.onComplete();
                 } else {
                     // O documento não existe, crie-o
-                    //Map<String, Object> data = new HashMap<>();
-                    //data.put("campoASerCriado", valorInicial);
-                    //docRef.set(data);
+                    Map<String, Object> dados = new HashMap<>();
+                    dados.put(matricula, novoTimestamp); // Insere o timestamp atual
+
+// Cria um array com um mapa dentro dele
+                    List<Map<String, Object>> array = new ArrayList<>();
+                    array.add(dados);
+
+// Cria um mapa para o campo "todos"
+                    Map<String, Object> mapaTodos = new HashMap<>();
+                    mapaTodos.put("todos", array);
+
+// Insere os dados no documento
+                    docRef.set(mapaTodos)
+                            .addOnSuccessListener(aVoid -> {
+                                // Sucesso ao criar o documento
+                            })
+                            .addOnFailureListener(e -> {
+                                // Falha ao criar o documento
+                            });
                     callback.onComplete();
                 }
             } else {
