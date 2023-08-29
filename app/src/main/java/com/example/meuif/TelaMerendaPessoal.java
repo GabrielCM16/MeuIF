@@ -18,6 +18,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 
 import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
@@ -165,11 +166,23 @@ public class TelaMerendaPessoal extends AppCompatActivity {
     }
 
     private void telaCarteirinha(){
-        // Criar a Intent
-        Intent intent = new Intent(this, Tela_Principal.class);
+        ScrollView aux = findViewById(R.id.scroll);
+        aux.setVisibility(View.GONE);
+        recyclerViewPessoalMerenda.setVisibility(View.GONE);
+        // Criar uma instância do fragmento
+        GalleryFragment meuFragment = new GalleryFragment();
 
-        // Iniciar a atividade de destino
-        startActivity(intent);
+        // Obter o FragmentManager
+        FragmentManager fragmentManager = getSupportFragmentManager();
+
+        // Iniciar a transação de fragmento
+        FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
+
+        // Substituir o conteúdo do LinearLayout pelo fragmento
+        fragmentTransaction.replace(R.id.principalConstraint, meuFragment);
+
+        // Confirmar a transação
+        fragmentTransaction.commit();
     }
 
     @Override
