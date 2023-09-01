@@ -78,7 +78,7 @@ public class Informacoes_pessoais extends Fragment {
 
 
 
-        teste.setText("Ola!\n Esta é a primeira versão do aplicativo MeuIF. Caso encontre erros, falhas ou queira deixar sugestões/feedback, agradecemos!\n\n entre em contato pelo email:");
+        teste.setText("Ola!\n Esta é a primeira versão do aplicativo MeuIF. Caso encontre erros, falhas ou queira deixar sugestões/feedback, agradecemos!\n\n entre em contato pelo email:\n\n gabrielcostademoraes13@gmail.com\\n ou\\n heloisaraquel1304@gmail.com");
         db = FirebaseFirestore.getInstance();
         botao.setOnClickListener(new View.OnClickListener() {
             @Override

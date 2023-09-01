@@ -2,6 +2,8 @@ package com.example.meuif.sepae;
 
 import static android.app.PendingIntent.getActivity;
 
+import static androidx.core.content.ContentProviderCompat.requireContext;
+
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
@@ -17,6 +19,7 @@ import androidx.constraintlayout.widget.ConstraintLayout;
 import com.example.meuif.CRUD;
 import com.example.meuif.MainActivity;
 import com.example.meuif.R;
+import com.example.meuif.sepae.Portaria.PassePortaria;
 import com.example.meuif.sepae.chamada.TelaChamadaLideres;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -30,6 +33,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
     private TextView textViewBemVindo;
     private Button botaosair;
     private ConstraintLayout merenda;
+    private ConstraintLayout carteirinha;
     private ConstraintLayout chamada;
 
     @SuppressLint("MissingInflatedId")
@@ -55,6 +59,13 @@ public class telaPrincipalSepae extends AppCompatActivity {
             }
         });
 
+        carteirinha.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                telaPortaria();
+            }
+        });
+
         botaosair.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -74,8 +85,16 @@ public class telaPrincipalSepae extends AppCompatActivity {
     private void inicializarComponentes(){
         textViewBemVindo = findViewById(R.id.textViewBemVindo);
         merenda = findViewById(R.id.constraintMerenda);
+        carteirinha = findViewById(R.id.constraintPasseCarteirinha);
         botaosair = findViewById(R.id.botaoSair);
         chamada = findViewById(R.id.constraintChamada);
+    }
+
+    private void telaPortaria(){
+        // Criar a Intent
+        Intent intent = new Intent(telaPrincipalSepae.this, PassePortaria.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
     public void limparDados(){

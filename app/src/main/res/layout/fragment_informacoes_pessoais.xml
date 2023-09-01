@@ -9,13 +9,13 @@
 
     <TextView
         android:id="@+id/testeaaa"
-        android:layout_width="339dp"
-        android:layout_height="303dp"
+        android:layout_width="359dp"
+        android:layout_height="513dp"
         android:contextClickable="false"
         android:elegantTextHeight="true"
         android:fontFamily="@font/fira_mono_bold"
         android:freezesText="false"
-        android:text="Ola!\n Esta é a primeira versão do aplicativo MeuIF. Caso encontre erros, falhas ou queira deixar sugestões/feedback, agradecemos!\n\n entre em contato pelo email:"
+        android:text="Ola!\n Esta é a primeira versão do aplicativo MeuIF. Caso encontre erros, falhas ou queira deixar sugestões/feedback, agradecemos!\n\n entre em contato pelo email:\n\n gabrielcostademoraes13@gmail.com\n ou\n heloisaraquel1304@gmail.com"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="24sp"
@@ -25,25 +25,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.172" />
-
-    <TextView
-        android:id="@+id/textemail"
-        android:layout_width="387dp"
-        android:layout_height="94dp"
-        android:contextClickable="false"
-        android:elegantTextHeight="true"
-        android:fontFamily="@font/fira_mono_bold"
-        android:freezesText="false"
-        android:text="gabrielcostademoraes13@gmail.com\n ou\n heloisaraquel1304@gmail.com"
-        android:textAlignment="center"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.654" />
 
     <Button
         android:id="@+id/botao"
