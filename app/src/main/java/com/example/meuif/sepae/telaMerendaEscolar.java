@@ -41,6 +41,7 @@ import com.google.firebase.firestore.QueryDocumentSnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.lang.reflect.Array;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -294,8 +295,16 @@ public class telaMerendaEscolar extends AppCompatActivity {
                         String nome = nomesAlunos.getOrDefault(chave, "Erro em nome");
                         String turmaAux = turmasAlunos.getOrDefault(chave, "Erro Turma");
                         String aux = chave + " - " + turmaAux;
-                        AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
-                        alunosList.add(aluno);
+                        if (turma.equals("Todos")) {
+                            AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
+                            alunosList.add(aluno);
+                        } else if (turma.equals(turmaAux)){
+                            AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
+                            alunosList.add(aluno);
+                        } else {
+                            continue;
+                        }
+
 
                     }
                 }
@@ -548,6 +557,9 @@ public class telaMerendaEscolar extends AppCompatActivity {
     }
 
     private void listarDiasMerendados(Callback callback){
+
+        dias.clear();
+        listDias.clear();
 
         db.collection("MerendaEscolar")
                 .get()

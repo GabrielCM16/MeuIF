@@ -30,6 +30,7 @@
     </string-array>
 
     <string-array name="turmas">
+        <item>Todos</item>
         <item>1INF</item>
         <item>2INF</item>
         <item>3INF</item>
