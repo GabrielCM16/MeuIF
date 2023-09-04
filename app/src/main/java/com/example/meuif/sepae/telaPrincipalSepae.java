@@ -8,17 +8,23 @@ import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.ViewUtils;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
 import com.example.meuif.CRUD;
 import com.example.meuif.MainActivity;
 import com.example.meuif.R;
+import com.example.meuif.sepae.Portaria.ContabilizarFaltas;
 import com.example.meuif.sepae.Portaria.PassePortaria;
 import com.example.meuif.sepae.chamada.TelaChamadaLideres;
 import com.google.firebase.auth.FirebaseAuth;
@@ -32,9 +38,11 @@ public class telaPrincipalSepae extends AppCompatActivity {
     private CRUD crud = new CRUD();
     private TextView textViewBemVindo;
     private Button botaosair;
+    private ProgressBar loadingSepae;
     private ConstraintLayout merenda;
     private ConstraintLayout carteirinha;
     private ConstraintLayout chamada;
+    private ConstraintLayout faltas;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -56,6 +64,13 @@ public class telaPrincipalSepae extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 telaChamada();
+            }
+        });
+
+        faltas.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                contabilizarFaltas();
             }
         });
 
@@ -87,7 +102,10 @@ public class telaPrincipalSepae extends AppCompatActivity {
         merenda = findViewById(R.id.constraintMerenda);
         carteirinha = findViewById(R.id.constraintPasseCarteirinha);
         botaosair = findViewById(R.id.botaoSair);
+        loadingSepae = findViewById(R.id.loadingSepae);
+        faltas = findViewById(R.id.constraintFaltas);
         chamada = findViewById(R.id.constraintChamada);
+        loadingSepae.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
     }
 
     private void telaPortaria(){
@@ -95,6 +113,18 @@ public class telaPrincipalSepae extends AppCompatActivity {
         Intent intent = new Intent(telaPrincipalSepae.this, PassePortaria.class);
         // Iniciar a atividade de destino
         startActivity(intent);
+    }
+
+    private void contabilizarFaltas(){
+        loadingSepae.setVisibility(View.VISIBLE);
+        ContabilizarFaltas contabil = new ContabilizarFaltas(getApplicationContext(), "03092023");
+        contabil.contarFaltas(new ContabilizarFaltas.Callback() {
+            @Override
+            public void onComplete() {
+                loadingSepae.setVisibility(View.INVISIBLE);
+            }
+        });
+
     }
 
     public void limparDados(){
@@ -110,6 +140,10 @@ public class telaPrincipalSepae extends AppCompatActivity {
         Intent intent = new Intent(telaPrincipalSepae.this, TelaChamadaLideres.class);
         // Iniciar a atividade de destino
         startActivity(intent);
+    }
+
+    private interface Callback {
+        void onComplete();
     }
 
 
