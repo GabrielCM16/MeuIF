@@ -86,7 +86,7 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/constraintPasseCarteirinha"
-        app:layout_constraintVertical_bias="0.103" />
+        app:layout_constraintVertical_bias="0.496" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintChamada"
@@ -197,6 +197,45 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageViewCarteirinha" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintCardapio"
+        android:layout_width="120dp"
+        android:layout_height="120dp"
+        android:background="@drawable/background_button"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.527"
+        app:layout_constraintStart_toEndOf="@+id/constraintPasseCarteirinha"
+        app:layout_constraintTop_toBottomOf="@+id/constraintFaltas"
+        app:layout_constraintVertical_bias="0.123">
+
+        <ImageView
+            android:id="@+id/imageViewCardapio"
+            android:layout_width="85dp"
+            android:layout_height="63dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.457"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.087"
+            app:srcCompat="@drawable/talher" />
+
+        <TextView
+            android:id="@+id/textViewCardapio"
+            android:layout_width="119dp"
+            android:layout_height="45dp"
+            android:fontFamily="@font/fira_mono_bold"
+            android:gravity="center"
+            android:text="Cardápio"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewCardapio" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
 

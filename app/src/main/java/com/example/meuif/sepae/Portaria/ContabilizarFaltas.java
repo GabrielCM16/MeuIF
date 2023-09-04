@@ -1,8 +1,11 @@
 package com.example.meuif.sepae.Portaria;
 
+import static com.google.common.net.InetAddresses.increment;
+
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.util.Log;
 import android.view.View;
 import android.widget.Toast;
@@ -15,6 +18,7 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.text.SimpleDateFormat;
@@ -31,13 +35,15 @@ public class ContabilizarFaltas {
 
     private FirebaseFirestore db;
     private Context context;
+    private String diaSemana;
     private List<String> dias = new ArrayList<String>();
     private String dia;
     private final Map<String, String> nomesAlunos = new HashMap<>();
 
-    public ContabilizarFaltas(Context context, String dia) {
+    public ContabilizarFaltas(Context context, String dia, String diaSemana) {
         this.context = context;
         this.dia = dia;
+        this.diaSemana = diaSemana;
     }
 
 
@@ -94,6 +100,7 @@ public class ContabilizarFaltas {
                         pegarNomesAlunos(new Callback() {
                             @Override
                             public void onComplete() {
+                                //setarFalta("20213018108", dia);
                                 for (String chave : nomesAlunos.keySet()) {
                                     setarFalta(chave, dia);
                                     Log.d("cont", chave);
@@ -150,6 +157,7 @@ public class ContabilizarFaltas {
         });
     }
 
+
     private void setarFalta(String matricula, String data){
         DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(matricula)
                 .document("chamadaPessoal");
@@ -164,6 +172,20 @@ public class ContabilizarFaltas {
                     if (task.getResult().exists() && task.getResult().contains("faltas")){
                         DocumentSnapshot document = task.getResult();
                         String valorPresenca = document.getString("faltas");
+                        Map<String, String> todosMap = (Map<String, String>) document.get("todos");
+
+                        // Verifique se a chave existe no mapa
+                        Log.d("cont", diaSemana);
+                        Log.d("cont", todosMap.toString());
+                        if (todosMap.containsKey(diaSemana)) {
+                            String valorAtual =  String.valueOf(todosMap.get(diaSemana));
+
+                            // Converte o valorLong para Integer, incrementa e coloca de volta no mapa
+                            todosMap.put(diaSemana, String.valueOf(Integer.valueOf(valorAtual) + 1));
+                        } else {
+                            // Se a chave não existe no mapa, você pode simplesmente colocar o valorLong convertido em Integer no mapa
+                            todosMap.put(diaSemana, String.valueOf(1));
+                        }
 
                         // Converta o valor atual para inteiro
                         int valorAtualInt = Integer.parseInt(valorPresenca);
@@ -172,6 +194,14 @@ public class ContabilizarFaltas {
                         docRef.update("faltas", String.valueOf(valorAtualInt + 1))
                                 .addOnSuccessListener(aVoid -> System.out.println("Campo incrementado com sucesso!"))
                                 .addOnFailureListener(e -> System.out.println("Erro ao incrementar campo: " + e.getMessage()));
+
+                        docRef.update("todos", todosMap)
+                                .addOnSuccessListener(aVoid1 -> {
+                                    System.out.println("Campo 'todos' atualizado com sucesso!");
+                                })
+                                .addOnFailureListener(e -> {
+                                    System.out.println("Erro ao atualizar campo 'todos': " + e.getMessage());
+                                });
 
                     }
                 }

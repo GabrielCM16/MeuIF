@@ -31,7 +31,10 @@ import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.Date;
+import java.util.Locale;
+import java.util.TimeZone;
 
 public class telaPrincipalSepae extends AppCompatActivity {
 
@@ -117,7 +120,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
 
     private void contabilizarFaltas(){
         loadingSepae.setVisibility(View.VISIBLE);
-        ContabilizarFaltas contabil = new ContabilizarFaltas(getApplicationContext(), "03092023");
+        ContabilizarFaltas contabil = new ContabilizarFaltas(getApplicationContext(), "04092023", diaAtualSemAcentos());
         contabil.contarFaltas(new ContabilizarFaltas.Callback() {
             @Override
             public void onComplete() {
@@ -125,6 +128,39 @@ public class telaPrincipalSepae extends AppCompatActivity {
             }
         });
 
+    }
+
+        public String diaAtualSemAcentos() {
+            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
+            int diaSemana = calendar.get(Calendar.DAY_OF_WEEK);
+
+            String nomeDiaSemana = "";
+
+            switch (diaSemana) {
+                case Calendar.SUNDAY:
+                    nomeDiaSemana = "Domingo";
+                    break;
+                case Calendar.MONDAY:
+                    nomeDiaSemana = "Segunda-feira";
+                    break;
+                case Calendar.TUESDAY:
+                    nomeDiaSemana = "Terca-feira";
+                    break;
+                case Calendar.WEDNESDAY:
+                    nomeDiaSemana = "Quarta-feira";
+                    break;
+                case Calendar.THURSDAY:
+                    nomeDiaSemana = "Quinta-feira";
+                    break;
+                case Calendar.FRIDAY:
+                    nomeDiaSemana = "Sexta-feira";
+                    break;
+                case Calendar.SATURDAY:
+                    nomeDiaSemana = "Sabado";
+                    break;
+            }
+
+            return nomeDiaSemana;
     }
 
     public void limparDados(){
