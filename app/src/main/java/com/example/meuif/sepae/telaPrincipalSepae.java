@@ -41,6 +41,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
     private CRUD crud = new CRUD();
     private TextView textViewBemVindo;
     private Button botaosair;
+    private ConstraintLayout cardapio;
     private ProgressBar loadingSepae;
     private ConstraintLayout merenda;
     private ConstraintLayout carteirinha;
@@ -84,6 +85,13 @@ public class telaPrincipalSepae extends AppCompatActivity {
             }
         });
 
+        cardapio.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                telaCardapio();
+            }
+        });
+
         botaosair.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -105,10 +113,18 @@ public class telaPrincipalSepae extends AppCompatActivity {
         merenda = findViewById(R.id.constraintMerenda);
         carteirinha = findViewById(R.id.constraintPasseCarteirinha);
         botaosair = findViewById(R.id.botaoSair);
+        cardapio = findViewById(R.id.constraintCardapio);
         loadingSepae = findViewById(R.id.loadingSepae);
         faltas = findViewById(R.id.constraintFaltas);
         chamada = findViewById(R.id.constraintChamada);
         loadingSepae.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+    }
+
+    private void telaCardapio(){
+        // Criar a Intent
+        Intent intent = new Intent(telaPrincipalSepae.this, telaCardapio.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
     private void telaPortaria(){

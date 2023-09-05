@@ -17,12 +17,16 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class MostrarAtualizacoes {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     List<String> atualizacoesNovas = new ArrayList<>();
-    List<String> atualizacoesCarpio = new ArrayList<>();
+    public String cardapioSEPAE = "";
+    private final List<String> atualizacoesCarpio = new ArrayList<>();
 
     public void abrirDialogAtualizacoes(Context context, String nome){
         StringBuilder builder = new StringBuilder();
@@ -105,6 +109,7 @@ public class MostrarAtualizacoes {
                             // Faça algo com o item do array
                             Log.d("Firestore", "Item do array: " + item.toString());
                             atualizacoesCarpio.add(item.toString());
+                            Log.d("aux", "na func mostrar ca " + atualizacoesCarpio.toString());
                         }
 
                         callback.onComplete();
@@ -158,9 +163,71 @@ public class MostrarAtualizacoes {
         });
     }
 
+    public void getCardapioSEPAE(Callback callback1){
+        StringBuilder builder = new StringBuilder();
+        getAtualizaCardapio(new Callback() {
+            @Override
+            public void onComplete() {
+                Log.d("aux", "dps do on  " + atualizacoesCarpio.toString());
+                for (Object item : atualizacoesCarpio) {
+                    builder.append(item.toString()).append("\n");
+                }
+                cardapioSEPAE = builder.toString();
+                callback1.onComplete();
+            }
+        });
+    }
+
+    public String returnStringCardapioSEPAE(){
+        return cardapioSEPAE;
+    }
+
+    public void salvarNovaMerenda(String novaMerenda, Callback callback){
+        DocumentReference docRef = db.collection("MaisInformacoes").document("cardapio");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        List<Object> arrayCampo = (List<Object>) document.get("itens");
+
+                        List<String> novaList = new ArrayList<String>();
+                        // Divida a string com base em quebras de linha
+                        String[] frases = novaMerenda.split("\n");
+
+                        Collections.addAll(novaList, frases);
+
+                        Map<String, Object> updates = new HashMap<>();
+                        updates.put("itens", novaList);
+
+// Atualize o documento no Firestore
+                        docRef.update(updates)
+                                .addOnSuccessListener(aVoid -> {
+                                    // Sucesso na atualização
+                                    Log.d("Firestore", "Documento atualizado com sucesso!");
+                                })
+                                .addOnFailureListener(e -> {
+                                    // Erro na atualização
+                                    Log.w("Firestore", "Erro ao atualizar documento", e);
+                                });
+                        callback.onComplete();
 
 
-    private interface Callback {
+                    } else {
+                        Log.d("TAGG", "Documento de turma não encontrado");
+                        callback.onComplete();
+                    }
+                } else {
+                    Log.d("TAGG", "Falhou em ", task.getException());
+                    callback.onComplete();
+
+                }
+            }
+        });
+    }
+
+    public interface Callback {
         void onComplete();
     }
 }
