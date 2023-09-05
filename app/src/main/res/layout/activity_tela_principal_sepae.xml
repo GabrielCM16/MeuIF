@@ -85,8 +85,8 @@
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintPasseCarteirinha"
-        app:layout_constraintVertical_bias="0.496" />
+        app:layout_constraintTop_toBottomOf="@+id/constraintCardapio"
+        app:layout_constraintVertical_bias="0.046" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintChamada"
