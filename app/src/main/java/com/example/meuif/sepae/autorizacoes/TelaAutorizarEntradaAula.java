@@ -133,7 +133,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
 
     private void registrarEntrada(String matricula){
 
-        DocumentReference docRef = db.collection("Autorizacoes").document(matricula);
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(matricula).document("autorizacoes");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
             public void onComplete(@NonNull Task<DocumentSnapshot> task) {
