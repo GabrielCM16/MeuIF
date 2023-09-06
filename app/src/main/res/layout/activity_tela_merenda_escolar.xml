@@ -131,11 +131,11 @@
 
     <Button
         android:id="@+id/botaoCamera"
-        android:layout_width="197dp"
-        android:layout_height="49dp"
+        android:layout_width="261dp"
+        android:layout_height="52dp"
         android:background="@drawable/background_button"
         android:fontFamily="@font/fira_mono_bold"
-        android:text="Camera"
+        android:text="Registrar Retiradas"
         android:textAllCaps="false"
         android:textColor="@color/black"
         android:textSize="16sp"

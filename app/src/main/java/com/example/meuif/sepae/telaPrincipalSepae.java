@@ -26,6 +26,7 @@ import com.example.meuif.MainActivity;
 import com.example.meuif.R;
 import com.example.meuif.sepae.Portaria.ContabilizarFaltas;
 import com.example.meuif.sepae.Portaria.PassePortaria;
+import com.example.meuif.sepae.autorizacoes.TelaAutorizarEntradaAula;
 import com.example.meuif.sepae.chamada.TelaChamadaLideres;
 import com.google.firebase.auth.FirebaseAuth;
 
@@ -43,6 +44,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
     private Button botaosair;
     private ConstraintLayout cardapio;
     private ProgressBar loadingSepae;
+    private ConstraintLayout autorizarAula;
     private ConstraintLayout merenda;
     private ConstraintLayout carteirinha;
     private ConstraintLayout chamada;
@@ -92,6 +94,13 @@ public class telaPrincipalSepae extends AppCompatActivity {
             }
         });
 
+        autorizarAula.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                telaAutorizarAula();
+            }
+        });
+
         botaosair.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -115,9 +124,17 @@ public class telaPrincipalSepae extends AppCompatActivity {
         botaosair = findViewById(R.id.botaoSair);
         cardapio = findViewById(R.id.constraintCardapio);
         loadingSepae = findViewById(R.id.loadingSepae);
+        autorizarAula = findViewById(R.id.constraintAutorizarAula);
         faltas = findViewById(R.id.constraintFaltas);
         chamada = findViewById(R.id.constraintChamada);
         loadingSepae.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+    }
+
+    private void telaAutorizarAula(){
+// Criar a Intent
+        Intent intent = new Intent(telaPrincipalSepae.this, TelaAutorizarEntradaAula.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
     private void telaCardapio(){
