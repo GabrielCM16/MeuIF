@@ -20,6 +20,10 @@
             android:id="@+id/informacoes_pessoais"
             android:icon="@drawable/baseline_credit_card_24"
             android:title="Meus Dados"/>
+        <item
+            android:id="@+id/autorizacao_atrasada"
+            android:icon="@drawable/baseline_badge_24"
+            android:title="Entrada Atrasada" />
     </group>
 
 </menu>

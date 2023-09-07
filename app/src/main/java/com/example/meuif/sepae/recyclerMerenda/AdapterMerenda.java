@@ -11,7 +11,6 @@ import com.example.meuif.R;
 import java.util.List;
 
 public class AdapterMerenda extends RecyclerView.Adapter<AdapterMerenda.ViewHolder> {
-
     private List<AlunoMerenda> stringList;
 
     public AdapterMerenda(List<AlunoMerenda> stringList) {
