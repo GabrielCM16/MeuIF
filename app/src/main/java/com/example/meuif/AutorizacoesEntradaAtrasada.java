@@ -17,12 +17,14 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.meuif.autorizacoes.AdapterAutorizacaoEntrada;
 import com.example.meuif.autorizacoes.AlunoAutorizacaoEntrada;
+import com.example.meuif.autorizacoes.RecyclerItemClickListener;
 import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
 import com.example.meuif.sepae.recyclerMerenda.AlunoMerenda;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -140,7 +142,57 @@ public class AutorizacoesEntradaAtrasada extends Fragment {
         RecyclerDiasAtrasados.setLayoutManager(layoutManager);
         RecyclerDiasAtrasados.setHasFixedSize(true);
         RecyclerDiasAtrasados.addItemDecoration(new DividerItemDecoration(getContext(),LinearLayout.VERTICAL));
-        RecyclerDiasAtrasados.setAdapter(adapter); //criar adapter
+        RecyclerDiasAtrasados.setAdapter(adapter);
+
+        RecyclerDiasAtrasados.addOnItemTouchListener(new RecyclerItemClickListener(getContext(),
+                RecyclerDiasAtrasados,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        AlunoAutorizacaoEntrada aluno = stringList.get(position);
+                        verificarDiaAtrasado(aluno);
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+
+                    @Override
+                    public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+                    }
+                }));
+    }
+
+    private void verificarDiaAtrasado(AlunoAutorizacaoEntrada aluno){
+        String alunoNome = recuperarDados("nome");
+        String turma = recuperarDados("turma");
+        AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
+
+        //configurar titulo e mensagem
+        dialog.setTitle("Entrada Autorizada" );
+        dialog.setMessage("A entrada atrasada de: " + alunoNome +
+                "\nDe turma: " + turma +
+                "\nFoi Autorizada pelo agente SEPAE: " + aluno.getNome() +
+                "\nNo dia e horário: " + aluno.getHora() );
+
+        //configurar cancelamento do alert dialog
+        dialog.setCancelable(false);
+
+        //configurar icone
+        //dialog.setIcon(android.R.drawable.ic_btn_speak_now);
+
+        //configurar açoes para sim e nâo
+        dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getContext(), "Duvidas, procure a SEPAE", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.create();
+        dialog.show();
     }
 
     private void pegarDiasAtrasados(String matricula, Callback callback){
