@@ -45,6 +45,7 @@
         android:id="@+id/horaAutorizacao"
         android:layout_width="120dp"
         android:layout_height="67dp"
+        android:layout_marginEnd="20dp"
         android:gravity="center"
         android:text="17/08/2023\n13:01:01"
         android:textColor="@color/black"
@@ -59,11 +60,13 @@
         android:id="@+id/numeroAtrasado"
         android:layout_width="44dp"
         android:layout_height="37dp"
+        android:layout_marginStart="16dp"
         android:gravity="center"
         android:text="1"
         android:textColor="@color/black"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toStartOf="@+id/matriculaMerenda"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.515" />
 </androidx.constraintlayout.widget.ConstraintLayout>

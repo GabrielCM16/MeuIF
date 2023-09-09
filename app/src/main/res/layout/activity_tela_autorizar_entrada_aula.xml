@@ -16,7 +16,7 @@
         android:ems="10"
         android:fontFamily="@font/fira_mono_bold"
         android:hint="Matricula"
-        android:inputType="text"
+        android:inputType="number"
         android:paddingLeft="10dp"
         android:textColor="@color/black"
         android:textColorHint="@color/black"

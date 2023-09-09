@@ -90,9 +90,13 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
 
                     } else {
                         // O documento não existe
+                        Toast.makeText(getApplicationContext(), "Erro ao procurar matrícula, matrícula inexistente", Toast.LENGTH_SHORT).show();
+                        progressBarRegistrarEntrada.setVisibility(View.INVISIBLE);
                     }
                 } else {
                     // Falha ao obter o documento
+                    Toast.makeText(getApplicationContext(), "Falha inesperada + " + task.getException(), Toast.LENGTH_SHORT).show();
+                    progressBarRegistrarEntrada.setVisibility(View.INVISIBLE);
                 }
             }
         });

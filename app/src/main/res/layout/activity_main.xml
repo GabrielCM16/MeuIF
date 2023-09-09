@@ -16,7 +16,7 @@
         android:elegantTextHeight="true"
         android:fontFamily="@font/fira_mono_bold"
         android:freezesText="false"
-        android:text="Ola! para começar insira seu número de matricula"
+        android:text="Ola! para começar insira seu número de matrícula"
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="24sp"
