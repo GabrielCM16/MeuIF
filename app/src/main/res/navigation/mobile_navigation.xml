@@ -32,4 +32,9 @@
         android:name="com.example.meuif.AutorizacoesEntradaAtrasada"
         android:label="Entrada atrasada"
         tools:layout="@layout/fragment_autorizacoes_entrada_atrasada" />
+    <fragment
+        android:id="@+id/autorizacoesSaidaAntecipada"
+        android:name="com.example.meuif.AutorizacoesSaidaAntecipada"
+        android:label="fragment_autorizacoes_saida_antecipada"
+        tools:layout="@layout/fragment_autorizacoes_saida_antecipada" />
 </navigation>

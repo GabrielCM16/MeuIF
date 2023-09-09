@@ -24,6 +24,10 @@
             android:id="@+id/autorizacao_atrasada"
             android:icon="@drawable/baseline_badge_24"
             android:title="Entrada Atrasada" />
+        <item
+            android:id="@+id/autorizacoesSaidaAntecipada"
+            android:icon="@drawable/baseline_logout_24"
+            android:title="Saída Antecipada" />
     </group>
 
 </menu>
