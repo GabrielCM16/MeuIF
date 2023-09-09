@@ -137,6 +137,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
         });
     }
     private void listarDiasAtrasados(Map<String, List<Map<String, Timestamp>>>  aux){
+        stringList.clear();
         TimeZone timeZone = TimeZone.getTimeZone("GMT-3");
 
         // Crie um SimpleDateFormat usando o fuso horário definido
