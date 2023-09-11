@@ -59,7 +59,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
     private FirebaseFirestore db;
     private RecyclerView RecyclerEntradasAutorizadasHoje;
     private TextView textViewMostarEntradasNoDia;
-    private  Map<String, String> nomesAlunos = new HashMap<String, String>();
+    private Map<String, String> nomesAlunos = new HashMap<String, String>();
     private ProgressBar progressBarRegistrarEntrada;
     private List<SepaeAutorizacoesEntradaAtrasada> stringList = new ArrayList<>();
     private MediaPlayer mediaPlayer;
@@ -80,7 +80,14 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
             public void onClick(View v) {
                 progressBarRegistrarEntrada.setVisibility(View.VISIBLE);
                 String matricula = entradaMatriculaAtrasada.getText().toString();
-                procurarDadosAluno(matricula);
+                if (!matricula.equals("") && matricula != null && matricula.length() > 10) {
+                    progressBarRegistrarEntrada.setVisibility(View.VISIBLE);
+                    procurarDadosAluno(matricula);
+                } else{
+                    Toast.makeText(getApplicationContext(), "Matrícula Invalida", Toast.LENGTH_SHORT).show();
+                    progressBarRegistrarEntrada.setVisibility(View.INVISIBLE);
+                }
+
             }
         });
 

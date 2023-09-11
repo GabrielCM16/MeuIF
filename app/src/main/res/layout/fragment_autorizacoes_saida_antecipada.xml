@@ -17,8 +17,8 @@
 
             <TextView
                 android:id="@+id/textViewSaidaAntecipadaTextDia"
-                android:layout_width="266dp"
-                android:layout_height="77dp"
+                android:layout_width="301dp"
+                android:layout_height="76dp"
                 android:layout_marginStart="164dp"
                 android:layout_marginEnd="165dp"
                 android:fontFamily="@font/fira_mono_bold"
@@ -40,7 +40,7 @@
                 android:layout_marginEnd="165dp"
                 android:fontFamily="@font/fira_mono_bold"
                 android:gravity="center"
-                android:text="Autorizações de saida antecipada"
+                android:text="Autorizações de saída antecipada"
                 android:textColor="@color/black"
                 android:textSize="20sp"
                 app:layout_constraintEnd_toEndOf="parent"

@@ -26,6 +26,7 @@ import com.example.meuif.MainActivity;
 import com.example.meuif.R;
 import com.example.meuif.sepae.Portaria.ContabilizarFaltas;
 import com.example.meuif.sepae.Portaria.PassePortaria;
+import com.example.meuif.sepae.autorizacoes.AutorizarSaidaAntecipada;
 import com.example.meuif.sepae.autorizacoes.TelaAutorizarEntradaAula;
 import com.example.meuif.sepae.chamada.TelaChamadaLideres;
 import com.google.firebase.auth.FirebaseAuth;
@@ -43,6 +44,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
     private TextView textViewBemVindo;
     private Button botaosair;
     private ConstraintLayout cardapio;
+    private ConstraintLayout constraintAutorizarSaida;
     private ProgressBar loadingSepae;
     private ConstraintLayout autorizarAula;
     private ConstraintLayout merenda;
@@ -100,6 +102,12 @@ public class telaPrincipalSepae extends AppCompatActivity {
                 telaAutorizarAula();
             }
         });
+        constraintAutorizarSaida.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                telaAutorizarSaida();
+            }
+        });
 
         botaosair.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -125,9 +133,17 @@ public class telaPrincipalSepae extends AppCompatActivity {
         cardapio = findViewById(R.id.constraintCardapio);
         loadingSepae = findViewById(R.id.loadingSepae);
         autorizarAula = findViewById(R.id.constraintAutorizarAula);
+        constraintAutorizarSaida = findViewById(R.id.constraintAutorizarSaida);
         faltas = findViewById(R.id.constraintFaltas);
         chamada = findViewById(R.id.constraintChamada);
         loadingSepae.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+    }
+
+    private void telaAutorizarSaida(){
+        // Criar a Intent
+        Intent intent = new Intent(telaPrincipalSepae.this, AutorizarSaidaAntecipada.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
     private void telaAutorizarAula(){
