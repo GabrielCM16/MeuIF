@@ -136,7 +136,6 @@ public class MostrarAtualizacoes {
                     builder.append(item.toString()).append("\n\n");
                 }
 
-
                 AlertDialog.Builder dialog = new AlertDialog.Builder(context);
 
                 //configurar titulo e mensagem
