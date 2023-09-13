@@ -3,8 +3,24 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
+    android:layout_height="90dp"
     android:background="@color/azulFundo">
+
+    <TextView
+        android:id="@+id/MotivoAtraso"
+        android:layout_width="206dp"
+        android:layout_height="27dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="Justificativa:"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.292"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/nomeAutorizou" />
 
     <TextView
         android:id="@+id/textAuth"
@@ -21,13 +37,13 @@
         app:layout_constraintHorizontal_bias="0.307"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.348" />
+        app:layout_constraintVertical_bias="0.238" />
 
     <TextView
         android:id="@+id/nomeAutorizou"
         android:layout_width="208dp"
         android:layout_height="22dp"
-        android:layout_marginBottom="4dp"
+        android:layout_marginBottom="24dp"
         android:ellipsize="end"
         android:maxLines="1"
         android:text="nome quem autorizou"

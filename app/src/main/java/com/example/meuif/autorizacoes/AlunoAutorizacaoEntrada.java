@@ -4,11 +4,13 @@ public class AlunoAutorizacaoEntrada {
     private String nome;
     private String hora;
     private String numero;
+    private String motivo;
 
-    public AlunoAutorizacaoEntrada(String nome, String hora, String numero) {
+    public AlunoAutorizacaoEntrada(String nome, String hora, String numero, String motivo) {
         this.nome = nome;
         this.hora = hora;
         this.numero = numero;
+        this.motivo = motivo;
     }
 
     public String getNome() {
@@ -21,5 +23,9 @@ public class AlunoAutorizacaoEntrada {
 
     public String getNumero() {
         return numero;
+    }
+
+    public String getMotivo() {
+        return motivo;
     }
 }

@@ -184,8 +184,6 @@ public class AutorizarSaidaAntecipada extends AppCompatActivity {
             RecyclerSaidasAutorizadasHoje.setHasFixedSize(true);
             RecyclerSaidasAutorizadasHoje.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayout.VERTICAL));
             RecyclerSaidasAutorizadasHoje.setAdapter(adapter);
-
-
         }
     }
 

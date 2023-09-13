@@ -35,6 +35,7 @@ public class AdapterAutorizacaoEntrada extends RecyclerView.Adapter<AdapterAutor
         holder.nomeAutorizou.setText(aluno.getNome());
         holder.horaAutorizacao.setText(aluno.getHora());
         holder.numeroAtrasado.setText(aluno.getNumero());
+        holder.MotivoAtraso.setText(aluno.getMotivo());
     }
 
     @Override
@@ -46,12 +47,14 @@ public class AdapterAutorizacaoEntrada extends RecyclerView.Adapter<AdapterAutor
         TextView nomeAutorizou;
         TextView horaAutorizacao;
         TextView numeroAtrasado;
+        TextView MotivoAtraso;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
             nomeAutorizou = itemView.findViewById(R.id.nomeAutorizou);
             horaAutorizacao = itemView.findViewById(R.id.horaAutorizacao);
             numeroAtrasado = itemView.findViewById(R.id.numeroAtrasado);
+            MotivoAtraso = itemView.findViewById(R.id.MotivoAtraso);
         }
     }
 }

@@ -4,6 +4,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.SharedPreferences;
+import android.graphics.Typeface;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
@@ -13,6 +14,11 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.text.Layout;
+import android.text.Spannable;
+import android.text.SpannableStringBuilder;
+import android.text.style.AlignmentSpan;
+import android.text.style.StyleSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +54,7 @@ public class AutorizacoesEntradaAtrasada extends Fragment {
     private TextView textViewEntradaAtrasadaTextDia;
     private RecyclerView RecyclerDiasAtrasados;
     private FirebaseFirestore db;
-    private List<Map<String, Timestamp>> diaAtrasado = new ArrayList<Map<String, Timestamp>>();
+    private List<Map<String, Object>> diaAtrasado = new ArrayList<Map<String, Object>>();
     private View binding;
 
 
@@ -119,19 +125,27 @@ public class AutorizacoesEntradaAtrasada extends Fragment {
         sdf.setTimeZone(timeZone);
 
         int auxNumero = 0;
+        String motivoPessoal = "";
 
-        for (Map<String, Timestamp> mapa : diaAtrasado) {
-            for (Map.Entry<String, Timestamp> entry : mapa.entrySet()) {
-                auxNumero++;
-                String chave = entry.getKey();       // Obtém a chave (String)
-                Timestamp timestamp = entry.getValue(); // Obtém o timestamp (Timestamp)
 
-                String dataFormatada = sdf.format(timestamp.toDate());
-
-                AlunoAutorizacaoEntrada aluno = new AlunoAutorizacaoEntrada(chave, dataFormatada, String.valueOf(auxNumero));
-                stringList.add(aluno);
-
+        for (Map<String, Object> mapa : diaAtrasado) {
+            auxNumero++;
+            if (mapa.containsKey("motivo")){
+                motivoPessoal = (String) String.valueOf((mapa.get("motivo")));
             }
+            for (Map.Entry<String, Object> entry : mapa.entrySet()) {
+
+                String chave = (String) String.valueOf(entry.getKey());       // Obtém a chave (String)
+                if (!chave.equals("motivo")){
+                    Timestamp timestamp = (Timestamp) entry.getValue(); // Obtém o timestamp (Timestamp)
+
+                    String dataFormatada = sdf.format(timestamp.toDate());
+
+                    AlunoAutorizacaoEntrada aluno = new AlunoAutorizacaoEntrada(chave, dataFormatada, String.valueOf(auxNumero), motivoPessoal);
+                    stringList.add(aluno);
+                }
+            }
+            motivoPessoal = "";
         }
 
 
@@ -168,22 +182,54 @@ public class AutorizacoesEntradaAtrasada extends Fragment {
     private void verificarDiaAtrasado(AlunoAutorizacaoEntrada aluno){
         String alunoNome = recuperarDados("nome");
         String turma = recuperarDados("turma");
+        String hora = aluno.getHora(); // Supondo que aluno.getHora() retorna uma string em negrito
+        String motivo = aluno.getMotivo(); // Supondo que aluno.getMotivo() retorna uma string em negrito
+
+// Crie um SpannableString para formatar o texto em negrito
+        SpannableStringBuilder mensagem = new SpannableStringBuilder();
+        mensagem.append("A entrada atrasada de: ");
+        int startAlunoNome = mensagem.length();
+        mensagem.append(alunoNome).append("\n\n");
+        mensagem.setSpan(new StyleSpan(Typeface.BOLD), startAlunoNome, mensagem.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        mensagem.append("De turma: ");
+        int startTurma = mensagem.length();
+        mensagem.append(turma).append("\n\n");
+        mensagem.setSpan(new StyleSpan(Typeface.BOLD), startTurma, mensagem.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        mensagem.append("Foi Autorizada pelo agente SEPAE: ");
+        int startNomeAgente = mensagem.length();
+        mensagem.append(aluno.getNome()).append("\n\n");
+        mensagem.setSpan(new StyleSpan(Typeface.BOLD), startNomeAgente, mensagem.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        mensagem.append("No dia e horário: ");
+        int startHora = mensagem.length();
+        mensagem.append(hora).append("\n\n");
+        mensagem.setSpan(new StyleSpan(Typeface.BOLD), startHora, mensagem.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        mensagem.append("Com justificativa de: ");
+        int startMotivo = mensagem.length();
+        mensagem.append(motivo).append("\n\n");
+        mensagem.setSpan(new StyleSpan(Typeface.BOLD), startMotivo, mensagem.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+        // Adicione a palavra "SEPAE" em negrito e centralizado
+        int startSepae = mensagem.length();
+        mensagem.append("\n\nSEPAE\n");
+        mensagem.setSpan(new StyleSpan(Typeface.BOLD), startSepae, mensagem.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+        mensagem.setSpan(new AlignmentSpan.Standard(Layout.Alignment.ALIGN_CENTER), startSepae, mensagem.length(), Spannable.SPAN_EXCLUSIVE_EXCLUSIVE);
+
+
+// Crie o AlertDialog
         AlertDialog.Builder dialog = new AlertDialog.Builder(getContext());
 
-        //configurar titulo e mensagem
-        dialog.setTitle("Entrada Autorizada" );
-        dialog.setMessage("A entrada atrasada de: " + alunoNome +
-                "\nDe turma: " + turma +
-                "\nFoi Autorizada pelo agente SEPAE: " + aluno.getNome() +
-                "\nNo dia e horário: " + aluno.getHora() );
+//configurar titulo e mensagem
+        dialog.setTitle("Autorização de Entrada por Atraso");
+        dialog.setMessage(mensagem);
 
-        //configurar cancelamento do alert dialog
+//configurar cancelamento do alert dialog
         dialog.setCancelable(false);
 
-        //configurar icone
-        //dialog.setIcon(android.R.drawable.ic_btn_speak_now);
-
-        //configurar açoes para sim e nâo
+//configurar açoes para sim e nâo
         dialog.setPositiveButton("Ok", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
@@ -191,8 +237,10 @@ public class AutorizacoesEntradaAtrasada extends Fragment {
             }
         });
 
+// Mostre o diálogo
         dialog.create();
         dialog.show();
+
     }
 
     private void pegarDiasAtrasados(String matricula, Callback callback){
@@ -203,12 +251,12 @@ public class AutorizacoesEntradaAtrasada extends Fragment {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Map<String, List<Map<String, Timestamp>>> entradas = (Map<String, List<Map<String, Timestamp>>>) document.get("entradaAula");
+                        Map<String, List<Map<String, Object>>> entradas = (Map<String, List<Map<String, Object>>>) document.get("entradaAula");
 
                         String dia = getDayAndMonth();
 
                         if (entradas.containsKey(dia)){
-                            List<Map<String, Timestamp>> aux = entradas.get(dia);
+                            List<Map<String, Object>> aux = entradas.get(dia);
                             diaAtrasado = aux;
                         }
                         callback.onComplete();
