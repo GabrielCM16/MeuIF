@@ -3,8 +3,26 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="90dp"
+    android:layout_height="110dp"
     android:background="@color/azulFundo">
+
+    <TextView
+        android:id="@+id/motivoAutorizacao"
+        android:layout_width="208dp"
+        android:layout_height="22dp"
+        android:layout_marginTop="2dp"
+        android:layout_marginBottom="4dp"
+        android:ellipsize="end"
+        android:maxLines="1"
+        android:text="motivo"
+        android:textColor="@color/black"
+        android:textSize="16sp"
+        android:textStyle="bold|italic"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.305"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/quemAutorizouSepaeEntrada" />
 
     <TextView
         android:id="@+id/quemAutorizouSepaeEntrada"
@@ -21,7 +39,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.31"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/turmaAluno" />
+        app:layout_constraintTop_toBottomOf="@+id/turmaAluno"
+        app:layout_constraintVertical_bias="0.0" />
 
     <TextView
         android:id="@+id/nomeAlunoAutorizacao"
@@ -35,10 +54,10 @@
         android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.307"
+        app:layout_constraintHorizontal_bias="0.302"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.253" />
+        app:layout_constraintVertical_bias="0.132" />
 
     <TextView
         android:id="@+id/turmaAluno"

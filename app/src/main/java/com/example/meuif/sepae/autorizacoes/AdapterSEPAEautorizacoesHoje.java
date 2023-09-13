@@ -11,6 +11,8 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.example.meuif.R;
 import com.example.meuif.sepae.recyclerMerenda.AlunoMerenda;
 
+import org.w3c.dom.Text;
+
 import java.util.List;
 
 public class AdapterSEPAEautorizacoesHoje extends RecyclerView.Adapter<AdapterSEPAEautorizacoesHoje.ViewHolder>{
@@ -37,6 +39,7 @@ public class AdapterSEPAEautorizacoesHoje extends RecyclerView.Adapter<AdapterSE
         holder.numeroAtrasado.setText(aluno.getNumero());
         holder.nomeAlunoAutorizacao.setText(aluno.getNome());
         holder.turmaAluno.setText(aluno.getTurma());
+        holder.motivoAutorizacao.setText(aluno.getMotivo());
     }
 
     @Override
@@ -49,6 +52,7 @@ public class AdapterSEPAEautorizacoesHoje extends RecyclerView.Adapter<AdapterSE
         TextView horaAutorizacaoSepae;
         TextView numeroAtrasado;
         TextView nomeAlunoAutorizacao;
+        TextView motivoAutorizacao;
         TextView turmaAluno;
 
         public ViewHolder(@NonNull View itemView) {
@@ -58,6 +62,7 @@ public class AdapterSEPAEautorizacoesHoje extends RecyclerView.Adapter<AdapterSE
             numeroAtrasado = itemView.findViewById(R.id.numeroAtrasado);
             nomeAlunoAutorizacao = itemView.findViewById(R.id.nomeAlunoAutorizacao);
             turmaAluno = itemView.findViewById(R.id.turmaAluno);
+            motivoAutorizacao = itemView.findViewById(R.id.motivoAutorizacao);
         }
     }
 }

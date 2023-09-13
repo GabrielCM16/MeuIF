@@ -161,7 +161,7 @@ public class AutorizarSaidaAntecipada extends AppCompatActivity {
                     //chave interna = quem autorizou
                     // chave externa = matricula
                     String dataFormatada = sdf.format(timestamp.toDate());
-                    novaEntrada(chaveExterna, chaveInterna,dataFormatada, String.valueOf(auxCont));
+                    novaEntrada(chaveExterna, chaveInterna,dataFormatada, String.valueOf(auxCont), "motivo");
                 }
             }
         }
@@ -178,7 +178,7 @@ public class AutorizarSaidaAntecipada extends AppCompatActivity {
 
     }
 
-    private void novaEntrada(String matricula, String quemAutorizou, String data, String cont){
+    private void novaEntrada(String matricula, String quemAutorizou, String data, String cont, String motivo){
         //Configurar RecyclerView
         RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
         RecyclerSaidasAutorizadasHoje.setLayoutManager(layoutManager);
@@ -194,7 +194,7 @@ public class AutorizarSaidaAntecipada extends AppCompatActivity {
                     if (document.exists()) {
                         String nomeAluno = (String) document.get("nome");
                         String turma = (String) document.get("turma");
-                        SepaeAutorizacoesEntradaAtrasada sepaeAutorizacoesEntradaAtrasada = new SepaeAutorizacoesEntradaAtrasada(nomeAluno, data, cont, quemAutorizou, turma);
+                        SepaeAutorizacoesEntradaAtrasada sepaeAutorizacoesEntradaAtrasada = new SepaeAutorizacoesEntradaAtrasada(nomeAluno, data, cont, quemAutorizou, turma, motivo);
                         stringList.add(sepaeAutorizacoesEntradaAtrasada);
                         AdapterSEPAEautorizacoesHoje adapter = new AdapterSEPAEautorizacoesHoje(stringList);
 
@@ -204,7 +204,7 @@ public class AutorizarSaidaAntecipada extends AppCompatActivity {
                     } else {
                         // O documento não existe
                         Toast.makeText(getApplicationContext(), "Erro ao procurar matrícula, matrícula inexistente", Toast.LENGTH_SHORT).show();
-                        SepaeAutorizacoesEntradaAtrasada sepaeAutorizacoesEntradaAtrasada = new SepaeAutorizacoesEntradaAtrasada("Matrícula inexistente", data, cont, quemAutorizou, "Matrícula inexistente");
+                        SepaeAutorizacoesEntradaAtrasada sepaeAutorizacoesEntradaAtrasada = new SepaeAutorizacoesEntradaAtrasada("Matrícula inexistente", data, cont, quemAutorizou, "Matrícula inexistente", "Matrícula inexistente");
                         stringList.add(sepaeAutorizacoesEntradaAtrasada);
                         AdapterSEPAEautorizacoesHoje adapter = new AdapterSEPAEautorizacoesHoje(stringList);
 

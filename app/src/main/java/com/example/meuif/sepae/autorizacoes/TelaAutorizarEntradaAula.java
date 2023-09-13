@@ -63,7 +63,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
     private ProgressBar progressBarRegistrarEntrada;
     private List<SepaeAutorizacoesEntradaAtrasada> stringList = new ArrayList<>();
     private MediaPlayer mediaPlayer;
-    private List<Map<String, Timestamp>> diaAtrasado = new ArrayList<>();
+    private List<Map<String, Object>> diaAtrasado = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -129,7 +129,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
 
 
                         if (entradas.containsKey(dia)){
-                            Map<String, List<Map<String, Timestamp>>> aux = (Map<String, List<Map<String, Timestamp>>>) entradas.get(dia);
+                            Map<String, List<Map<String, Object>>> aux = (Map<String, List<Map<String, Object>>>) entradas.get(dia);
                             listarDiasAtrasados(aux);
                         }
 
@@ -143,7 +143,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
             }
         });
     }
-    private void listarDiasAtrasados(Map<String, List<Map<String, Timestamp>>>  aux){
+    private void listarDiasAtrasados(Map<String, List<Map<String, Object>>>  aux){
         stringList.clear();
         TimeZone timeZone = TimeZone.getTimeZone("GMT-3");
 
@@ -152,27 +152,38 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
         sdf.setTimeZone(timeZone);
 
         int auxCont = 0;
+        String motivoPessoal = "";
 
         // Percorra o mapa externo (chave externa)
-        for (Map.Entry<String, List<Map<String, Timestamp>>> entradaExterna : aux.entrySet()) {
+        for (Map.Entry<String, List<Map<String, Object>>> entradaExterna : aux.entrySet()) {
             String chaveExterna = entradaExterna.getKey();
-            List<Map<String, Timestamp>> listaInterna = entradaExterna.getValue();
+            List<Map<String, Object>> listaInterna = entradaExterna.getValue();
 
             // Agora, percorra a lista interna
-            for (Map<String, Timestamp> mapaInterno : listaInterna) {
+            for (Map<String, Object> mapaInterno : listaInterna) {
+                //percorrer a lista
                 // Percorra o mapa interno (chave interna)
-                for (Map.Entry<String, Timestamp> entradaInterna : mapaInterno.entrySet()) {
-                    auxCont++;
-                    String chaveInterna = entradaInterna.getKey();
-                    Timestamp timestamp = entradaInterna.getValue();
-
-                    //chave interna = quem autorizou
-                    // chave externa = matricula
-                    String dataFormatada = sdf.format(timestamp.toDate());
-
-                Log.d("testes", "Chave Interna: " + chaveInterna + " timestamp: " + timestamp + "Chave Externa " + chaveExterna);
-                    novaEntrada(chaveExterna, chaveInterna,dataFormatada, String.valueOf(auxCont));
+                auxCont++;
+                if (mapaInterno.containsKey("motivo")) {
+                    motivoPessoal = (String) String.valueOf(mapaInterno.get("motivo"));
                 }
+                Log.d("testes", mapaInterno.toString());
+                for (Map.Entry<String, Object> entradaInterna : mapaInterno.entrySet()) {
+
+                    String chaveInterna = entradaInterna.getKey();
+
+                    if (!chaveInterna.equals("motivo")){
+                        Timestamp timestamp = (Timestamp) entradaInterna.getValue();
+
+                        //chave interna = quem autorizou
+                        // chave externa = matricula
+                        String dataFormatada = sdf.format(timestamp.toDate());
+
+                        Log.d("testes", "Chave Interna: " + chaveInterna + " timestamp: " + timestamp + "Chave Externa " + chaveExterna + "motivo" + motivoPessoal);
+                        novaEntrada(chaveExterna, chaveInterna,dataFormatada, String.valueOf(auxCont), motivoPessoal);
+                    }
+                }
+                motivoPessoal = "";
             }
         }
 
@@ -188,7 +199,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
 
     }
 
-    private void novaEntrada(String matricula, String quemAutorizou, String data, String cont){
+    private void novaEntrada(String matricula, String quemAutorizou, String data, String cont, String motivo){
         DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(matricula).document("dados");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
             @Override
@@ -198,7 +209,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
                     if (document.exists()) {
                         String nomeAluno = (String) document.get("nome");
                         String turma = (String) document.get("turma");
-                        SepaeAutorizacoesEntradaAtrasada sepaeAutorizacoesEntradaAtrasada = new SepaeAutorizacoesEntradaAtrasada(nomeAluno, data, cont, quemAutorizou, turma);
+                        SepaeAutorizacoesEntradaAtrasada sepaeAutorizacoesEntradaAtrasada = new SepaeAutorizacoesEntradaAtrasada(nomeAluno, data, cont, quemAutorizou, turma, motivo);
                         stringList.add(sepaeAutorizacoesEntradaAtrasada);
                         AdapterSEPAEautorizacoesHoje adapter = new AdapterSEPAEautorizacoesHoje(stringList);
 
@@ -213,7 +224,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
                     } else {
                         // O documento não existe
                         Toast.makeText(getApplicationContext(), "Erro ao procurar matrícula, matrícula inexistente", Toast.LENGTH_SHORT).show();
-                        SepaeAutorizacoesEntradaAtrasada sepaeAutorizacoesEntradaAtrasada = new SepaeAutorizacoesEntradaAtrasada("Matrícula inexistente", data, cont, quemAutorizou, "Matrícula inexistente");
+                        SepaeAutorizacoesEntradaAtrasada sepaeAutorizacoesEntradaAtrasada = new SepaeAutorizacoesEntradaAtrasada("Matrícula inexistente", data, cont, quemAutorizou, "Matrícula inexistente", "Matrícula inexistente");
                         stringList.add(sepaeAutorizacoesEntradaAtrasada);
                         AdapterSEPAEautorizacoesHoje adapter = new AdapterSEPAEautorizacoesHoje(stringList);
 
@@ -282,7 +293,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
             public void onClick(DialogInterface dialog, int which) {
                 progressBarRegistrarEntrada.setVisibility(View.VISIBLE);
                 Toast.makeText(getApplicationContext(), "Processando...", Toast.LENGTH_SHORT).show();
-                registrarEntrada(matricula);
+                motivoDoAtrasado(matricula);
             }
         });
         dialog.setNegativeButton("Incorreto", new DialogInterface.OnClickListener() {
@@ -296,7 +307,42 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
         dialog.show();
     }
 
-    private void registrarEntrada(String matricula){
+    private void motivoDoAtrasado(String matricula){
+        AlertDialog.Builder dialog2 = new AlertDialog.Builder(this);
+        dialog2.setTitle("Justificativa" );
+        dialog2.setMessage("Defina a justificativa");
+        dialog2.setCancelable(false);
+
+        EditText editText = new EditText(this);
+        LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.WRAP_CONTENT,
+                LinearLayout.LayoutParams.WRAP_CONTENT);
+
+        editText.setLayoutParams(params);
+
+        dialog2.setView(editText);
+
+        dialog2.setPositiveButton("Enviar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                progressBarRegistrarEntrada.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(), "Processando...", Toast.LENGTH_SHORT).show();
+                String motivo = editText.getText().toString();
+                registrarEntrada(matricula, motivo);
+            }
+        });
+        dialog2.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                progressBarRegistrarEntrada.setVisibility(View.INVISIBLE);
+                Toast.makeText(getApplicationContext(), "Confira os dados e tente novamente", Toast.LENGTH_SHORT).show();
+            }
+        });
+        dialog2.create();
+        dialog2.show();
+    }
+
+    private void registrarEntrada(String matricula, String motivo){
 
         DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(matricula).document("autorizacoes");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -305,22 +351,23 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Map<String, List<Map<String, Timestamp>>> entradas = (Map<String, List<Map<String, Timestamp>>>) document.get("entradaAula");
+                        Map<String, List<Map<String, Object>>> entradas = (Map<String, List<Map<String, Object>>>) document.get("entradaAula");
 
                         String nome = recuperarDados("nome");
                         Timestamp novoTimestamp = Timestamp.now();
 
                         String dia = getDayAndMonth();
 
-                        Map<String, Timestamp> aux = new HashMap<>();
+                        Map<String, Object> aux = new HashMap<>();
                         aux.put(nome, novoTimestamp);
+                        aux.put("motivo", motivo);
 
                         if (entradas.containsKey(dia)){
-                            List<Map<String, Timestamp>> auxdia = entradas.get(dia);
+                            List<Map<String, Object>> auxdia = entradas.get(dia);
                             auxdia.add(aux);
                             entradas.put(dia, auxdia);
                         } else {
-                            List<Map<String, Timestamp>> auxdia = new ArrayList<>();
+                            List<Map<String, Object>> auxdia = new ArrayList<>();
                             auxdia.add(aux);
                             entradas.put(dia, auxdia);
                         }
@@ -343,7 +390,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
                                     progressBarRegistrarEntrada.setVisibility(View.INVISIBLE);
                                 });
 
-                        atualizarSEPAE(matricula, novoTimestamp, nome);
+                        atualizarSEPAE(matricula, novoTimestamp, nome, motivo);
 
 
                     } else {
@@ -357,7 +404,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
         });
     }
 
-    private void atualizarSEPAE(String matricula, Timestamp timestamp, String quem){
+    private void atualizarSEPAE(String matricula, Timestamp timestamp, String quem, String motivo){
         Toast.makeText(getApplicationContext(), "Atualizando SEPAE...", Toast.LENGTH_SHORT).show();
         progressBarRegistrarEntrada.setVisibility(View.VISIBLE);
         DocumentReference docRef = db.collection("MaisInformacoes").document("autorizacoes");
@@ -367,27 +414,29 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Map<String, Map<String, List<Map<String, Timestamp>>>> entradas = (Map<String, Map<String, List<Map<String, Timestamp>>>>) document.get("entradasAtrasadas");
+                        Map<String, Map<String, List<Map<String, Object>>>> entradas = (Map<String, Map<String, List<Map<String, Object>>>>) document.get("entradasAtrasadas");
 
                         String dia = getDayAndMonth();
 
 
                         if (entradas.containsKey(dia)){
-                            Map<String, List<Map<String, Timestamp>>> auxdia = (Map<String, List<Map<String, Timestamp>>>) entradas.get(dia);
-                            Map<String, Timestamp> a = new HashMap<>();
+                            Map<String, List<Map<String, Object>>> auxdia = (Map<String, List<Map<String, Object>>>) entradas.get(dia);
+                            Map<String, Object> a = new HashMap<>();
                             a.put(quem, timestamp);
+                            a.put("motivo", motivo);
                             if (auxdia.containsKey(matricula)){
                                 auxdia.get(matricula).add(a);
                             }else{
-                                List<Map<String, Timestamp>> b = new ArrayList<>();
+                                List<Map<String, Object>> b = new ArrayList<>();
                                 b.add(a);
                                 auxdia.put(matricula, b);
                             }
                         } else {
-                            Map<String, List<Map<String, Timestamp>>> auxdia = new HashMap<>();
-                            Map<String, Timestamp> a = new HashMap<>();
+                            Map<String, List<Map<String, Object>>> auxdia = new HashMap<>();
+                            Map<String, Object> a = new HashMap<>();
                             a.put(quem, timestamp);
-                            List<Map<String, Timestamp>> b = new ArrayList<>();
+                            a.put("motivo", motivo);
+                            List<Map<String, Object>> b = new ArrayList<>();
                             b.add(a);
                             auxdia.put(matricula, b);
                             entradas.put(dia, auxdia);

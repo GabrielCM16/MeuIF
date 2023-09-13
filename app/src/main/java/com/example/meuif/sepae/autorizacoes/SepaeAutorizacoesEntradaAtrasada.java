@@ -6,13 +6,15 @@ public class SepaeAutorizacoesEntradaAtrasada {
     private String numero;
     private String nomeSEPAE;
     private String turma;
+    private String motivo;
 
-    public SepaeAutorizacoesEntradaAtrasada(String nome, String hora, String numero, String nomeSEPAE, String turma) {
+    public SepaeAutorizacoesEntradaAtrasada(String nome, String hora, String numero, String nomeSEPAE, String turma, String motivo) {
         this.nome = nome;
         this.hora = hora;
         this.numero = numero;
         this.turma = turma;
         this.nomeSEPAE = nomeSEPAE;
+        this.motivo = motivo;
     }
 
     public String getNome() {
@@ -33,5 +35,9 @@ public class SepaeAutorizacoesEntradaAtrasada {
 
     public String getTurma() {
         return turma;
+    }
+
+    public String getMotivo() {
+        return motivo;
     }
 }
