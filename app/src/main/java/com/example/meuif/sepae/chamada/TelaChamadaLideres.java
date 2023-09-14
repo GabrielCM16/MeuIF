@@ -37,13 +37,17 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class TelaChamadaLideres extends AppCompatActivity {
     private ActivityResultLauncher<String> requestPermissionLauncher;
@@ -288,6 +292,8 @@ public class TelaChamadaLideres extends AppCompatActivity {
     private void baixarPDF(String turma, String mes){
         Context context = this;
 
+        String diaGerado = getDayAndMonth();
+
                 Map<String, String> mesesMap = new HashMap<>();
                 mesesMap.put("Janeiro", "01");
                 mesesMap.put("Fevereiro", "02");
@@ -311,11 +317,18 @@ public class TelaChamadaLideres extends AppCompatActivity {
                     public void onComplete() {
                         Toast.makeText(getApplicationContext(), "Processando PDF", Toast.LENGTH_SHORT).show();
                         Log.d("pdf", nome + "dia" + diaMes + "data" + dataGlobal);
-                        RecyclerViewToPdf recyclerViewToPdf = new RecyclerViewToPdf(dataGlobal, diaMes);
+                        RecyclerViewToPdf recyclerViewToPdf = new RecyclerViewToPdf(dataGlobal, diaMes, mes, turma, diaGerado);
                         recyclerViewToPdf.createPdf(context, nome);
                     }
                 });
 
+    }
+
+    private String getDayAndMonth() {
+        DateFormat dateFormat = new SimpleDateFormat("dd/MM/YYYY");
+        dateFormat.setTimeZone(TimeZone.getTimeZone("GMT-3")); // Defina o fuso horário desejado
+        Date date = new Date();
+        return dateFormat.format(date);
     }
 
     private void pegarDadosDias(String turma, Callback callback){

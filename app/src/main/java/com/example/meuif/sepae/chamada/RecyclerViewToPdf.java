@@ -1,9 +1,13 @@
 package com.example.meuif.sepae.chamada;
 
+
 import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
@@ -11,12 +15,16 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.meuif.R;
 import com.itextpdf.io.font.FontConstants;
+import com.itextpdf.io.image.ImageData;
+import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.DeviceGray;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.WriterProperties;
 import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.kernel.font.PdfFont;
 import com.itextpdf.kernel.font.PdfFontFactory;
@@ -29,6 +37,7 @@ import com.itextpdf.layout.element.Paragraph;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 
+import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -41,8 +50,11 @@ public class RecyclerViewToPdf {
     private static Map<String, Object> diasParaPdf = new HashMap<>();
     private static List<String> dias = new ArrayList<>();
     private static String mes = "";
+    private static String mesTitulo = "";
+    private static String turma = "";
+    private static String diaGerada = "";
 
-    public RecyclerViewToPdf(Map<String, Object> diasParaPdf, String mes) {
+    public RecyclerViewToPdf(Map<String, Object> diasParaPdf, String mes, String mesTitulo, String turma, String diaGerada) {
         this.diasParaPdf = diasParaPdf;
         if (diasParaPdf != null) {
             // Iterando pelos campos e imprimindo seus nomes
@@ -53,6 +65,9 @@ public class RecyclerViewToPdf {
             }
         }
         this.mes = mes;
+        this.mesTitulo = mesTitulo;
+        this.turma = turma;
+        this.diaGerada = diaGerada;
         Log.d("pdf", mes + diasParaPdf.toString());
     }
 
@@ -98,9 +113,41 @@ public class RecyclerViewToPdf {
             pdfDocument.setDefaultPageSize(PageSize.A4.rotate()); // Isso define a orientação como paisagem (horizontal)
 
             Document document = new Document(pdfDocument);
+            PdfFont font = PdfFontFactory.createFont(FontConstants.HELVETICA);
+
+            // Crie um parágrafo para o título
+            Paragraph title = new Paragraph("Planilha De Frequência Da Turma " + turma + " Do Mês " + mesTitulo);
+            title.setFont(font); // Defina a fonte para o título
+            title.setFontSize(14f); // Defina o tamanho da fonte para o título
+            title.setTextAlignment(TextAlignment.CENTER); // Centralize o título
+
+            // Adicione o título ao documento
+            document.add(title);
+
+// Suponhamos que "logoapp" seja o nome do recurso em res/drawable
+            int resourceId = R.drawable.logoapp;
+
+// Cria um objeto BitmapFactory para decodificar a imagem do recurso
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
+// Define o tamanho desejado da imagem (por exemplo, 100x100)
+            float desiredWidth = 10f;
+            float desiredHeight = 10f;
+
+// Redimensiona o bitmap para o tamanho desejado
+            bitmap = Bitmap.createScaledBitmap(bitmap, (int) desiredWidth, (int) desiredHeight, false);
+
+// Converte o bitmap em um objeto ImageData
+            ImageData imageData = ImageDataFactory.create(toByteArray(bitmap));
+
+// Cria uma imagem com base no ImageData
+            Image image = new Image(imageData);
+
+// Adicione a imagem ao documento
+            document.add(image);
 
             // Configurar fonte
-            PdfFont font = PdfFontFactory.createFont(FontConstants.HELVETICA);
+
 
             // Configurações de estilo da tabela
             float[] columnWidths = {150f, 80f, 150f}; // Larguras das colunas
@@ -173,25 +220,28 @@ public class RecyclerViewToPdf {
 
                 // Iterar sobre os elementos da lista
                 for (Boolean valor : lista) {
-                    table.addCell(createCell(String.valueOf(valor), font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                    if (valor){
+                        table.addCell(createCell("P", font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                    }else {
+                        table.addCell(createCell("F", font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                    }
+
                 }
             }
 
-
-
-
-//            for (int i = 0; i < content.length; i++) {
-//                table.addCell(createCell("Nome:", font, 10f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
-//                table.addCell(createCell(content[i][0], font, 10f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
-//
-//                table.addCell(createCell("Idade:", font, 10f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
-//                table.addCell(createCell(content[i][1], font, 10f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
-//
-//                table.addCell(createCell("Cidade:", font, 10f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
-//                table.addCell(createCell(content[i][2], font, 10f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
-//            }
-
             document.add(table);
+
+            // Crie um parágrafo para o rodapé
+            Paragraph footer = new Paragraph("Planilha MeuIF Gerada Em " + diaGerada );
+            footer.setFont(font); // Defina a fonte para o rodapé
+            footer.setFontSize(10f); // Defina o tamanho da fonte para o rodapé
+            footer.setTextAlignment(TextAlignment.CENTER); // Centralize o rodapé
+
+// Adicione espaço em branco após o rodapé (opcional)
+            footer.setMarginTop(10);
+
+// Adicione o rodapé ao documento
+            document.add(footer);
 
             // Feche o documento PDF
             document.close();
@@ -203,6 +253,11 @@ public class RecyclerViewToPdf {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+    private static byte[] toByteArray(Bitmap bitmap) {
+        ByteArrayOutputStream stream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
+        return stream.toByteArray();
     }
 
     private static Cell createCell(String text, PdfFont font, float fontSize, TextAlignment alignment, VerticalAlignment verticalAlignment) {
