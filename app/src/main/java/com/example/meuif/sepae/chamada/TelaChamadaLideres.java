@@ -1,16 +1,22 @@
 package com.example.meuif.sepae.chamada;
 
+import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -40,6 +46,8 @@ import java.util.List;
 import java.util.Map;
 
 public class TelaChamadaLideres extends AppCompatActivity {
+    private ActivityResultLauncher<String> requestPermissionLauncher;
+    private static final int STORAGE_PERMISSION_CODE = 101;
     private Spinner spinnerMeses;
     private Spinner spinnerDias;
     private Spinner spinnerTurmas;
@@ -61,6 +69,8 @@ public class TelaChamadaLideres extends AppCompatActivity {
         setContentView(R.layout.activity_tela_chamada_lideres);
 
         carregarComponentes();
+        setupPermissionLauncher();
+
 
     }
 
@@ -234,7 +244,7 @@ public class TelaChamadaLideres extends AppCompatActivity {
 
                 // Agora você pode usar turmaSelecionada e mesSelecionado como desejado
 
-                baixarPDF(turmaSelecionada, mesSelecionado);
+                requestWriteExternalStoragePermission(turmaSelecionada, mesSelecionado);
             }
         });
 
@@ -250,7 +260,95 @@ public class TelaChamadaLideres extends AppCompatActivity {
 
     }
 
+    private void setupPermissionLauncher() {
+        requestPermissionLauncher = registerForActivityResult(new RequestPermission(), isGranted -> {
+            if (isGranted) {
+                // A permissão foi concedida, você pode prosseguir com a operação que exigia a permissão.
+
+            } else {
+                //requestWriteExternalStoragePermission();
+                // A permissão foi negada pelo usuário.
+
+            }
+        });
+    }
+    // Para solicitar a permissão em algum lugar do seu código
+    private void requestWriteExternalStoragePermission(String turmaSelecionada, String mesSelecionado) {
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED) {
+            // A permissão já foi concedida, prossiga com a operação.
+            baixarPDF(turmaSelecionada, mesSelecionado);
+        } else {
+            // Solicitar a permissão usando ActivityCompat.requestPermissions
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+        }
+    }
+
+
     private void baixarPDF(String turma, String mes){
+        Context context = this;
+
+                Map<String, String> mesesMap = new HashMap<>();
+                mesesMap.put("Janeiro", "01");
+                mesesMap.put("Fevereiro", "02");
+                mesesMap.put("Março", "03");
+                mesesMap.put("Abril", "04");
+                mesesMap.put("Maio", "05");
+                mesesMap.put("Junho", "06");
+                mesesMap.put("Julho", "07");
+                mesesMap.put("Agosto", "08");
+                mesesMap.put("Setembro", "09");
+                mesesMap.put("Outubro", "10");
+                mesesMap.put("Novembro", "11");
+                mesesMap.put("Dezembro", "12");
+
+                String diaMes = mesesMap.get(mes);
+
+                String nome = turma + mes + ".pdf";
+                Toast.makeText(getApplicationContext(), "Processando Turmas", Toast.LENGTH_SHORT).show();
+                pegarDadosDias(turma, new Callback() {
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(getApplicationContext(), "Processando PDF", Toast.LENGTH_SHORT).show();
+                        Log.d("pdf", nome + "dia" + diaMes + "data" + dataGlobal);
+                        RecyclerViewToPdf recyclerViewToPdf = new RecyclerViewToPdf(dataGlobal, diaMes);
+                        recyclerViewToPdf.createPdf(context, nome);
+                    }
+                });
+
+    }
+
+    private void pegarDadosDias(String turma, Callback callback){
+
+        DocumentReference docRef = db.collection("ChamadaTurma").document(turma);
+
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // Obtendo todos os campos do documento
+                        Map<String, Object> data = document.getData();
+
+                        dataGlobal = data;
+
+                        Log.d("TAG", "dataGlobal = " + dataGlobal.toString());
+
+                        Log.d("TAG", "completo "+data.toString());
+                        callback.onComplete();
+
+                    } else {
+                        Log.d("TAG", "O documento não existe.");
+                        callback.onComplete();
+                    }
+                } else {
+                    Log.d("TAG", "Erro ao obter o documento: " + task.getException());
+                    callback.onComplete();
+                }
+            }
+        });
+
 
     }
 
