@@ -7,6 +7,9 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
@@ -14,8 +17,11 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.meuif.R;
 import com.example.meuif.sepae.telaPrincipalSepae;
@@ -56,16 +62,6 @@ public class TelaChamadaLideres extends AppCompatActivity {
 
         carregarComponentes();
 
-    }
-
-    public boolean onOptionsItemSelected(MenuItem item) {
-        // Verifica se o item clicado é o botão do ActionBar
-        if (item.getItemId() == android.R.id.home) {
-            // Chame o método que você deseja executar quando o ActionBar for clicado
-            telaVoltar();
-            return true;
-        }
-        return super.onOptionsItemSelected(item);
     }
 
 
@@ -181,11 +177,81 @@ public class TelaChamadaLideres extends AppCompatActivity {
         nomesChamadas = new ArrayList<>();
         chamdaImages = new ArrayList<>();
 
+
         ActionBar actionBar = getSupportActionBar();
-        setTitle("Chamada Líderes");
-        // Adiciona um ícone de ação à direita
-        actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
-        actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setCustomView(R.layout.custom_actionbar);
+        ImageView leftImage = findViewById(R.id.leftImage);
+        ImageView rightImage = findViewById(R.id.rightImage); //baixar pdf
+
+        leftImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                telaVoltar();
+            }
+        });
+
+        rightImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                abrirDialogPDF();
+            }
+        });
+    }
+
+    private void abrirDialogPDF(){
+        AlertDialog.Builder dialog2 = new AlertDialog.Builder(this);
+        dialog2.setTitle("Baixar PDF de Chamada");
+        dialog2.setMessage("Escolha a turma e mês");
+        dialog2.setCancelable(false);
+
+// Inflar o layout customizado que contém os Spinners
+        View customLayout = getLayoutInflater().inflate(R.layout.custom_dialog_layout, null);
+        dialog2.setView(customLayout);
+
+// Obtenha referências para os Spinners
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"}) Spinner spinnerTurma = customLayout.findViewById(R.id.spinnerTurmaDialog);
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"}) Spinner spinnerMes = customLayout.findViewById(R.id.spinnerMesDialog);
+
+
+
+// Crie um ArrayAdapter para preencher os Spinners com os itens desejados
+        ArrayAdapter<CharSequence> turmaAdapter = ArrayAdapter.createFromResource(this, R.array.turmas, android.R.layout.simple_spinner_item);
+        turmaAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerTurma.setAdapter(turmaAdapter);
+
+        ArrayAdapter<CharSequence> mesAdapter = ArrayAdapter.createFromResource(this, R.array.months_array, android.R.layout.simple_spinner_item);
+        mesAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerMes.setAdapter(mesAdapter);
+
+        dialog2.setPositiveButton("Baixar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(), "Processando...", Toast.LENGTH_SHORT).show();
+
+                String turmaSelecionada = spinnerTurma.getSelectedItem().toString();
+                String mesSelecionado = spinnerMes.getSelectedItem().toString();
+
+                // Agora você pode usar turmaSelecionada e mesSelecionado como desejado
+
+                baixarPDF(turmaSelecionada, mesSelecionado);
+            }
+        });
+
+        dialog2.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(), "Confira os dados e tente novamente", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog2.create();
+        dialog2.show();
+
+    }
+
+    private void baixarPDF(String turma, String mes){
+
     }
 
     private void setarSpinnerTurmas(Callback callback){
