@@ -6,6 +6,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DefaultItemAnimator;
+import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -22,11 +23,16 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.example.meuif.autorizacoes.RecyclerItemClickListener;
+import com.example.meuif.chamadaLideres.AdapterChamadaLideres;
+import com.example.meuif.sepae.autorizacoes.AdapterSEPAEautorizacoesHoje;
 import com.example.meuif.ui.home.HomeFragment;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -36,6 +42,9 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.time.DayOfWeek;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
@@ -46,20 +55,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.TimeZone;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class tela_chamada_dia extends AppCompatActivity {
     private Button botaoDias;
     private TextView saidaData;
     private ProgressBar progressBarChamada;
     private String diaAtual;
-    private ListView listView;
+    private RecyclerView recyclerChamdaLider;
+    private Boolean TercaQuinta;
     private String turma;
     private Button botaoSalvar;
     private FirebaseFirestore db;
     private String dataBDAtual;
-    List<String> nomesChamada;
-    List<Integer> chamdaImages;
-
+    private List<AlunoChamada> listaAlunos = new ArrayList<>();
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -71,17 +81,14 @@ public class tela_chamada_dia extends AppCompatActivity {
         botaoDias.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
         botaoDias.setPadding(30, botaoDias.getPaddingTop(), 15, botaoDias.getPaddingBottom());
         saidaData = findViewById(R.id.saidaData);
-        listView = (ListView) findViewById(R.id.listViewChamada);
         botaoSalvar = findViewById(R.id.botaoSalvar);
         progressBarChamada = findViewById(R.id.progressBarChamada);
+        recyclerChamdaLider = findViewById(R.id.recyclerChamdaLider);
 
         progressBarChamada.setVisibility(View.VISIBLE);
 
         //muda a cor do progressBar pra preto
         progressBarChamada.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
-
-        nomesChamada = new ArrayList<>();
-        chamdaImages = new ArrayList<>();
 
         diaAtual = diaAtual();
         saidaData.setText(diaAtual);
@@ -100,60 +107,124 @@ public class tela_chamada_dia extends AppCompatActivity {
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
         actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação coo
 
+        TercaQuinta = isTercaOuQuinta();
+        Log.d("dia", TercaQuinta.toString());
 
-        CustomChamadaAdapter customChamadaAdapter = new CustomChamadaAdapter(getApplicationContext(), nomesChamada, chamdaImages);
-        listView.setAdapter(customChamadaAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
-                if (chamdaImages.get(i) == R.drawable.falta){
-                    chamdaImages.set(i, R.drawable.presenca);
-                } else if (chamdaImages.get(i) == R.drawable.presenca ){
-                    chamdaImages.set(i, R.drawable.falta);
-                }
-                atualizarListView();
-            }
-        });
+        pegarDadosChamada();
 
-        realizarChamada();
 
 
         botaoSalvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 diaAtual = diaAtual();
-                criarChamada(dataBDAtual, nomesChamada, chamdaImages);
+                salvarChamadaBD(dataBDAtual);
             }
         });
-
-
     }
 
-    private void atualizarListView(){
-        int firstVisibleItemPosition = listView.getFirstVisiblePosition();
-        Log.d("TAGGG", nomesChamada.toString());
-        List<String> nomesComPrefixo = new ArrayList<>();
-        for (int i = 0; i < nomesChamada.size(); i++) {
-            String nome = nomesChamada.get(i);
-            String nomeComPrefixo = (i + 1) + " - " + nome;
-            nomesComPrefixo.add(nomeComPrefixo);
+    private void salvarChamadaBD(String diaAtual) {
+        progressBarChamada.setVisibility(View.VISIBLE);
+
+        String chamadaTarde = diaAtual + "T";
+
+        Map<String, Boolean> mapDataChamada = new HashMap<>();
+
+        if (isTercaOuQuinta()){
+            Map<String, Boolean> mapDataChamada2 = new HashMap<>();
+
+            for(AlunoChamada aluno: listaAlunos){
+                String nomeCompleto = "";
+                String nome = aluno.getNome();
+                Boolean b = aluno.getChamadaTurno1();
+                Boolean b2 = aluno.getChamadaTurno2();
+
+                // Usar uma expressão regular para encontrar o nome
+                Pattern pattern = Pattern.compile("\\d+ - (.+)");
+                Matcher matcher = pattern.matcher(nome);
+
+                if (matcher.find()) {
+                    nomeCompleto = matcher.group(1); // O grupo 1 contém o nome
+                }
+
+                mapDataChamada.put(nomeCompleto, b);
+                mapDataChamada2.put(nomeCompleto, b2);
+            }
+
+            if (!mapDataChamada2.isEmpty()) {
+                db.collection("ChamadaTurma").document(turma)
+                        .update(chamadaTarde, mapDataChamada2).addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Log.d("TAG", "Campo do tipo Map criado com sucesso!");
+                                abrirToast("Chamada Turno Tarde Salvo Com Sucesso");
+                                progressBarChamada.setVisibility(View.INVISIBLE);
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Log.w("TAG", "Erro ao criar o campo do tipo Map: " + e.getMessage());
+                                abrirToast("Erro ao Salvar");
+                                progressBarChamada.setVisibility(View.INVISIBLE);
+                            }
+                        });
+            }
+        } else {
+            for(AlunoChamada aluno: listaAlunos){
+                String nomeCompleto = "";
+                String nome = aluno.getNome();
+                Boolean b = aluno.getChamadaTurno1();
+
+                // Usar uma expressão regular para encontrar o nome
+                Pattern pattern = Pattern.compile("\\d+ - (.+)");
+                Matcher matcher = pattern.matcher(nome);
+
+                if (matcher.find()) {
+                    nomeCompleto = matcher.group(1); // O grupo 1 contém o nome
+                }
+
+                mapDataChamada.put(nomeCompleto, b);
+            }
         }
-        Log.d("TAGGG", nomesComPrefixo.toString());
-        CustomChamadaAdapter customChamadaAdapter = new CustomChamadaAdapter(getApplicationContext(), nomesComPrefixo, chamdaImages);
-        listView.setAdapter(customChamadaAdapter);
-        listView.setSelection(firstVisibleItemPosition);
+
+
+        if (!mapDataChamada.isEmpty()){
+            db.collection("ChamadaTurma").document(turma)
+                    .update(diaAtual, mapDataChamada).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            Log.d("TAG", "Campo do tipo Map criado com sucesso!");
+                            abrirToast("Chamada Turno Manhã Salva Com Sucesso");
+                            progressBarChamada.setVisibility(View.INVISIBLE);
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            Log.w("TAG", "Erro ao criar o campo do tipo Map: " + e.getMessage());
+                            abrirToast("Erro ao Salvar");
+                            progressBarChamada.setVisibility(View.INVISIBLE);
+                        }
+                    });
+        }
     }
 
-    private void abrirToast(String texto){
-        Toast.makeText(
-                getApplicationContext(),
-                texto,
-                Toast.LENGTH_LONG
-        ).show();
+    public static boolean isTercaOuQuinta() {
+        // Obtém uma instância do Calendário com a data e hora atuais
+        Calendar calendario = Calendar.getInstance();
+
+        // Define a zona de tempo para Brasília
+        calendario.setTimeZone(TimeZone.getTimeZone("America/Sao_Paulo"));
+
+        // Obtém o dia da semana (0 = Domingo, 1 = Segunda, 2 = Terça, etc.)
+        int diaDaSemana = calendario.get(Calendar.DAY_OF_WEEK);
+
+        // Verifique se é terça-feira (3) ou quinta-feira (5)
+        return diaDaSemana == Calendar.TUESDAY || diaDaSemana == Calendar.THURSDAY;
     }
 
 
-    private void realizarChamada(){
+    private void pegarDadosChamada() {
         progressBarChamada.setVisibility(View.VISIBLE);
         turma = recuperarDados("turma");
         DocumentReference docRef = db.collection("ChamadaTurma").document(turma);
@@ -165,16 +236,48 @@ public class tela_chamada_dia extends AppCompatActivity {
                     if (document.exists()) {
 
                         if (document.contains(dataBDAtual)) {
+                            String tardeChamda = dataBDAtual + "T";
                             Object fieldValue = document.get(dataBDAtual);
-                            if (fieldValue instanceof Map) {
-                                Map<String, Boolean> mapData = (Map<String, Boolean>) fieldValue;
-                                // Agora você tem o Map e pode fazer o que quiser com ele
-                                atualizarListaNomes(mapData);
-                                for (Map.Entry<String, Boolean> entry : mapData.entrySet()) {
-                                    String key = entry.getKey();
-                                    Boolean value = entry.getValue();
-                                    Log.d("TAG", "Key: " + key + ", Value: " + value);
+
+                            if (isTercaOuQuinta()){
+
+                                Object fieldValue2 = document.get(tardeChamda);
+
+                                if (fieldValue instanceof Map && fieldValue2 instanceof Map) {
+
+                                    Map<String, Boolean> mapData = (Map<String, Boolean>) fieldValue;
+                                    Map<String, Boolean> mapData2 = (Map<String, Boolean>) fieldValue2;
+
+                                    for (Map.Entry<String, Boolean> entry : mapData.entrySet()) {
+                                        String key = entry.getKey();
+                                        Boolean value = entry.getValue();
+                                        Boolean value2 = mapData2.get(key);
+                                        AlunoChamada aluno = new AlunoChamada(value, value2, key);
+                                        Log.d("TAG", "Key: " + key + ", Value: " + value);
+                                        Log.d("aluno", "aluno: " + aluno.getNome() + " 1 " + aluno.getChamadaTurno1() + " " + aluno.getChamadaTurno2());
+                                        listaAlunos.add(aluno);
+
+                                    }
+                            } else {
+                                    if (fieldValue instanceof Map) {
+                                        Map<String, Boolean> mapData = (Map<String, Boolean>) fieldValue;
+
+
+                                        for (Map.Entry<String, Boolean> entry : mapData.entrySet()) {
+
+                                            String key = entry.getKey();
+                                            Boolean value = entry.getValue();
+
+                                            AlunoChamada aluno = new AlunoChamada(value, null, key);
+
+                                            listaAlunos.add(aluno);
+
+                                        }
+                                    }
                                 }
+
+                                Log.d("aluno", listaAlunos.toString());
+                                mostrarChamda(listaAlunos);
 
                             } else {
                                 Log.d("TAG", "O campo não contém um Map válido!");
@@ -183,8 +286,6 @@ public class tela_chamada_dia extends AppCompatActivity {
                             Log.d("TAG", "Campo com o Map da data não existe no documento!");
                             listarNomes();
                         }
-
-
                         Log.d("TAGBUSCANOMES", " achou o ducumento");
                     } else {
                         Log.d("TAGBUSCANOMES", "Documento de turma não encontrado");
@@ -197,100 +298,49 @@ public class tela_chamada_dia extends AppCompatActivity {
         });
     }
 
-    public void criarChamada(String data, List<String> mapData, List<Integer> images){
+    private void mostrarChamda(List<AlunoChamada> listaAlunos){
         progressBarChamada.setVisibility(View.VISIBLE);
-
-        Map<String, Boolean> mapDataChamada = new HashMap<>();
-
-        for (int i = 0; i < mapData.size(); i++) {
-            //String nomeAux = mapData.get(i).substring(4);
-            String nomeAux = mapData.get(i);
-            if (images.get(i) == R.drawable.falta){
-                mapDataChamada.put(nomeAux, false);
-            } else if (images.get(i) == R.drawable.presenca){
-                mapDataChamada.put(nomeAux, true);
+        // Ordene a lista pelo nome
+        Collections.sort(listaAlunos, new Comparator<AlunoChamada>() {
+            @Override
+            public int compare(AlunoChamada aluno1, AlunoChamada aluno2) {
+                // Comparar os nomes dos alunos
+                return aluno1.getNome().compareTo(aluno2.getNome());
             }
+        });
+        int count = 1;
+
+        for (AlunoChamada aluno : listaAlunos){
+            aluno.setNome(String.valueOf(count) + " - " + aluno.getNome());
+            count++;
         }
 
+        AdapterChamadaLideres adapter = new AdapterChamadaLideres(listaAlunos, isTercaOuQuinta());
 
-        db.collection("ChamadaTurma").document(turma)
-                .update(data, mapDataChamada).addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Log.d("TAG", "Campo do tipo Map criado com sucesso!");
-                        abrirToast("Chamada Salva Com Sucesso");
-                        progressBarChamada.setVisibility(View.INVISIBLE);
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Log.w("TAG", "Erro ao criar o campo do tipo Map: " + e.getMessage());
-                        abrirToast("Erro ao Salvar");
-                        progressBarChamada.setVisibility(View.INVISIBLE);
-                    }
-                });
+        //Configurar RecyclerView
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerChamdaLider.setLayoutManager(layoutManager);
+        recyclerChamdaLider.setHasFixedSize(true);
+        recyclerChamdaLider.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayout.VERTICAL));
+        recyclerChamdaLider.setAdapter(adapter);
+        progressBarChamada.setVisibility(View.INVISIBLE);
 
     }
 
+
+
+    private void abrirToast(String texto){
+        Toast.makeText(
+                getApplicationContext(),
+                texto,
+                Toast.LENGTH_LONG
+        ).show();
+    }
     private String recuperarDados(String chave){
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String aux = sharedPreferences.getString(chave, "");
         return aux;
     }
-
-    private void atualizarListaNomes(List<String> nomes){
-        progressBarChamada.setVisibility(View.VISIBLE);
-        int cont = 0;
-        for (String stringValue : nomes) {
-            cont += 1;
-            Log.d("TAG", "String da chamada list view: " + stringValue); // Exibir no logcat
-            nomesChamada.add(stringValue);
-            chamdaImages.add(R.drawable.presenca);
-        }
-        progressBarChamada.setVisibility(View.INVISIBLE);
-        atualizarListView();
-    }
-
-    private void atualizarListaNomes(Map<String, Boolean> mapData){
-        progressBarChamada.setVisibility(View.VISIBLE);
-        Log.d("ATU", "antes de atu" + mapData);
-
-        List<Map.Entry<String, Boolean>> sortedEntries = new ArrayList<>(mapData.entrySet());
-
-        Collections.sort(sortedEntries, new Comparator<Map.Entry<String, Boolean>>() {
-            @Override
-            public int compare(Map.Entry<String, Boolean> entry1, Map.Entry<String, Boolean> entry2) {
-                return entry1.getKey().compareTo(entry2.getKey());
-            }
-        });
-
-        Map<String, Boolean> sortedMap = new LinkedHashMap<>();
-        for (Map.Entry<String, Boolean> entry : sortedEntries) {
-            sortedMap.put(entry.getKey(), entry.getValue());
-        }
-
-        Log.d("ATU", "depois de atu" + sortedMap);
-
-        int cont = 1;
-
-        for (Map.Entry<String, Boolean> entry : sortedMap.entrySet()) {
-            String key = entry.getKey();
-            Boolean value = entry.getValue();
-            Log.d("TAG", "Key: " + key + ", Value: " + value);
-            String nomeAux = key;
-            nomesChamada.add(nomeAux);
-            if (value){
-                chamdaImages.add(R.drawable.presenca);
-            } else if (!value){
-                chamdaImages.add(R.drawable.falta);
-            }
-            cont++;
-        }
-
-        progressBarChamada.setVisibility(View.INVISIBLE);
-        atualizarListView();
-    }
-
     private void listarNomes(){
         progressBarChamada.setVisibility(View.VISIBLE);
         turma = recuperarDados("turma");
@@ -306,11 +356,29 @@ public class tela_chamada_dia extends AppCompatActivity {
 
                         if (stringArray != null) {
                             // Agora você tem a matriz de strings e pode fazer o que quiser com ela
-                            progressBarChamada.setVisibility(View.INVISIBLE);
-                            atualizarListaNomes(stringArray);
-                            for (String stringValue : stringArray) {
-                                Log.d("TAG", "String da chamda: " + stringValue); // Exibir no logcat
+
+                            TercaQuinta = isTercaOuQuinta();
+
+                            if (TercaQuinta){
+                                for (String stringValue : stringArray) {
+                                    AlunoChamada alunoChamada = new AlunoChamada(true,
+                                            true,
+                                            stringValue);
+                                    listaAlunos.add(alunoChamada);
+                                }
+                            } else {
+                                for (String stringValue : stringArray) {
+                                    AlunoChamada alunoChamada = new AlunoChamada(true,
+                                            null,
+                                            stringValue);
+                                    listaAlunos.add(alunoChamada);
+                                }
                             }
+
+                            Log.d("aluno", listaAlunos.toArray().toString());
+                            mostrarChamda(listaAlunos);
+                            progressBarChamada.setVisibility(View.INVISIBLE);
+
 
                         } else {
                             Log.d("TAG", "Campo da matriz não encontrado no documento!");
@@ -346,7 +414,6 @@ public class tela_chamada_dia extends AppCompatActivity {
         String data = "Hoje, " + String.format("%02d/%02d/%04d", dia, mes, ano);
         return data;
     }
-
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         // Verifica se o item clicado é o botão do ActionBar
@@ -357,8 +424,6 @@ public class tela_chamada_dia extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
-
     private void telaVoltar(){
         // Criar a Intent
        Intent intent = new Intent(tela_chamada_dia.this, Tela_Principal.class);
