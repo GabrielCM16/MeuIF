@@ -25,6 +25,7 @@ import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.WriterProperties;
 import com.itextpdf.layout.element.Cell;
+import com.itextpdf.layout.element.Div;
 import com.itextpdf.layout.element.Image;
 import com.itextpdf.layout.element.Table;
 import com.itextpdf.kernel.font.PdfFont;
@@ -120,36 +121,37 @@ public class RecyclerViewToPdf {
             Document document = new Document(pdfDocument);
             PdfFont font = PdfFontFactory.createFont(FontConstants.HELVETICA);
 
-            // Crie um parágrafo para o título
+            // Crie um Div para o título e a imagem
+            Div titleWithImage = new Div();
+
+// Crie uma tabela com duas colunas
+            Table table1 = new Table(new float[]{1, 4}); // As proporções (1 e 4) podem ser ajustadas conforme necessário
+
+// Adicione a imagem à primeira coluna da tabela
+            int resourceId = R.drawable.logoapp;
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
+            float desiredWidth = 30f;
+            float desiredHeight = 30f;
+            bitmap = Bitmap.createScaledBitmap(bitmap, (int) desiredWidth, (int) desiredHeight, false);
+            ImageData imageData = ImageDataFactory.create(toByteArray(bitmap));
+            Image image = new Image(imageData);
+            table1.addCell(new Cell().add(image));
+
+// Crie um Paragraph para o título
             Paragraph title = new Paragraph("Planilha De Frequência Da Turma " + turma + " Do Mês " + mesTitulo);
             title.setFont(font); // Defina a fonte para o título
             title.setFontSize(14f); // Defina o tamanho da fonte para o título
-            title.setTextAlignment(TextAlignment.CENTER); // Centralize o título
 
-            // Adicione o título ao documento
-            document.add(title);
+// Adicione o título à segunda coluna da tabela
+            table1.addCell(new Cell().add(title));
 
- //Suponhamos que "logoapp" seja o nome do recurso em res/drawable
-            int resourceId = R.drawable.logoapp;
+// Adicione a tabela ao Div
+            titleWithImage.add(table1);
 
-// Cria um objeto BitmapFactory para decodificar a imagem do recurso
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
-// Define o tamanho desejado da imagem (por exemplo, 100x100)
-            float desiredWidth = 10f;
-            float desiredHeight = 10f;
+// Adicione o Div ao documento
+            document.add(titleWithImage);
 
-// Redimensiona o bitmap para o tamanho desejado
-            bitmap = Bitmap.createScaledBitmap(bitmap, (int) desiredWidth, (int) desiredHeight, false);
-
-// Converte o bitmap em um objeto ImageData
-            ImageData imageData = ImageDataFactory.create(toByteArray(bitmap));
-
-// Cria uma imagem com base no ImageData
-            Image image = new Image(imageData);
-
-// Adicione a imagem ao documento
-            document.add(image);
 
             // Configurar fonte
 
