@@ -15,12 +15,12 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
-import com.example.meuif.R;
 import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
 import com.itextpdf.kernel.colors.Color;
 import com.itextpdf.kernel.colors.DeviceGray;
+import com.itextpdf.kernel.colors.DeviceRgb;
 import com.itextpdf.kernel.geom.PageSize;
 import com.itextpdf.kernel.pdf.WriterProperties;
 import com.itextpdf.layout.element.Cell;
@@ -34,6 +34,7 @@ import com.itextpdf.layout.Document;
 import com.itextpdf.layout.borders.SolidBorder;
 import com.itextpdf.layout.element.AreaBreak;
 import com.itextpdf.layout.element.Paragraph;
+import com.itextpdf.layout.element.Text;
 import com.itextpdf.layout.property.TextAlignment;
 import com.itextpdf.layout.property.VerticalAlignment;
 
@@ -41,7 +42,10 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -125,26 +129,26 @@ public class RecyclerViewToPdf {
             document.add(title);
 
 // Suponhamos que "logoapp" seja o nome do recurso em res/drawable
-            int resourceId = R.drawable.logoapp;
-
-// Cria um objeto BitmapFactory para decodificar a imagem do recurso
-            BitmapFactory.Options options = new BitmapFactory.Options();
-            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
-// Define o tamanho desejado da imagem (por exemplo, 100x100)
-            float desiredWidth = 10f;
-            float desiredHeight = 10f;
-
-// Redimensiona o bitmap para o tamanho desejado
-            bitmap = Bitmap.createScaledBitmap(bitmap, (int) desiredWidth, (int) desiredHeight, false);
-
-// Converte o bitmap em um objeto ImageData
-            ImageData imageData = ImageDataFactory.create(toByteArray(bitmap));
-
-// Cria uma imagem com base no ImageData
-            Image image = new Image(imageData);
-
-// Adicione a imagem ao documento
-            document.add(image);
+//            int resourceId = R.drawable.ic_launcher_background;
+//
+//// Cria um objeto BitmapFactory para decodificar a imagem do recurso
+//            BitmapFactory.Options options = new BitmapFactory.Options();
+//            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
+//// Define o tamanho desejado da imagem (por exemplo, 100x100)
+//            float desiredWidth = 20f;
+//            float desiredHeight = 20f;
+//
+//// Redimensiona o bitmap para o tamanho desejado
+//            bitmap = Bitmap.createScaledBitmap(bitmap, (int) desiredWidth, (int) desiredHeight, false);
+//
+//// Converte o bitmap em um objeto ImageData
+//            ImageData imageData = ImageDataFactory.create(toByteArray(bitmap));
+//
+//// Cria uma imagem com base no ImageData
+//            Image image = new Image(imageData);
+//
+//// Adicione a imagem ao documento
+//            document.add(image);
 
             // Configurar fonte
 
@@ -158,7 +162,11 @@ public class RecyclerViewToPdf {
             int contT = 0;
             if (diasParaPdf != null) {
                 for (String fieldName : diasParaPdf.keySet()) {
-                    if (!fieldName.equals("Lider") && !fieldName.equals("ViceLider") && !fieldName.equals("nomesSala") && fieldName.substring(2,4).equals(mes)){
+                    if (!fieldName.equals("Lider") &&
+                            !fieldName.equals("ViceLider") &&
+                            !fieldName.equals("nomesSala") &&
+                            fieldName.substring(fieldName.length() - 1).charAt(0) != 'T' &&
+                            fieldName.substring(2,4).equals(mes)){
                         contT++;
                     }
                 }
@@ -166,65 +174,161 @@ public class RecyclerViewToPdf {
 
             // Preencha a tabela com dados
             Table table = new Table(contT + 1); // Tabela com 6 colunas (rótulos e valores)
+            Log.d("sim", String.valueOf(contT));
 
             if (diasParaPdf != null) { //adiciona os dias
                 // Iterando pelos campos e imprimindo seus nomes
                 table.addCell(createCell("Dias: ", font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
                 for (String fieldName : diasParaPdf.keySet()) {
-                    if (!fieldName.equals("Lider") && !fieldName.equals("ViceLider") && !fieldName.equals("nomesSala") && fieldName.substring(2,4).equals(mes)){
-                        table.addCell(createCell(fieldName, font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                    if (!fieldName.equals("Lider") &&
+                            !fieldName.equals("ViceLider") &&
+                            !fieldName.equals("nomesSala") &&
+                            fieldName.substring(fieldName.length() - 1).charAt(0) != 'T' &&
+                            fieldName.substring(2,4).equals(mes)){
+                        table.addCell(createCell(fieldName.substring(0,2), font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
                     }
                 }
             }
 
-            Map<String, List<Boolean>> nomesChamada = new HashMap<>();
+            Map<String, List<List<Boolean>>> nomesChamada = new HashMap<>();
 
             if (diasParaPdf != null) {
                 for (String fieldName : diasParaPdf.keySet()) {
-                    if (fieldName.substring(2,4).equals(mes)){
+                    if (fieldName.substring(2,4).equals(mes) &&
+                            fieldName.substring(fieldName.length() - 1).charAt(0) != 'T'){
                         Object value = diasParaPdf.get(fieldName);
 
                         if (value instanceof Map) {
-                            // É um mapa, faça o cast e processe os valores
-                            Map<String, Object> diaAtual = (Map<String, Object>) value;
-                            Log.d("TAG", "cada dia  " + fieldName + " " + diaAtual.toString());
+                            if (diasParaPdf.containsKey(fieldName + "T")){
+                                Object value2 = diasParaPdf.get(fieldName + "T");
+                                // É um mapa, faça o cast e processe os valores
+                                Map<String, Object> diaAtualT = (Map<String, Object>) value2;
+                                Map<String, Object> diaAtualM = (Map<String, Object>) value;
 
-                            for (Object aux : diaAtual.keySet()) {
-                                //table.addCell(createCell(String.valueOf((Boolean) aux), font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
-                                if (nomesChamada.containsKey(aux)) {
-                                    Log.d("TAG", "lista" + diaAtual.get(aux) + "aux" + aux);
-                                    Boolean a = (Boolean) diaAtual.get(aux);
-                                    List<Boolean> b = nomesChamada.get(aux);
-                                    b.add((Boolean) diaAtual.get(aux));
-                                    nomesChamada.put((String) aux, b);
-                                } else {
-                                    List<Boolean> a = new ArrayList<>();
-                                    a.add((Boolean) diaAtual.get(aux));
-                                    nomesChamada.put((String) aux, a);
+                                for (Object aux : diaAtualM.keySet()) {
+                                    //table.addCell(createCell(String.valueOf((Boolean) aux), font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                                    if (nomesChamada.containsKey(aux)) {
+
+                                        Boolean a = (Boolean) diaAtualM.get(aux);
+                                        Boolean b = (Boolean) diaAtualT.get(aux);
+
+                                        List<List<Boolean>> listaAuxPrincipal = nomesChamada.get(aux);
+                                        List<Boolean> listaAux = new ArrayList<>();
+                                        listaAux.add(a);
+                                        listaAux.add(b);
+                                        listaAuxPrincipal.add(listaAux);
+
+                                        nomesChamada.put((String) aux, listaAuxPrincipal);
+
+                                    } else {
+                                        Boolean a = (Boolean) diaAtualM.get(aux);
+                                        Boolean b = (Boolean) diaAtualT.get(aux);
+
+                                        List<List<Boolean>> listaAuxPrincipal = new ArrayList<>();
+                                        List<Boolean> listaAux = new ArrayList<>();
+                                        listaAux.add(a);
+                                        listaAux.add(b);
+                                        listaAuxPrincipal.add(listaAux);
+
+                                        nomesChamada.put((String) aux, listaAuxPrincipal);
+                                    }
                                 }
+                            } else {
+                                Map<String, Object> diaAtualM = (Map<String, Object>) value;
+
+                                for (Object aux : diaAtualM.keySet()) {
+                                    //table.addCell(createCell(String.valueOf((Boolean) aux), font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                                    if (nomesChamada.containsKey(aux)) {
+
+                                        Boolean a = (Boolean) diaAtualM.get(aux);
+
+                                        List<List<Boolean>> listaAuxPrincipal = nomesChamada.get(aux);
+                                        List<Boolean> listaAux = new ArrayList<>();
+                                        listaAux.add(a);
+                                        listaAux.add(null);
+                                        listaAuxPrincipal.add(listaAux);
+
+
+                                        nomesChamada.put((String) aux, listaAuxPrincipal);
+                                    } else {
+                                        Boolean a = (Boolean) diaAtualM.get(aux);
+
+                                        List<List<Boolean>> listaAuxPrincipal = new ArrayList<>();
+                                        List<Boolean> listaAux = new ArrayList<>();
+                                        listaAux.add(a);
+                                        listaAux.add(null);
+                                        listaAuxPrincipal.add(listaAux);
+
+                                        nomesChamada.put((String) aux, listaAuxPrincipal);
+                                    }
+                                }
+
                             }
-                            Log.d("TAG", nomesChamada.toString());
                         } else {
-                            // Não é um mapa, faça o que for necessário para lidar com outros tipos de valores
+
                         }
+
+
                     }
                 }
             }
 
+            //vamos ordenar
+            // Converter o mapa em uma lista de entradas (chave-valor)
+            List<Map.Entry<String, List<List<Boolean>>>> listaEntradas = new ArrayList<>(nomesChamada.entrySet());
+
+            // Classificar a lista com base nas chaves (ordem alfabética)
+            Collections.sort(listaEntradas, new Comparator<Map.Entry<String, List<List<Boolean>>>>() {
+                @Override
+                public int compare(Map.Entry<String, List<List<Boolean>>> entrada1, Map.Entry<String, List<List<Boolean>>> entrada2) {
+                    return entrada1.getKey().compareTo(entrada2.getKey());
+                }
+            });
+
+            // Criar um novo mapa ordenado a partir da lista classificada
+            Map<String, List<List<Boolean>>> mapaOrdenado = new LinkedHashMap<>();
+            for (Map.Entry<String, List<List<Boolean>>> entrada : listaEntradas) {
+                mapaOrdenado.put(entrada.getKey(), entrada.getValue());
+            }
+
             // Iterar sobre as chaves do Map
-            for (String chave : nomesChamada.keySet()) {
+            for (String chave : mapaOrdenado.keySet()) {
                 table.addCell(createCell(chave, font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
 
                 // Obter a lista associada a essa chave
-                List<Boolean> lista = nomesChamada.get(chave);
+                List<List<Boolean>> lista = nomesChamada.get(chave);
+                Log.d("aluno", "nome: " + chave);
+                Log.d("aluno", "lista: " + lista.toString());
 
                 // Iterar sobre os elementos da lista
-                for (Boolean valor : lista) {
-                    if (valor){
-                        table.addCell(createCell("P", font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                for (List<Boolean> valor : lista) {
+                    if (valor.get(0) != null && valor.get(1) != null){
+                        if (valor.get(0) && valor.get(1)){
+                            Cell cell = createCustomCell("P", "P");
+                            table.addCell(cell);
+                        }else if(!valor.get(0) && !valor.get(1)) {
+                            Cell cell = createCustomCell("F", "F");
+                            table.addCell(cell);
+                        } else if (valor.get(0) && !valor.get(1)){
+                            Cell cell = createCustomCell("P", "F");
+                            table.addCell(cell);
+                        } else if (!valor.get(0) && valor.get(1)) {
+                            Cell cell = createCustomCell("F", "P");
+                            table.addCell(cell);
+                        }
                     }else {
-                        table.addCell(createCell("F", font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                        if (valor.get(0) != null && !valor.get(0) && valor.get(1) == null) {
+                            Cell cell = createCustomCell("F", "");
+                            table.addCell(cell);
+                        }else if (valor.get(0) != null && valor.get(0) && valor.get(1) == null) {
+                            Cell cell = createCustomCell("P", "");
+                            table.addCell(cell);
+                        } else {
+                            Cell cell = createCustomCell("X", "X");
+                            table.addCell(cell);
+                        }
                     }
+
 
                 }
             }
@@ -237,8 +341,8 @@ public class RecyclerViewToPdf {
             footer.setFontSize(10f); // Defina o tamanho da fonte para o rodapé
             footer.setTextAlignment(TextAlignment.CENTER); // Centralize o rodapé
 
-// Adicione espaço em branco após o rodapé (opcional)
-            footer.setMarginTop(10);
+            // Adicione espaço em branco após o rodapé (opcional)
+            //footer.setMarginTop(10);
 
 // Adicione o rodapé ao documento
             document.add(footer);
@@ -260,6 +364,60 @@ public class RecyclerViewToPdf {
         return stream.toByteArray();
     }
 
+    public static Cell createCustomCell(String a1, String a2) {
+        Color vermelho = new DeviceRgb(255, 0, 0);
+        Color verde = new DeviceRgb(0, 255, 0);
+        // Crie um Paragraph para a célula
+        Paragraph paragraph = new Paragraph();
+
+        if (a1.equals("P")){
+            // Adicione o "F" em vermelho
+            Text textoF = new Text(a1)
+                    .setFontColor(verde)
+                    .setFontSize(8f)
+                    .setTextAlignment(TextAlignment.LEFT);
+            paragraph.add(textoF);
+        } else {
+            // Adicione o "F" em vermelho
+            Text textoF = new Text(a1)
+                    .setFontColor(vermelho)
+                    .setFontSize(8f)
+                    .setTextAlignment(TextAlignment.LEFT);
+            paragraph.add(textoF);
+        }
+
+        if (!a2.equals("")){
+            // Adicione a barra ("/") em preto
+            Text barra = new Text("/")
+                    .setFontSize(8f)
+                    .setTextAlignment(TextAlignment.LEFT);
+            paragraph.add(barra);
+        }
+
+        if (a2.equals("P")){
+            // Adicione o "P" em verde
+            Text textoP = new Text(a2)
+                    .setFontColor(verde)
+                    .setFontSize(8f)
+                    .setTextAlignment(TextAlignment.LEFT);
+            paragraph.add(textoP);
+        } else {
+            // Adicione o "P" em verde
+            Text textoP = new Text(a2)
+                    .setFontColor(vermelho)
+                    .setFontSize(8f)
+                    .setTextAlignment(TextAlignment.LEFT);
+            paragraph.add(textoP);
+        }
+
+        // Crie a célula e adicione o Paragraph
+        Cell cell = new Cell()
+                .add(paragraph)
+                .setTextAlignment(TextAlignment.LEFT)
+                .setVerticalAlignment(VerticalAlignment.MIDDLE);
+
+        return cell;
+    }
     private static Cell createCell(String text, PdfFont font, float fontSize, TextAlignment alignment, VerticalAlignment verticalAlignment) {
         return new Cell()
                 .setFont(font)

@@ -40,6 +40,7 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -330,6 +331,7 @@ public class TelaChamadaLideres extends AppCompatActivity {
         Date date = new Date();
         return dateFormat.format(date);
     }
+
 
     private void pegarDadosDias(String turma, Callback callback){
 
