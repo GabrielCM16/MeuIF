@@ -11,7 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
@@ -85,6 +87,27 @@ public class tela_chamada_dia extends AppCompatActivity {
         progressBarChamada = findViewById(R.id.progressBarChamada);
         recyclerChamdaLider = findViewById(R.id.recyclerChamdaLider);
 
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setCustomView(R.layout.custom_actionbar);
+        ImageView leftImage = findViewById(R.id.leftImage);
+        ImageView rightImage = findViewById(R.id.rightImage); //baixar pdf
+        rightImage.setImageResource(R.drawable.baseline_question_mark_24);
+
+        leftImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                telaVoltar();
+            }
+        });
+
+        rightImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {duvidaChamada();
+            }
+        });
+
         progressBarChamada.setVisibility(View.VISIBLE);
 
         //muda a cor do progressBar pra preto
@@ -95,17 +118,7 @@ public class tela_chamada_dia extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
 
-        ActionBar actionBar = getSupportActionBar();
-
-        setTitle("Chamada Diaria de Classe");
         progressBarChamada.setVisibility(View.INVISIBLE);
-
-        // Obtém uma referência para a ActionBar ou Toolbar
-         // ou Toolbar toolbar = findViewById(R.id.toolbar);
-
-        // Adiciona um ícone de ação à direita
-        actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
-        actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação coo
 
         TercaQuinta = isTercaOuQuinta();
         Log.d("dia", TercaQuinta.toString());
@@ -122,6 +135,29 @@ public class tela_chamada_dia extends AppCompatActivity {
                 salvarChamadaBD(dataBDAtual);
             }
         });
+    }
+
+    private void duvidaChamada(){
+        // Inflar o layout personalizado
+        View customLayout = getLayoutInflater().inflate(R.layout.custom_dialog_duvida_chamada, null);
+
+// Configurar a imagem desejada no ImageView
+        @SuppressLint({"MissingInflatedId", "LocalSuppress"}) ImageView imageView = customLayout.findViewById(R.id.custom_dialog_image);
+        imageView.setImageResource(R.drawable.imagemduvidachamada); // Substitua 'sua_imagem' pelo recurso da sua imagem
+
+// Criar o AlertDialog personalizado
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        builder.setView(customLayout);
+
+// Criar e exibir o AlertDialog
+        AlertDialog alertDialog = builder.create();
+        alertDialog.setTitle("Como Realizar A Chamada");
+        alertDialog.setMessage("A chamada deve ser realizada todos os dias letivos, " +
+                "e às terças e quintas-feiras, a chamada deve ser realizada tanto no período da manhã quanto no período da tarde.");
+
+        alertDialog.show();
+
     }
 
     private void salvarChamadaBD(String diaAtual) {
@@ -239,7 +275,7 @@ public class tela_chamada_dia extends AppCompatActivity {
                             String tardeChamda = dataBDAtual + "T";
                             Object fieldValue = document.get(dataBDAtual);
 
-                            if (isTercaOuQuinta()){
+                            if (isTercaOuQuinta()) {
 
                                 Object fieldValue2 = document.get(tardeChamda);
 
@@ -253,15 +289,17 @@ public class tela_chamada_dia extends AppCompatActivity {
                                         Boolean value = entry.getValue();
                                         Boolean value2 = mapData2.get(key);
                                         AlunoChamada aluno = new AlunoChamada(value, value2, key);
-                                        Log.d("TAG", "Key: " + key + ", Value: " + value);
-                                        Log.d("aluno", "aluno: " + aluno.getNome() + " 1 " + aluno.getChamadaTurno1() + " " + aluno.getChamadaTurno2());
                                         listaAlunos.add(aluno);
 
                                     }
+                                } else {
+                                    progressBarChamada.setVisibility(View.INVISIBLE);
+                                    Toast.makeText(getApplicationContext(), "Erro na chamada", Toast.LENGTH_LONG).show();
+                                    Log.d("TAG", "O campo não contém um Map válido!");
+                                }
                             } else {
                                     if (fieldValue instanceof Map) {
                                         Map<String, Boolean> mapData = (Map<String, Boolean>) fieldValue;
-
 
                                         for (Map.Entry<String, Boolean> entry : mapData.entrySet()) {
 
@@ -273,21 +311,24 @@ public class tela_chamada_dia extends AppCompatActivity {
                                             listaAlunos.add(aluno);
 
                                         }
+                                    }else {
+                                        progressBarChamada.setVisibility(View.INVISIBLE);
+                                        Toast.makeText(getApplicationContext(), "Erro na chamada", Toast.LENGTH_LONG).show();
+                                        Log.d("TAG", "O campo não contém um Map válido!");
                                     }
                                 }
 
                                 Log.d("aluno", listaAlunos.toString());
                                 mostrarChamda(listaAlunos);
 
-                            } else {
-                                Log.d("TAG", "O campo não contém um Map válido!");
-                            }
                         } else {
                             Log.d("TAG", "Campo com o Map da data não existe no documento!");
                             listarNomes();
                         }
                         Log.d("TAGBUSCANOMES", " achou o ducumento");
                     } else {
+                        progressBarChamada.setVisibility(View.INVISIBLE);
+                        Toast.makeText(getApplicationContext(), "Erro na turma", Toast.LENGTH_LONG).show();
                         Log.d("TAGBUSCANOMES", "Documento de turma não encontrado");
                     }
                 } else {
