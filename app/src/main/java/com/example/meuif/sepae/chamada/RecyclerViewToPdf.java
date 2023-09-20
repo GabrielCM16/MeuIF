@@ -15,6 +15,7 @@ import android.widget.Toast;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
+import com.example.meuif.R;
 import com.itextpdf.io.font.FontConstants;
 import com.itextpdf.io.image.ImageData;
 import com.itextpdf.io.image.ImageDataFactory;
@@ -128,27 +129,27 @@ public class RecyclerViewToPdf {
             // Adicione o título ao documento
             document.add(title);
 
-// Suponhamos que "logoapp" seja o nome do recurso em res/drawable
-//            int resourceId = R.drawable.ic_launcher_background;
-//
-//// Cria um objeto BitmapFactory para decodificar a imagem do recurso
-//            BitmapFactory.Options options = new BitmapFactory.Options();
-//            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
-//// Define o tamanho desejado da imagem (por exemplo, 100x100)
-//            float desiredWidth = 20f;
-//            float desiredHeight = 20f;
-//
-//// Redimensiona o bitmap para o tamanho desejado
-//            bitmap = Bitmap.createScaledBitmap(bitmap, (int) desiredWidth, (int) desiredHeight, false);
-//
-//// Converte o bitmap em um objeto ImageData
-//            ImageData imageData = ImageDataFactory.create(toByteArray(bitmap));
-//
-//// Cria uma imagem com base no ImageData
-//            Image image = new Image(imageData);
-//
-//// Adicione a imagem ao documento
-//            document.add(image);
+ //Suponhamos que "logoapp" seja o nome do recurso em res/drawable
+            int resourceId = R.drawable.logoapp;
+
+// Cria um objeto BitmapFactory para decodificar a imagem do recurso
+            BitmapFactory.Options options = new BitmapFactory.Options();
+            Bitmap bitmap = BitmapFactory.decodeResource(context.getResources(), resourceId, options);
+// Define o tamanho desejado da imagem (por exemplo, 100x100)
+            float desiredWidth = 10f;
+            float desiredHeight = 10f;
+
+// Redimensiona o bitmap para o tamanho desejado
+            bitmap = Bitmap.createScaledBitmap(bitmap, (int) desiredWidth, (int) desiredHeight, false);
+
+// Converte o bitmap em um objeto ImageData
+            ImageData imageData = ImageDataFactory.create(toByteArray(bitmap));
+
+// Cria uma imagem com base no ImageData
+            Image image = new Image(imageData);
+
+// Adicione a imagem ao documento
+            document.add(image);
 
             // Configurar fonte
 
@@ -176,6 +177,8 @@ public class RecyclerViewToPdf {
             Table table = new Table(contT + 1); // Tabela com 6 colunas (rótulos e valores)
             Log.d("sim", String.valueOf(contT));
 
+            List<String> dias = new ArrayList<String>();
+
             if (diasParaPdf != null) { //adiciona os dias
                 // Iterando pelos campos e imprimindo seus nomes
                 table.addCell(createCell("Dias: ", font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
@@ -185,90 +188,112 @@ public class RecyclerViewToPdf {
                             !fieldName.equals("nomesSala") &&
                             fieldName.substring(fieldName.length() - 1).charAt(0) != 'T' &&
                             fieldName.substring(2,4).equals(mes)){
-                        table.addCell(createCell(fieldName.substring(0,2), font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                        dias.add(fieldName.substring(0,2));
                     }
                 }
             }
 
+            Log.d("dias", dias.toString());
+            Collections.sort(dias, new Comparator<String>() {
+                @Override
+                public int compare(String s1, String s2) {
+                    // Converta as strings em inteiros e compare
+                    int numero1 = Integer.parseInt(s1);
+                    int numero2 = Integer.parseInt(s2);
+                    return Integer.compare(numero1, numero2);
+                }
+            });
+
+            for (String dia: dias) {
+                table.addCell(createCell(dia, font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+            }
+            Log.d("dias", "dias ordenados = " + dias.toString());
+
+
             Map<String, List<List<Boolean>>> nomesChamada = new HashMap<>();
 
             if (diasParaPdf != null) {
-                for (String fieldName : diasParaPdf.keySet()) {
-                    if (fieldName.substring(2,4).equals(mes) &&
-                            fieldName.substring(fieldName.length() - 1).charAt(0) != 'T'){
-                        Object value = diasParaPdf.get(fieldName);
+                for (String dia: dias){
+                    for (String fieldName : diasParaPdf.keySet()) {
 
-                        if (value instanceof Map) {
-                            if (diasParaPdf.containsKey(fieldName + "T")){
-                                Object value2 = diasParaPdf.get(fieldName + "T");
-                                // É um mapa, faça o cast e processe os valores
-                                Map<String, Object> diaAtualT = (Map<String, Object>) value2;
-                                Map<String, Object> diaAtualM = (Map<String, Object>) value;
+                        Log.d("dias", "filedname" + fieldName.substring(0,2));
+                        if (fieldName.substring(2,4).equals(mes) &&
+                                fieldName.substring(fieldName.length() - 1).charAt(0) != 'T' &&
+                                dia.equals(fieldName.substring(0,2))){
+                            Object value = diasParaPdf.get(fieldName);
 
-                                for (Object aux : diaAtualM.keySet()) {
-                                    //table.addCell(createCell(String.valueOf((Boolean) aux), font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
-                                    if (nomesChamada.containsKey(aux)) {
+                            if (value instanceof Map) {
+                                if (diasParaPdf.containsKey(fieldName + "T")){
+                                    Object value2 = diasParaPdf.get(fieldName + "T");
+                                    // É um mapa, faça o cast e processe os valores
+                                    Map<String, Object> diaAtualT = (Map<String, Object>) value2;
+                                    Map<String, Object> diaAtualM = (Map<String, Object>) value;
 
-                                        Boolean a = (Boolean) diaAtualM.get(aux);
-                                        Boolean b = (Boolean) diaAtualT.get(aux);
+                                    for (Object aux : diaAtualM.keySet()) {
+                                        //table.addCell(createCell(String.valueOf((Boolean) aux), font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                                        if (nomesChamada.containsKey(aux)) {
 
-                                        List<List<Boolean>> listaAuxPrincipal = nomesChamada.get(aux);
-                                        List<Boolean> listaAux = new ArrayList<>();
-                                        listaAux.add(a);
-                                        listaAux.add(b);
-                                        listaAuxPrincipal.add(listaAux);
+                                            Boolean a = (Boolean) diaAtualM.get(aux);
+                                            Boolean b = (Boolean) diaAtualT.get(aux);
 
-                                        nomesChamada.put((String) aux, listaAuxPrincipal);
+                                            List<List<Boolean>> listaAuxPrincipal = nomesChamada.get(aux);
+                                            List<Boolean> listaAux = new ArrayList<>();
+                                            listaAux.add(a);
+                                            listaAux.add(b);
+                                            listaAuxPrincipal.add(listaAux);
 
-                                    } else {
-                                        Boolean a = (Boolean) diaAtualM.get(aux);
-                                        Boolean b = (Boolean) diaAtualT.get(aux);
+                                            nomesChamada.put((String) aux, listaAuxPrincipal);
 
-                                        List<List<Boolean>> listaAuxPrincipal = new ArrayList<>();
-                                        List<Boolean> listaAux = new ArrayList<>();
-                                        listaAux.add(a);
-                                        listaAux.add(b);
-                                        listaAuxPrincipal.add(listaAux);
+                                        } else {
+                                            Boolean a = (Boolean) diaAtualM.get(aux);
+                                            Boolean b = (Boolean) diaAtualT.get(aux);
 
-                                        nomesChamada.put((String) aux, listaAuxPrincipal);
+                                            List<List<Boolean>> listaAuxPrincipal = new ArrayList<>();
+                                            List<Boolean> listaAux = new ArrayList<>();
+                                            listaAux.add(a);
+                                            listaAux.add(b);
+                                            listaAuxPrincipal.add(listaAux);
+
+                                            nomesChamada.put((String) aux, listaAuxPrincipal);
+                                        }
                                     }
+                                } else {
+                                    Map<String, Object> diaAtualM = (Map<String, Object>) value;
+
+                                    for (Object aux : diaAtualM.keySet()) {
+                                        //table.addCell(createCell(String.valueOf((Boolean) aux), font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
+                                        if (nomesChamada.containsKey(aux)) {
+
+                                            Boolean a = (Boolean) diaAtualM.get(aux);
+
+                                            List<List<Boolean>> listaAuxPrincipal = nomesChamada.get(aux);
+                                            List<Boolean> listaAux = new ArrayList<>();
+                                            listaAux.add(a);
+                                            listaAux.add(null);
+                                            listaAuxPrincipal.add(listaAux);
+
+
+                                            nomesChamada.put((String) aux, listaAuxPrincipal);
+                                        } else {
+                                            Boolean a = (Boolean) diaAtualM.get(aux);
+
+                                            List<List<Boolean>> listaAuxPrincipal = new ArrayList<>();
+                                            List<Boolean> listaAux = new ArrayList<>();
+                                            listaAux.add(a);
+                                            listaAux.add(null);
+                                            listaAuxPrincipal.add(listaAux);
+
+                                            nomesChamada.put((String) aux, listaAuxPrincipal);
+                                        }
+                                    }
+
                                 }
                             } else {
-                                Map<String, Object> diaAtualM = (Map<String, Object>) value;
-
-                                for (Object aux : diaAtualM.keySet()) {
-                                    //table.addCell(createCell(String.valueOf((Boolean) aux), font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
-                                    if (nomesChamada.containsKey(aux)) {
-
-                                        Boolean a = (Boolean) diaAtualM.get(aux);
-
-                                        List<List<Boolean>> listaAuxPrincipal = nomesChamada.get(aux);
-                                        List<Boolean> listaAux = new ArrayList<>();
-                                        listaAux.add(a);
-                                        listaAux.add(null);
-                                        listaAuxPrincipal.add(listaAux);
-
-
-                                        nomesChamada.put((String) aux, listaAuxPrincipal);
-                                    } else {
-                                        Boolean a = (Boolean) diaAtualM.get(aux);
-
-                                        List<List<Boolean>> listaAuxPrincipal = new ArrayList<>();
-                                        List<Boolean> listaAux = new ArrayList<>();
-                                        listaAux.add(a);
-                                        listaAux.add(null);
-                                        listaAuxPrincipal.add(listaAux);
-
-                                        nomesChamada.put((String) aux, listaAuxPrincipal);
-                                    }
-                                }
 
                             }
-                        } else {
+
 
                         }
-
-
                     }
                 }
             }
