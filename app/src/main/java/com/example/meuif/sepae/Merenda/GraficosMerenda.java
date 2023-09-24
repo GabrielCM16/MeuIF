@@ -10,8 +10,10 @@ import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
+import android.widget.Toast;
 
 import com.example.meuif.R;
 import com.example.meuif.sepae.telaMerendaEscolar;
@@ -57,6 +59,7 @@ public class GraficosMerenda extends AppCompatActivity {
     private ProgressBar progressBarGrafico;
     private String mesSelecionado = "";
     private String turmaSelecionado = "";
+    private ImageView baixargraficoPNAE;
     private Map<String, String> turmasAlunos = new HashMap<>();
 
     @Override
@@ -73,9 +76,26 @@ public class GraficosMerenda extends AppCompatActivity {
             }
         });
 
+        baixargraficoPNAE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                baixarGrafico();
+            }
+        });
+
     }
     private interface Callback {
         void onComplete();
+    }
+
+    private void baixarGrafico(){
+        progressBarGrafico.setVisibility(View.VISIBLE);
+        Toast.makeText(this, "Preparando Gráfico para download...", Toast.LENGTH_SHORT).show();
+
+        String nomeArquivo = "PNAE" + turmaSelecionado + mesSelecionado;
+        barChart.saveToGallery(nomeArquivo, 100); // O segundo parâmetro é a qualidade da imagem (0-100).
+        Toast.makeText(this, "Salvo na galeria", Toast.LENGTH_SHORT).show();
+        progressBarGrafico.setVisibility(View.INVISIBLE);
     }
 
     private void pegarTurmaAlunos(Callback callback){
@@ -123,6 +143,7 @@ public class GraficosMerenda extends AppCompatActivity {
         spinnerTurmaMerendaGrafico = findViewById(R.id.spinnerTurmaMerendaGrafico);
         progressBarGrafico = findViewById(R.id.progressBarGrafico);
         progressBarGrafico.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+        baixargraficoPNAE = findViewById(R.id.baixargraficoPNAE);
 
     }
 
@@ -358,9 +379,7 @@ public class GraficosMerenda extends AppCompatActivity {
         barChart.getDescription().setEnabled(false);
         barChart.invalidate();
         progressBarGrafico.setVisibility(View.INVISIBLE);
-        // Suponha que 'barChart' seja a instância do seu gráfico de barras.
-        //String nomeArquivo = turmaSelecionado + mesSelecionado;
-        //barChart.saveToGallery(nomeArquivo, 100); // O segundo parâmetro é a qualidade da imagem (0-100).
+
 
     }
 

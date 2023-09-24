@@ -102,5 +102,16 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
+    <ImageView
+        android:id="@+id/baixargraficoPNAE"
+        android:layout_width="42dp"
+        android:layout_height="38dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.133"
+        app:layout_constraintStart_toEndOf="@+id/spinnerTurmaMerendaGrafico"
+        app:layout_constraintTop_toBottomOf="@+id/textViewOla2"
+        app:srcCompat="@drawable/baseline_download_24" />
+
 
 </androidx.constraintlayout.widget.ConstraintLayout>
