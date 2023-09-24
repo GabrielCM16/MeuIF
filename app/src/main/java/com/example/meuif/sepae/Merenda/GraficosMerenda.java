@@ -354,7 +354,7 @@ public class GraficosMerenda extends AppCompatActivity {
 
     private void setarGrafico(ArrayList<String> xAxisLabels){
         // creating a new bar data set.
-        barDataSet = new BarDataSet(barEntriesArrayList, "Controle de quantidade PNAE, do mês: " +  mesSelecionado + ", da turma: " + turmaSelecionado + " Gerado por MeuIF");
+        barDataSet = new BarDataSet(barEntriesArrayList, "Controle de quantidade PNAE, do mês: " +  mesSelecionado + ", da turma: " + turmaSelecionado);
 
         // Obtenha o eixo X do seu gráfico de barras
         XAxis xAxis = barChart.getXAxis();

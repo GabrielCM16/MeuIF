@@ -38,7 +38,7 @@
         android:textColor="@color/black"
         android:textSize="16sp"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.316"
+        app:layout_constraintHorizontal_bias="0.322"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textViewOla2" />
 
@@ -58,8 +58,8 @@
 
     <TextView
         android:id="@+id/textViewOla2"
-        android:layout_width="334dp"
-        android:layout_height="121dp"
+        android:layout_width="335dp"
+        android:layout_height="98dp"
         android:autoText="false"
         android:contextClickable="false"
         android:elegantTextHeight="true"
@@ -76,7 +76,7 @@
         app:layout_constraintHorizontal_bias="0.493"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.026" />
+        app:layout_constraintVertical_bias="0.0" />
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/graficoMerenda"
@@ -86,8 +86,8 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.647" >
+        app:layout_constraintTop_toBottomOf="@+id/turmaGrafico"
+        app:layout_constraintVertical_bias="0.103">
 
     </com.github.mikephil.charting.charts.BarChart>
 
