@@ -21,12 +21,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.meuif.CaptureAct;
 import com.example.meuif.R;
+import com.example.meuif.sepae.Merenda.GraficosMerenda;
 import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
 import com.example.meuif.sepae.recyclerMerenda.AlunoMerenda;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -90,13 +92,6 @@ public class telaMerendaEscolar extends AppCompatActivity {
 
         carregarComponentes();
 
-
-        ActionBar actionBar = getSupportActionBar();
-        setTitle("Lista Merenda");
-        // Adiciona um ícone de ação à direita
-        actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
-        actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
-
         carregarCamera();
     }
 
@@ -108,6 +103,30 @@ public class telaMerendaEscolar extends AppCompatActivity {
         spinnerMesesMerenda = findViewById(R.id.spinnerMesesMerenda);
         spinnerTurmasMerenda = findViewById(R.id.spinnerTurmasMerenda);
         listardiasMerenda = findViewById(R.id.listardiasMerenda);
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setCustomView(R.layout.custom_actionbar);
+        TextView titleText = findViewById(R.id.titleText);
+        ImageView leftImage = findViewById(R.id.leftImage);
+        ImageView rightImage = findViewById(R.id.rightImage); //baixar pdf
+
+        rightImage.setImageResource(R.drawable.baseline_insert_chart_outlined_24);
+
+        titleText.setText("Merenda Escolar");
+
+        leftImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                telaVoltar();
+            }
+        });
+
+        rightImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { telaGraficos();
+                            }
+        });
     }
 
     protected void onStart() {
@@ -136,8 +155,14 @@ public class telaMerendaEscolar extends AppCompatActivity {
                 });
             }
         });
+    }
 
-
+    private void telaGraficos(){
+        // Criar a Intent
+        Intent intent = new Intent(getApplicationContext(), GraficosMerenda.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
+        finish();
     }
 
     private void pegarNomesAlunos(Callback callback){
