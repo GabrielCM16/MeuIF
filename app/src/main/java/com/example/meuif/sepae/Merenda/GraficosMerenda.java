@@ -3,6 +3,7 @@ package com.example.meuif.sepae.Merenda;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
@@ -14,6 +15,12 @@ import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Toast;
+
+import pub.devrel.easypermissions.AfterPermissionGranted;
+import pub.devrel.easypermissions.EasyPermissions;
+import pub.devrel.easypermissions.PermissionRequest;
+
+
 
 import com.example.meuif.R;
 import com.example.meuif.sepae.telaMerendaEscolar;
@@ -45,6 +52,7 @@ import java.util.Locale;
 import java.util.Map;
 
 public class GraficosMerenda extends AppCompatActivity {
+    public static final int REQUEST_STORAGE_PERMISSION = 123;
     FirebaseFirestore db;
     // variable for our bar chart
     BarChart barChart;
@@ -61,6 +69,7 @@ public class GraficosMerenda extends AppCompatActivity {
     private String turmaSelecionado = "";
     private ImageView baixargraficoPNAE;
     private Map<String, String> turmasAlunos = new HashMap<>();
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -79,7 +88,7 @@ public class GraficosMerenda extends AppCompatActivity {
         baixargraficoPNAE.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                baixarGrafico();
+                someMethodRequiringPermissions();
             }
         });
 
@@ -97,6 +106,42 @@ public class GraficosMerenda extends AppCompatActivity {
         Toast.makeText(this, "Salvo na galeria", Toast.LENGTH_SHORT).show();
         progressBarGrafico.setVisibility(View.INVISIBLE);
     }
+
+    private void someMethodRequiringPermissions() {
+        String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
+        if (EasyPermissions.hasPermissions(this, perms)) {
+           baixarGrafico();
+        } else {
+            // A permissão ainda não foi concedida, solicite-a
+            EasyPermissions.requestPermissions(
+                    new PermissionRequest.Builder(this, REQUEST_STORAGE_PERMISSION, perms)
+                            .setRationale("Precisamos da permissão para acessar o armazenamento.")
+                            .setPositiveButtonText("Conceder")
+                            .setNegativeButtonText("Cancelar")
+                          //  .setTheme(R.style.AppTheme)
+                            .build()
+            );
+        }
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        // Passe os resultados para EasyPermissions para tratamento
+        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
+    }
+
+    @AfterPermissionGranted(REQUEST_STORAGE_PERMISSION)
+    public void onPermissionGranted() {
+        // A permissão foi concedida, você pode prosseguir com a ação desejada.
+        baixarGrafico();
+    }
+
+    public void onPermissionDenied() {
+        // O usuário negou a permissão, você pode exibir uma mensagem ou tomar outra ação apropriada.
+        Toast.makeText(this, "A permissão foi negada.", Toast.LENGTH_SHORT).show();
+    }
+
 
     private void pegarTurmaAlunos(Callback callback){
         progressBarGrafico.setVisibility(View.VISIBLE);

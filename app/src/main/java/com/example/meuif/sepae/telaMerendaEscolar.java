@@ -320,7 +320,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
                         String nome = nomesAlunos.getOrDefault(chave, "Erro em nome");
                         String turmaAux = turmasAlunos.getOrDefault(chave, "Erro Turma");
                         String aux = chave + " - " + turmaAux;
-                        if (turma.equals("Todos")) {
+                        if (turma.equals("Todas")) {
                             AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
                             alunosList.add(aluno);
                         } else if (turma.equals(turmaAux)){
