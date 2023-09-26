@@ -15,6 +15,8 @@ import com.example.meuif.CaptureAct;
 import com.example.meuif.Informacoes_pessoais;
 import com.example.meuif.R;
 import com.example.meuif.databinding.FragmentInformacoesPessoaisBinding;
+import com.example.meuif.events.Events;
+import com.example.meuif.events.SalvarEvento;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -24,6 +26,7 @@ import com.journeyapps.barcodescanner.ScanOptions;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -34,6 +37,7 @@ public class PassePortaria extends AppCompatActivity {
     private long tempoValidade = 30000;
     private MediaPlayer mediaPlayer;
     final PassePortaria activity= this;
+    private Button botaoEvento;
 
 
     @SuppressLint("MissingInflatedId")
@@ -50,6 +54,41 @@ public class PassePortaria extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 sCanCode();
+            }
+        });
+
+
+
+        // Obtém a data e hora atual
+        Calendar calendar = Calendar.getInstance();
+
+// Adiciona 1 dia à data atual
+        calendar.add(Calendar.DAY_OF_MONTH, 1);
+
+// Obtém a data resultante como um objeto Date
+        Date data = calendar.getTime();
+
+// Converte a data em um Timestamp do Firebase Firestore
+        Timestamp timestamp = new Timestamp(data);
+
+
+        botaoEvento = findViewById(R.id.botaoEvento);
+        botaoEvento.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Events events = new Events("Projeto de Extensão",
+                        "treinamento para a OBI",
+                        "OBI",
+                        Timestamp.now(),
+                        timestamp,
+                        new ArrayList<>(),
+                        new ArrayList<>(),
+                "Odair",
+                        "Geral",
+                "lab 3");
+
+                SalvarEvento salvarEvento = new SalvarEvento(events);
+                salvarEvento.gravarEvent();
             }
         });
 
