@@ -4,6 +4,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.annotation.SuppressLint;
+import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
@@ -17,6 +18,7 @@ import com.example.meuif.R;
 import com.example.meuif.databinding.FragmentInformacoesPessoaisBinding;
 import com.example.meuif.events.Events;
 import com.example.meuif.events.SalvarEvento;
+import com.example.meuif.events.TelaNovoEvento;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -59,36 +61,14 @@ public class PassePortaria extends AppCompatActivity {
 
 
 
-        // Obtém a data e hora atual
-        Calendar calendar = Calendar.getInstance();
-
-// Adiciona 1 dia à data atual
-        calendar.add(Calendar.DAY_OF_MONTH, 1);
-
-// Obtém a data resultante como um objeto Date
-        Date data = calendar.getTime();
-
-// Converte a data em um Timestamp do Firebase Firestore
-        Timestamp timestamp = new Timestamp(data);
-
 
         botaoEvento = findViewById(R.id.botaoEvento);
         botaoEvento.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Events events = new Events("Projeto de Extensão",
-                        "treinamento para a OBI",
-                        "OBI",
-                        Timestamp.now(),
-                        timestamp,
-                        new ArrayList<>(),
-                        new ArrayList<>(),
-                "Odair",
-                        "Geral",
-                "lab 3");
-
-                SalvarEvento salvarEvento = new SalvarEvento(events);
-                salvarEvento.gravarEvent();
+                Intent intent = new Intent(getApplicationContext(), TelaNovoEvento.class);
+                startActivity(intent);
+                overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
             }
         });
 
