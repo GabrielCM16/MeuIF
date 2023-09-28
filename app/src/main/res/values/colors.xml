@@ -11,4 +11,6 @@
     <color name="azulMaisEscuro">#5DC1B9</color>
     <color name="verdeFraco">#4DC639</color>
     <color name="verdeSenha">#23501B</color>
+    <color name="vermelho">#FF0000</color>
+    <color name="verde">#008000</color>
 </resources>
