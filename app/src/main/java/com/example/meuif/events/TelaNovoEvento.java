@@ -1,6 +1,7 @@
 package com.example.meuif.events;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 
@@ -15,12 +16,14 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.TextView;
 
 import com.example.meuif.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.database.collection.LLRBNode;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -40,6 +43,9 @@ public class TelaNovoEvento extends AppCompatActivity {
     private ConstraintLayout entradaCoresEvento;
     private List<String> disciplinas = new ArrayList<String>();
     private Button selectedButton;
+    private TextView TextoDescricao;
+    private TextView entradaTituloNovoEvento;
+    private String disciplinaSelecionada;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +62,8 @@ public class TelaNovoEvento extends AppCompatActivity {
         SpinnerCategoria = findViewById(R.id.SpinnerCategoria);
         entradaCoresEvento = findViewById(R.id.entradaCoresEvento);
         textDisciplina2 = findViewById(R.id.textDisciplina2);
+        entradaTituloNovoEvento = findViewById(R.id.entradaTituloNovoEvento);
+        TextoDescricao = findViewById(R.id.TextoDescricao);
         SpinnerDisciplina = findViewById(R.id.SpinnerDisciplina);
 
         entradaCoresEvento.setOnClickListener(new View.OnClickListener() {
@@ -64,6 +72,49 @@ public class TelaNovoEvento extends AppCompatActivity {
                 abrirDialogCores();
             }
         });
+
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setCustomView(R.layout.actionbar_novo_evento);
+        TextView cancelar = findViewById(R.id.TextCancelar);
+        TextView salvar = findViewById(R.id.TextSalvar);
+
+        salvar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                salvarEvento();
+            }
+        });
+    }
+
+    private void salvarEvento() {
+        // Obtém o Timestamp para o momento atual
+        Timestamp timestampAtual = Timestamp.now();
+
+// Define um período de 1 dia em segundos (24 horas x 60 minutos x 60 segundos)
+        long umDiaEmSegundos = 24 * 60 * 60;
+
+// Adiciona um dia (em segundos) ao timestamp atual
+        Timestamp timestampAmanha = new Timestamp(timestampAtual.getSeconds() + umDiaEmSegundos, 0);
+
+        List<Timestamp> modificacoes = new ArrayList<Timestamp>();
+
+
+
+
+        Events events = new Events(categoriaSelecionado,
+                TextoDescricao.getText().toString(),
+                entradaTituloNovoEvento.getText().toString(),
+                timestampAtual,
+                timestampAmanha,
+                modificacoes,
+                "#ffa500",
+                "Gabriel",
+                disciplinaSelecionada,
+                "IF");
+
+        SalvarEvento salvarEvento = new SalvarEvento(events);
+        salvarEvento.gravarEvent();
     }
 
     public String recuperarDados(String chave){
@@ -83,6 +134,8 @@ public class TelaNovoEvento extends AppCompatActivity {
 // Encontre os botões no layout personalizado
         Button buttonRed = dialogView.findViewById(R.id.button_red);
         Button buttonGreen = dialogView.findViewById(R.id.button_green);
+        Button buttonPurple = dialogView.findViewById(R.id.button_purple);
+        Button buttonOrange = dialogView.findViewById(R.id.button_orange);
 
         // Crie o diálogo
         AlertDialog dialog = builder.create();
@@ -114,6 +167,61 @@ public class TelaNovoEvento extends AppCompatActivity {
                 dialog.dismiss();
             }
         });
+
+        buttonPurple.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Desmarcar o botão selecionado anteriormente (se houver)
+                if (selectedButton != null) {
+                    selectedButton.setSelected(false);
+                }
+
+                // Marcar o botão atual como selecionado
+                buttonPurple.setSelected(true);
+
+                // Defina o botão atual como o botão selecionado
+                selectedButton = buttonPurple;
+
+                // Registre o botão selecionado no log
+                Log.d("botao", "Botão selecionado = vermelho" + selectedButton.getText().toString());
+                // Fechar o diálogo após a seleção
+                // Suponha que você tenha um recurso Drawable chamado "fundo_botao_cor_vermelho".
+                Drawable drawable = getResources().getDrawable(R.drawable.fundo_botao_cor_purple);
+
+// Defina o Drawable como plano de fundo do seu ConstraintLayout
+                entradaCoresEvento.setBackground(drawable);
+
+                dialog.dismiss();
+            }
+        });
+
+        buttonOrange.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Desmarcar o botão selecionado anteriormente (se houver)
+                if (selectedButton != null) {
+                    selectedButton.setSelected(false);
+                }
+
+                // Marcar o botão atual como selecionado
+                buttonOrange.setSelected(true);
+
+                // Defina o botão atual como o botão selecionado
+                selectedButton = buttonOrange;
+
+                // Registre o botão selecionado no log
+                Log.d("botao", "Botão selecionado = vermelho" + selectedButton.getText().toString());
+                // Fechar o diálogo após a seleção
+                // Suponha que você tenha um recurso Drawable chamado "fundo_botao_cor_vermelho".
+                Drawable drawable = getResources().getDrawable(R.drawable.fundo_botao_cor_laranja);
+
+// Defina o Drawable como plano de fundo do seu ConstraintLayout
+                entradaCoresEvento.setBackground(drawable);
+
+                dialog.dismiss();
+            }
+        });
+
 
         buttonGreen.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -180,6 +288,7 @@ public class TelaNovoEvento extends AppCompatActivity {
                             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                                 //dias.clear();
                                 String selectedDisciplina = parent.getItemAtPosition(position).toString();
+                                disciplinaSelecionada = selectedDisciplina;
                             }
                             @Override
                             public void onNothingSelected(AdapterView<?> parent) {

@@ -11,14 +11,14 @@ public class Events {
     private Timestamp started;
     private Timestamp ended;
     private List<Timestamp> Modifications;
-    private List<String> colors;
+    private String colors;
     private String whoCreated;
     private String discipline;
     private String location;
 
     // Constructor
     public Events(String type, String description, String title, Timestamp started, Timestamp ended,
-                   List<Timestamp> Modifications, List<String> colors, String whoCreated,
+                   List<Timestamp> Modifications,String colors, String whoCreated,
                    String discipline, String location) {
         this.type = type;
         this.description = description;
@@ -87,11 +87,11 @@ public class Events {
     }
 
     // Setter and Getter methods for 'colors'
-    public List<String> getColors() {
+    public String getColors() {
         return colors;
     }
 
-    public void setColors(List<String> colors) {
+    public void setColors(String colors) {
         this.colors = colors;
     }
 

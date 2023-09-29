@@ -19,13 +19,13 @@ public class SalvarEvento {
     }
 
     public void gravarEvent(){
-        String turma = evento.getDiscipline();
+        //String turma = evento.getDiscipline();
         Map<String, Object> objetosMap = new HashMap<>();
         String identificador1 = UUID.randomUUID().toString();
         objetosMap.put(identificador1, evento);
 
         db.collection("Agenda")
-                .document(turma)
+                .document("Geral")
                 .update(objetosMap)
                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
