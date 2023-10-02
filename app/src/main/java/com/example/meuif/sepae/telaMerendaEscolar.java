@@ -10,21 +10,26 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.meuif.CaptureAct;
 import com.example.meuif.R;
@@ -110,10 +115,19 @@ public class telaMerendaEscolar extends AppCompatActivity {
         TextView titleText = findViewById(R.id.titleText);
         ImageView leftImage = findViewById(R.id.leftImage);
         ImageView rightImage = findViewById(R.id.rightImage); //baixar pdf
+        ImageView imageTeclado = findViewById(R.id.imageTeclado);
+        imageTeclado.setVisibility(View.VISIBLE);
 
         rightImage.setImageResource(R.drawable.baseline_insert_chart_outlined_24);
 
         titleText.setText("Merenda Escolar");
+
+        imageTeclado.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                abrirTeclado();
+            }
+        });
 
         leftImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -155,6 +169,96 @@ public class telaMerendaEscolar extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private void abrirTeclado(){
+        Log.d("teclado", "teclado");
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        LayoutInflater inflater = getLayoutInflater();
+        View dialogView = inflater.inflate(R.layout.custom_dialog_entrada_merenda, null);
+        builder.setView(dialogView);
+
+        final EditText editText = dialogView.findViewById(R.id.editText);
+
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                String textoDigitado = editText.getText().toString();
+                // Faça algo com o texto inserido, por exemplo, exiba-o em um Toast
+                procurarDadosAluno(textoDigitado);
+                dialog.dismiss(); // Fecha o diálogo
+            }
+        });
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+    }
+
+    private void procurarDadosAluno(String matricula){
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(matricula).document("dados");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String nomeAluno = (String) document.get("nome");
+                        String turma = (String) document.get("turma");
+                       // .setVisibility(View.INVISIBLE);
+                        abrirDialogInfAluno(nomeAluno, turma, matricula);
+
+                    } else {
+                        // O documento não existe
+                        Toast.makeText(getApplicationContext(), "Erro ao procurar matrícula, matrícula inexistente", Toast.LENGTH_SHORT).show();
+                      //  progressBarRegistrarEntrada.setVisibility(View.INVISIBLE);
+                    }
+                } else {
+                    // Falha ao obter o documento
+                    Toast.makeText(getApplicationContext(), "Falha inesperada + " + task.getException(), Toast.LENGTH_SHORT).show();
+                   // progressBarRegistrarEntrada.setVisibility(View.INVISIBLE);
+                }
+            }
+        });
+    }
+
+    private void abrirDialogInfAluno(String nomeAluno, String turma, String matricula) {
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        //configurar titulo e mensagem
+        dialog.setTitle("Confira os dados" );
+        dialog.setMessage("O nome é: " + nomeAluno + "\nA turma é: " + turma);
+
+        //configurar cancelamento do alert dialog
+        dialog.setCancelable(false);
+
+        //configurar icone
+        //dialog.setIcon(android.R.drawable.ic_btn_speak_now);
+
+        //configurar açoes para sim e nâo
+        dialog.setPositiveButton("Correto", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              //  progressBarRegistrarEntrada.setVisibility(View.VISIBLE);
+                Toast.makeText(getApplicationContext(), "Processando...", Toast.LENGTH_SHORT).show();
+              //  motivoDoAtrasado(matricula);
+                atualizarMerenda(matricula, diaAtual(), new Callback() {
+                    @Override
+                    public void onComplete() {
+                        playSucessSound();
+                        Toast.makeText(getApplicationContext(), "Registro Realizado com sucesso", Toast.LENGTH_SHORT).show();
+                    }
+                });
+            }
+        });
+        dialog.setNegativeButton("Incorreto", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(), "Confira os dados e tente novamente", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.create();
+        dialog.show();
     }
 
     private void telaGraficos(){

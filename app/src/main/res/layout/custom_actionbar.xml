@@ -22,6 +22,16 @@
         android:textColor="@color/white"
         android:textSize="18sp" />
 
+    <!-- Novo ImageView colado à esquerda -->
+    <ImageView
+        android:id="@+id/imageTeclado"
+        android:layout_width="57dp"
+        android:layout_height="48dp"
+        android:layout_centerVertical="true"
+        android:layout_toStartOf="@id/rightImage"
+        android:src="@drawable/baseline_keyboard_24"
+        android:visibility="invisible" />
+
     <!-- Imagem à direita -->
     <ImageView
         android:id="@+id/rightImage"
