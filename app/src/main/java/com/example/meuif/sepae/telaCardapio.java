@@ -82,7 +82,7 @@ public class telaCardapio extends AppCompatActivity {
 
 
         ActionBar actionBar = getSupportActionBar();
-        setTitle("Chamada Líderes");
+        setTitle("'Merenda'");
         // Adiciona um ícone de ação à direita
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
         actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação

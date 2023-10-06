@@ -75,8 +75,6 @@ public class TelaChamadaLideres extends AppCompatActivity {
 
         carregarComponentes();
         setupPermissionLauncher();
-
-
     }
 
 
@@ -191,7 +189,6 @@ public class TelaChamadaLideres extends AppCompatActivity {
 
         nomesChamadas = new ArrayList<>();
         chamdaImages = new ArrayList<>();
-
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowCustomEnabled(true);
@@ -318,11 +315,35 @@ public class TelaChamadaLideres extends AppCompatActivity {
                     public void onComplete() {
                         Toast.makeText(getApplicationContext(), "Processando PDF", Toast.LENGTH_SHORT).show();
                         Log.d("pdf", nome + "dia" + diaMes + "data" + dataGlobal);
+                        //antes de criar o pdf precisa adicoonar os dias q n foram realizados a chamada
+
                         RecyclerViewToPdf recyclerViewToPdf = new RecyclerViewToPdf(dataGlobal, diaMes, mes, turma, diaGerado);
                         recyclerViewToPdf.createPdf(context, nome);
                     }
                 });
 
+    }
+    public static List<String> obterDiasUteisDoMes() {
+        List<String> diasUteis = new ArrayList<>();
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(Calendar.DAY_OF_MONTH, 1); // Defina o dia para o primeiro dia do mês atual
+
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+
+        int ultimoDiaDoMes = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
+
+        while (calendar.get(Calendar.DAY_OF_MONTH) <= ultimoDiaDoMes) {
+            int diaDaSemana = calendar.get(Calendar.DAY_OF_WEEK);
+
+            // 1 é Domingo, 7 é Sábado
+            if (diaDaSemana != Calendar.SATURDAY && diaDaSemana != Calendar.SUNDAY) {
+                diasUteis.add(dateFormat.format(calendar.getTime()));
+            }
+
+            calendar.add(Calendar.DAY_OF_MONTH, 1); // Avança para o próximo dia
+        }
+
+        return diasUteis;
     }
 
     private String getDayAndMonth() {

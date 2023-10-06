@@ -29,6 +29,7 @@ import com.example.meuif.sepae.Portaria.PassePortaria;
 import com.example.meuif.sepae.autorizacoes.AutorizarSaidaAntecipada;
 import com.example.meuif.sepae.autorizacoes.TelaAutorizarEntradaAula;
 import com.example.meuif.sepae.chamada.TelaChamadaLideres;
+import com.example.meuif.sepae.gestao.GestaoUsuarios;
 import com.google.firebase.auth.FirebaseAuth;
 
 import java.text.DateFormat;
@@ -51,6 +52,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
     private ConstraintLayout carteirinha;
     private ConstraintLayout chamada;
     private ConstraintLayout faltas;
+    private ConstraintLayout constraintGerenciarUsers;
 
     @SuppressLint("MissingInflatedId")
     @Override
@@ -122,6 +124,14 @@ public class telaPrincipalSepae extends AppCompatActivity {
                 finish();
             }
         });
+        constraintGerenciarUsers.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Intent intent = new Intent(telaPrincipalSepae.this, GestaoUsuarios.class);
+                // Iniciar a atividade de destino
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -135,6 +145,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
         autorizarAula = findViewById(R.id.constraintAutorizarAula);
         constraintAutorizarSaida = findViewById(R.id.constraintAutorizarSaida);
         faltas = findViewById(R.id.constraintFaltas);
+        constraintGerenciarUsers = findViewById(R.id.constraintGerenciarUsers);
         chamada = findViewById(R.id.constraintChamada);
         loadingSepae.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
     }
