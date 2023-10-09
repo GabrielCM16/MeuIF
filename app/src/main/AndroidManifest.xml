@@ -19,6 +19,9 @@
         android:theme="@style/Theme.MeuIF"
         tools:targetApi="31">
         <activity
+            android:name=".sepae.gestao.GerenciarLideres"
+            android:exported="false" />
+        <activity
             android:name=".sepae.gestao.TelaCadastrarNovoUsuario"
             android:exported="false" />
         <activity
