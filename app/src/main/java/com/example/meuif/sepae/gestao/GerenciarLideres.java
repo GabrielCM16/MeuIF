@@ -1,27 +1,36 @@
 package com.example.meuif.sepae.gestao;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.meuif.R;
+import com.example.meuif.Tela_Principal;
 import com.example.meuif.sepae.gestao.lideres.AdapterLideres;
 import com.example.meuif.sepae.gestao.lideres.Lider;
 import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
 import com.example.meuif.sepae.telaMerendaEscolar;
+import com.example.meuif.tela_chamada_dia;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
@@ -45,6 +54,7 @@ public class GerenciarLideres extends AppCompatActivity {
     private Map<String, String> matriculaNome = new HashMap<String, String>();
     private Map<String, String> matriculaTurma = new HashMap<String, String>();
     private Map<String, String> matriculaCargo = new HashMap<String, String>();
+    private ProgressBar progressBarGerenciarLideres;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,10 +62,10 @@ public class GerenciarLideres extends AppCompatActivity {
         overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
         setContentView(R.layout.activity_gerenciar_lideres);
 
+        carregarComponentes();
         pegarNomes();
         pegarTurmaAlunos();
         pegarLideres();
-        carregarComponentes();
         setarSpinnerTurmas();
     }
 
@@ -64,6 +74,30 @@ public class GerenciarLideres extends AppCompatActivity {
         switchViceLider = findViewById(R.id.switchViceLider);
         spinnerTurmasLideres = findViewById(R.id.spinnerTurmasLideres);
         recyclerlideres = findViewById(R.id.recyclerlideres);
+        progressBarGerenciarLideres = findViewById(R.id.progressBarGerenciarLideres);
+        progressBarGerenciarLideres.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+        ActionBar actionBar = getSupportActionBar();
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setCustomView(R.layout.custom_actionbar);
+        ImageView leftImage = findViewById(R.id.leftImage);
+        ImageView rightImage = findViewById(R.id.rightImage); //baixar pdf
+        TextView titleText = findViewById(R.id.titleText);
+        titleText.setText("Gerenciar Lideres");
+        rightImage.setImageResource(R.drawable.baseline_question_mark_24);
+
+        leftImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                telaVoltar();
+            }
+        });
+
+        rightImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                //duvidaChamada();
+            }
+        });
 
         switchLider.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
@@ -79,6 +113,31 @@ public class GerenciarLideres extends AppCompatActivity {
             }
         });
 
+        recyclerlideres.addOnItemTouchListener(new RecyclerItemClickListener(
+                getApplicationContext(),
+                recyclerlideres,
+                new RecyclerItemClickListener.OnItemClickListener() {
+                    @Override
+                    public void onItemClick(View view, int position) {
+                        Toast.makeText(getApplicationContext(),
+                                "local: " +  matriculaLideres.get(position),
+                                Toast.LENGTH_LONG).show();
+                    }
+
+                    @Override
+                    public void onLongItemClick(View view, int position) {
+
+                    }
+
+                    @Override
+                    public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
+
+                    }
+                }));
+
+    }
+    private void telaVoltar(){
+        finish();
     }
     private void pegarNomes(){
         DocumentReference docRef = db.collection("Usuarios").document("Alunos");
@@ -170,6 +229,7 @@ public class GerenciarLideres extends AppCompatActivity {
         Log.d("documento", "array" + turmasList.toString());
 
         for (String turmas : turmasList){
+            progressBarGerenciarLideres.setVisibility(View.VISIBLE);
             Log.d("documento", turmas);
             DocumentReference docRef = db.collection("ChamadaTurma").document(turmas);
 
@@ -204,10 +264,12 @@ public class GerenciarLideres extends AppCompatActivity {
                     }
                 }
             });
+            progressBarGerenciarLideres.setVisibility(View.INVISIBLE);
         }
     }
 
     private void mostrarLideres(List<String> matriculaLideres) {
+        progressBarGerenciarLideres.setVisibility(View.VISIBLE);
         List<Lider> liders = new ArrayList<Lider>();
 
         for (String matricula : matriculaLideres) {
@@ -237,6 +299,7 @@ public class GerenciarLideres extends AppCompatActivity {
         recyclerlideres.setHasFixedSize(true);
         recyclerlideres.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
         recyclerlideres.setAdapter(adapter); //criar adapter
+        progressBarGerenciarLideres.setVisibility(View.INVISIBLE);
     }
 
 }

@@ -9,6 +9,7 @@ import android.app.AlertDialog;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -16,9 +17,12 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.meuif.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -43,13 +47,20 @@ public class TelaNovoEvento extends AppCompatActivity {
     private ConstraintLayout entradaCoresEvento;
     private List<String> disciplinas = new ArrayList<String>();
     private Button selectedButton;
+    private ProgressBar progressBarNovoEvento;
     private TextView TextoDescricao;
     private TextView entradaTituloNovoEvento;
     private String disciplinaSelecionada;
+    private EditText editTextLocal;
+    private Button buttonRed;
+    private Button buttonGreen;
+    private Button buttonPurple;
+    private Button buttonOrange;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
         setContentView(R.layout.activity_tela_novo_evento);
 
         carregarComponentes();
@@ -64,7 +75,10 @@ public class TelaNovoEvento extends AppCompatActivity {
         textDisciplina2 = findViewById(R.id.textDisciplina2);
         entradaTituloNovoEvento = findViewById(R.id.entradaTituloNovoEvento);
         TextoDescricao = findViewById(R.id.TextoDescricao);
+        editTextLocal = findViewById(R.id.editTextLocal);
         SpinnerDisciplina = findViewById(R.id.SpinnerDisciplina);
+        progressBarNovoEvento = findViewById(R.id.progressBarNovoEvento);
+        progressBarNovoEvento.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
 
         entradaCoresEvento.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -82,7 +96,15 @@ public class TelaNovoEvento extends AppCompatActivity {
         salvar.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                progressBarNovoEvento.setVisibility(View.VISIBLE);
                 salvarEvento();
+            }
+        });
+
+        cancelar.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                finish();
             }
         });
     }
@@ -99,8 +121,14 @@ public class TelaNovoEvento extends AppCompatActivity {
 
         List<Timestamp> modificacoes = new ArrayList<Timestamp>();
 
+        String local = editTextLocal.getText().toString();
+        String quemCriou = recuperarDados("nome");
 
+        String cor = qualCorSelecionada();
 
+        if (categoriaSelecionado.equals("Eventos Acadêmicos") || categoriaSelecionado.equals("Projeto de Extensão")){
+            disciplinaSelecionada = "";
+        }
 
         Events events = new Events(categoriaSelecionado,
                 TextoDescricao.getText().toString(),
@@ -108,19 +136,38 @@ public class TelaNovoEvento extends AppCompatActivity {
                 timestampAtual,
                 timestampAmanha,
                 modificacoes,
-                "#ffa500",
-                "Gabriel",
+                cor,
+                quemCriou,
                 disciplinaSelecionada,
-                "IF");
+                local);
 
         SalvarEvento salvarEvento = new SalvarEvento(events);
         salvarEvento.gravarEvent();
+        progressBarNovoEvento.setVisibility(View.INVISIBLE);
+        Toast.makeText(getApplicationContext(), "Evento Salvo", Toast.LENGTH_SHORT).show();
+        finish();
     }
 
     public String recuperarDados(String chave){
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
         String aux = sharedPreferences.getString(chave, "");
         return aux;
+    }
+
+    private String qualCorSelecionada(){
+        String corHEXA = "";
+        if (selectedButton.equals(buttonRed)) {
+            corHEXA = "FF0000";
+        } else if (selectedButton.equals(buttonGreen)) {
+            corHEXA = "00FF00";
+        } else if (selectedButton.equals(buttonPurple)){
+            corHEXA = "A020F0";
+        } else if (selectedButton.equals(buttonOrange)){
+            corHEXA = "ffa500";
+        } else {
+            corHEXA = "000000";
+        }
+        return corHEXA;
     }
 
     private void abrirDialogCores(){
@@ -132,10 +179,10 @@ public class TelaNovoEvento extends AppCompatActivity {
         builder.setView(dialogView);
 
 // Encontre os botões no layout personalizado
-        Button buttonRed = dialogView.findViewById(R.id.button_red);
-        Button buttonGreen = dialogView.findViewById(R.id.button_green);
-        Button buttonPurple = dialogView.findViewById(R.id.button_purple);
-        Button buttonOrange = dialogView.findViewById(R.id.button_orange);
+        buttonRed = dialogView.findViewById(R.id.button_red);
+         buttonGreen = dialogView.findViewById(R.id.button_green);
+         buttonPurple = dialogView.findViewById(R.id.button_purple);
+         buttonOrange = dialogView.findViewById(R.id.button_orange);
 
         // Crie o diálogo
         AlertDialog dialog = builder.create();
@@ -183,7 +230,7 @@ public class TelaNovoEvento extends AppCompatActivity {
                 selectedButton = buttonPurple;
 
                 // Registre o botão selecionado no log
-                Log.d("botao", "Botão selecionado = vermelho" + selectedButton.getText().toString());
+                Log.d("botao", "Botão selecionado = roxo" + selectedButton.getText().toString());
                 // Fechar o diálogo após a seleção
                 // Suponha que você tenha um recurso Drawable chamado "fundo_botao_cor_vermelho".
                 Drawable drawable = getResources().getDrawable(R.drawable.fundo_botao_cor_purple);
@@ -210,7 +257,7 @@ public class TelaNovoEvento extends AppCompatActivity {
                 selectedButton = buttonOrange;
 
                 // Registre o botão selecionado no log
-                Log.d("botao", "Botão selecionado = vermelho" + selectedButton.getText().toString());
+                Log.d("botao", "Botão selecionado = laranja" + selectedButton.getText().toString());
                 // Fechar o diálogo após a seleção
                 // Suponha que você tenha um recurso Drawable chamado "fundo_botao_cor_vermelho".
                 Drawable drawable = getResources().getDrawable(R.drawable.fundo_botao_cor_laranja);

@@ -68,7 +68,6 @@ public class PassePortaria extends AppCompatActivity {
             public void onClick(View v) {
                 Intent intent = new Intent(getApplicationContext(), TelaNovoEvento.class);
                 startActivity(intent);
-                overridePendingTransition(R.anim.slide_up, R.anim.slide_down);
             }
         });
 
