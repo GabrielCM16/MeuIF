@@ -157,6 +157,7 @@ public class TelaCadastrarNovoUsuario extends AppCompatActivity {
                 });
 
         Toast.makeText(getApplicationContext(), "Usuario criado com Êxito!" , Toast.LENGTH_SHORT).show();
+        finish();
 
     }
 }

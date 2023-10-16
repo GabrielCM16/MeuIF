@@ -83,6 +83,7 @@ public class AutorizacoesSaidaAntecipada extends Fragment {
         RecyclerDiasSaidaAntecipada = bindng.findViewById(R.id.RecyclerDiasSaidaAntecipada);
 
         mostrarDia();
+        getActivity().setTitle("Saída Antecipada");
         String matricula = recuperarDados("matricula");
         pegarDiasAtrasados(matricula, new Callback() {
             @Override
