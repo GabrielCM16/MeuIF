@@ -1,5 +1,7 @@
 package com.example.meuif.sepae.gestao;
 
+import static java.security.AccessController.getContext;
+
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
@@ -7,11 +9,19 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.Typeface;
 import android.os.Bundle;
+import android.text.Spannable;
+import android.text.SpannableString;
+import android.text.style.StyleSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -32,6 +42,8 @@ import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
 import com.example.meuif.sepae.telaMerendaEscolar;
 import com.example.meuif.tela_chamada_dia;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -54,7 +66,9 @@ public class GerenciarLideres extends AppCompatActivity {
     private Map<String, String> matriculaNome = new HashMap<String, String>();
     private Map<String, String> matriculaTurma = new HashMap<String, String>();
     private Map<String, String> matriculaCargo = new HashMap<String, String>();
+    private Map<String, List<String>> turmaNomes = new HashMap<>();
     private ProgressBar progressBarGerenciarLideres;
+    private String novoLider = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -119,9 +133,7 @@ public class GerenciarLideres extends AppCompatActivity {
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        Toast.makeText(getApplicationContext(),
-                                "local: " +  matriculaLideres.get(position),
-                                Toast.LENGTH_LONG).show();
+                        mudarLider(matriculaLideres.get(position));
                     }
 
                     @Override
@@ -136,10 +148,126 @@ public class GerenciarLideres extends AppCompatActivity {
                 }));
 
     }
+    @SuppressLint("MissingInflatedId")
+    private void mudarLider(String matricula) {
+        String nomeLider = matriculaNome.getOrDefault(matricula, "Erro Em Nome");
+        String turmaLider = matriculaTurma.getOrDefault(matricula, "Erro Em Turma");
+        String cargo = matriculaCargo.getOrDefault(matricula, "Erro Em Cargo");
+
+// Use o contexto da atividade atual
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+
+        View dialogView = LayoutInflater.from(this).inflate(R.layout.custom_dialog_trocar_lider, null);
+
+        TextView textAlunoNome = dialogView.findViewById(R.id.textAlunoNome);
+        TextView textMatriculaLider = dialogView.findViewById(R.id.textMatriculaLider);
+        Spinner spinnerTurmaTrocaLider = dialogView.findViewById(R.id.spinnerTurmaTrocaLider);
+        List<String> nomesSala = turmaNomes.get(turmaLider);
+
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, nomesSala);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerTurmaTrocaLider.setAdapter(adapter);
+
+        spinnerTurmaTrocaLider.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String selectedNome = parent.getItemAtPosition(position).toString();
+                novoLider = selectedNome;
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
+
+
+        textAlunoNome.setText(nomeLider);
+        textMatriculaLider.setText(matricula);
+
+        builder.setView(dialogView);
+
+        String turmaCargo = turmaLider + " - " + cargo;
+        View titleView = LayoutInflater.from(this).inflate(R.layout.title_centered_dialog, null);
+        TextView textCenterDialog = titleView.findViewById(R.id.textCenterDialog);
+        textCenterDialog.setText(turmaCargo);
+
+        builder.setCustomTitle(titleView);
+
+        builder.setCancelable(false);
+        builder.setPositiveButton("Substituir", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                //mudar lider
+                trocaLider(novoLider, matricula);
+            }
+        });
+
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+              dialog.dismiss();
+            }
+        });
+
+        AlertDialog alertDialog = builder.create();
+        alertDialog.show();
+
+    }
+
+    private void trocaLider(String nome, String antigoLider){
+        Log.d("nome", "nome" + nome);
+        for (Map.Entry<String, String> entry : matriculaNome.entrySet()) {
+            String matriculaAtual = entry.getKey();
+            String nomeAtual = entry.getValue();
+            if (nome.equals(nomeAtual)) {
+                String turma = matriculaTurma.getOrDefault(matriculaAtual, "Error");
+                String cargo = matriculaCargo.getOrDefault(antigoLider, "Error");
+                DocumentReference docRef = db.collection("ChamadaTurma").document(turma);
+
+// 2. Obtenha o documento atual.
+                docRef.get().addOnSuccessListener(new OnSuccessListener<DocumentSnapshot>() {
+                    @Override
+                    public void onSuccess(DocumentSnapshot documentSnapshot) {
+                        if (documentSnapshot.exists()) {
+                            // 3. Atualize o campo da string desejado no documento.
+                            Map<String, Object> updates = new HashMap<>();
+                            if (cargo.equals("lider")){
+                                updates.put("Lider", matriculaAtual);
+                            } if (cargo.equals("vice")){
+                                updates.put("ViceLider", matriculaAtual);
+                            }
+
+
+                            // 4. Envie o documento atualizado de volta para o Firestore.
+                            docRef.update(updates).addOnSuccessListener(new OnSuccessListener<Void>() {
+                                @Override
+                                public void onSuccess(Void aVoid) {
+                                    // A atualização foi bem-sucedida.
+                                    Log.d("update", "onSuccess");
+                                    Toast.makeText(getApplicationContext(), "Sucesso ao atualizar", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            }).addOnFailureListener(new OnFailureListener() {
+                                @Override
+                                public void onFailure(@NonNull Exception e) {
+                                    // Ocorreu um erro durante a atualização.
+                                    Toast.makeText(getApplicationContext(), "Erro ao atualizar", Toast.LENGTH_SHORT).show();
+                                    finish();
+                                }
+                            });
+                        }
+                    }
+                });
+
+            }
+        }
+    }
     private void telaVoltar(){
         finish();
     }
     private void pegarNomes(){
+        progressBarGerenciarLideres.setVisibility(View.VISIBLE);
         DocumentReference docRef = db.collection("Usuarios").document("Alunos");
 
 // Obtém os dados do documento
@@ -160,18 +288,22 @@ public class GerenciarLideres extends AppCompatActivity {
                             matriculaNome.put(matricula, nome);
                         }
                         Log.d("TAG", "nomes alunos ==== " + matriculaNome.toString());
+                        progressBarGerenciarLideres.setVisibility(View.INVISIBLE);
 
                     } else {
                         // O documento não existe
+                        progressBarGerenciarLideres.setVisibility(View.INVISIBLE);
                     }
                 } else {
                     // Falha ao obter o documento
+                    progressBarGerenciarLideres.setVisibility(View.INVISIBLE);
                 }
             }
         });
     }
 
     private void pegarTurmaAlunos(){
+        progressBarGerenciarLideres.setVisibility(View.VISIBLE);
         DocumentReference docRef = db.collection("Usuarios").document("Alunos");
 
 // Obtém os dados do documento
@@ -191,21 +323,26 @@ public class GerenciarLideres extends AppCompatActivity {
                             matriculaTurma.put(matricula, turma);
                         }
                         Log.d("TAG", "turmas alunos ==== " + matriculaTurma.toString());
+                        progressBarGerenciarLideres.setVisibility(View.INVISIBLE);
 
                     } else {
                         // O documento não existe
+                        progressBarGerenciarLideres.setVisibility(View.INVISIBLE);
                     }
                 } else {
                     // Falha ao obter o documento
+                    progressBarGerenciarLideres.setVisibility(View.INVISIBLE);
                 }
             }
         });
     }
 
     private void setarSpinnerTurmas(){
+        progressBarGerenciarLideres.setVisibility(View.VISIBLE);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.turmas, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTurmasLideres.setAdapter(adapter);
+        progressBarGerenciarLideres.setVisibility(View.INVISIBLE);
 
         spinnerTurmasLideres.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
@@ -224,6 +361,7 @@ public class GerenciarLideres extends AppCompatActivity {
     }
 
     private void pegarLideres(){
+        progressBarGerenciarLideres.setVisibility(View.VISIBLE);
         String[] turmasArray = getResources().getStringArray(R.array.turmas);
         List<String> turmasList = Arrays.asList(turmasArray);
         Log.d("documento", "array" + turmasList.toString());
@@ -243,11 +381,13 @@ public class GerenciarLideres extends AppCompatActivity {
                             if (document.contains("Lider") && document.contains("ViceLider")) {
                                 String lider = document.getString("Lider");
                                 String viceLider = document.getString("ViceLider");
+                                List<String> nomesTurma = (List<String>) document.get("nomesSala");
 
                                 matriculaLideres.add(lider);
                                 matriculaCargo.put(lider, "lider");
                                 matriculaLideres.add(viceLider);
                                 matriculaCargo.put(viceLider, "vice");
+                                turmaNomes.put(turmas, nomesTurma);
                                 mostrarLideres(matriculaLideres);
                                 Log.d("Lideres", "lideres na func " + matriculaLideres.toString());
                             } else {

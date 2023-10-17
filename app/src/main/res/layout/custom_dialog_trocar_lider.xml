@@ -1,0 +1,49 @@
+<LinearLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+    <TextView
+        android:id="@+id/textAlunoNome"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="nomee"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:ellipsize="end"
+        android:singleLine="true"
+        android:layout_marginBottom="16dp"
+    />
+
+    <!-- Outro texto em negrito -->
+    <TextView
+        android:id="@+id/textMatriculaLider"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:text="turma"
+        android:textColor="@android:color/black"
+        android:textSize="18sp"
+        android:layout_marginBottom="16dp"
+    />
+
+    <!-- Pequeno ImageView -->
+    <ImageView
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_gravity="center"
+        android:src="@drawable/baseline_keyboard_double_arrow_down_24"
+        android:layout_marginBottom="16dp"
+    />
+
+    <!-- Spinner -->
+    <Spinner
+        android:id="@+id/spinnerTurmaTrocaLider"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginBottom="16dp" />
+
+</LinearLayout>
