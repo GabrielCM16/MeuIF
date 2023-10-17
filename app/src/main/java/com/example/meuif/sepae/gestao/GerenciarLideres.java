@@ -69,6 +69,7 @@ public class GerenciarLideres extends AppCompatActivity {
     private Map<String, List<String>> turmaNomes = new HashMap<>();
     private ProgressBar progressBarGerenciarLideres;
     private String novoLider = "";
+    private List<Lider> liders = new ArrayList<Lider>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +134,10 @@ public class GerenciarLideres extends AppCompatActivity {
                 new RecyclerItemClickListener.OnItemClickListener() {
                     @Override
                     public void onItemClick(View view, int position) {
-                        mudarLider(matriculaLideres.get(position));
+                        Lider l = liders.get(position);
+                        String[] matriculaL = l.getMatricula().split(" ");
+                        String m = matriculaL[0];
+                        mudarLider(m);
                     }
 
                     @Override
@@ -410,7 +414,7 @@ public class GerenciarLideres extends AppCompatActivity {
 
     private void mostrarLideres(List<String> matriculaLideres) {
         progressBarGerenciarLideres.setVisibility(View.VISIBLE);
-        List<Lider> liders = new ArrayList<Lider>();
+        liders.clear();
 
         for (String matricula : matriculaLideres) {
             String turmaAtual = matriculaTurma.getOrDefault(matricula, "Turma Incorreta");
@@ -426,7 +430,6 @@ public class GerenciarLideres extends AppCompatActivity {
                     Lider lider = new Lider(nome, n, cargo);
                     liders.add(lider);
                 }
-
             }
         }
 
@@ -441,5 +444,4 @@ public class GerenciarLideres extends AppCompatActivity {
         recyclerlideres.setAdapter(adapter); //criar adapter
         progressBarGerenciarLideres.setVisibility(View.INVISIBLE);
     }
-
 }
