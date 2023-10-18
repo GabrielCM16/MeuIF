@@ -275,15 +275,15 @@ public class GalleryFragment extends Fragment {
         return matricula;
     }
 
-    public void gerarQR(String gerar){
+    public void gerarQR(String textoAGerar){
         try {
             BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            Bitmap bitmap = barcodeEncoder.encodeBitmap(gerar, BarcodeFormat.QR_CODE, 500, 500);
+            Bitmap bitmap = barcodeEncoder.encodeBitmap(textoAGerar, BarcodeFormat.QR_CODE, 500, 500);
             ImageView imageViewQrCode = (ImageView) qrCode;
             imageViewQrCode.setImageBitmap(bitmap);
             qrCode.setVisibility(View.VISIBLE);
         } catch(Exception e) {
-
+            Toast.makeText(getContext(), "Ocorreu um Erro ao gerar o QR Code", Toast.LENGTH_SHORT).show();
         }
     }
 

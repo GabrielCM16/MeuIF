@@ -31,6 +31,7 @@ import com.example.meuif.R;
 import com.example.meuif.TelaMerendaPessoal;
 import com.example.meuif.Tela_Principal;
 import com.example.meuif.databinding.FragmentHomeBinding;
+import com.example.meuif.faltasPessoais.telaVerFaltasPessoais;
 import com.example.meuif.tela_chamada_dia;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
@@ -158,7 +159,8 @@ public class HomeFragment extends Fragment {
         layoutFaltas.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(getContext(), "Função em desenvolvimento", Toast.LENGTH_LONG).show();
+               Intent intent = new Intent(getContext(), telaVerFaltasPessoais.class);
+                startActivity(intent);
             }
         });
 
