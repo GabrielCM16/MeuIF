@@ -35,7 +35,7 @@
     <fragment
         android:id="@+id/autorizacoesSaidaAntecipada"
         android:name="com.example.meuif.AutorizacoesSaidaAntecipada"
-        android:label="fragment_autorizacoes_saida_antecipada"
+        android:label="Saida Antecipada"
         tools:layout="@layout/fragment_autorizacoes_saida_antecipada" />
     <fragment
         android:id="@+id/gestaoSEPAE"

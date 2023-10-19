@@ -1,20 +1,26 @@
 package com.example.meuif.faltasPessoais;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.TextView;
 
 import com.example.meuif.R;
+import com.example.meuif.Tela_Principal;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
+import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.components.XAxis;
 import com.github.mikephil.charting.data.BarData;
 import com.github.mikephil.charting.data.BarDataSet;
@@ -30,6 +36,9 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 public class telaVerFaltasPessoais extends AppCompatActivity {
     private String ausencias;
@@ -54,11 +63,40 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
     }
 
     private void carregarComponentes() {
+        ActionBar actionBar = getSupportActionBar();
+        setTitle("Minhas Faltas");
+        actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24);
+        actionBar.setDisplayHomeAsUpEnabled(true);
+
+        if (actionBar != null) {
+            // Defina a cor de background desejada (por exemplo, cor vermelha)
+            ColorDrawable colorDrawable = new ColorDrawable(0xff23729a);
+            actionBar.setBackgroundDrawable(colorDrawable);
+        }
+
+
         saidaNumAulas = findViewById(R.id.saidaNumAulas2);
         saidaNumAusencias = findViewById(R.id.saidaNumAusencias2);
         saidaNumPresencas = findViewById(R.id.saidaNumPresencas2);
         pieChart = findViewById(R.id.pie_chart);
         graficoFaltaDiaSemana = findViewById(R.id.graficoFaltaDiaSemana);
+    }
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Verifica se o item clicado é o botão do ActionBar
+        if (item.getItemId() == android.R.id.home) {
+            // Chame o método que você deseja executar quando o ActionBar for clicado
+            telaVoltar();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+    private void telaVoltar(){
+        // Criar a Intent
+        Intent intent = new Intent(this, Tela_Principal.class);
+
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
     private void mostrarPresenca(){
         presencas = recuperarDados("presencas");
@@ -118,14 +156,36 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
     }
 
     private void atualizarGraficoSemanal(){
-        // Suponha que você tenha um ArrayList de inteiros representando os valores para cada dia da semana.
         ArrayList<Integer> valores = new ArrayList<>();
-        valores.add(10); // Segunda-feira
-        valores.add(15); // Terça-feira
-        valores.add(8);  // Quarta-feira
-        valores.add(12); // Quinta-feira
-        valores.add(5);  // Sexta-feira
+        String nMatricula = recuperarDados("matricula");
 
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("chamadaPessoal");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Map<String, Integer> mapFaltas = (Map<String, Integer>) document.get("todos");
+                        Log.d("tagler", "map " + mapFaltas.toString() + " tipos " + String.valueOf(mapFaltas.get("Segunda-feira")));
+                        valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Segunda-feira"))));
+                        valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Terca-feira"))));
+                        valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Quarta-feira"))));
+                        valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Quinta-feira"))));
+                        valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Sexta-feira"))));
+
+                        mostrargraficoSemanal(valores);
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void mostrargraficoSemanal(ArrayList<Integer> valores) {
 // Crie um ArrayList de String para os rótulos do eixo X.
         ArrayList<String> diasDaSemana = new ArrayList<>();
         diasDaSemana.add("Segunda");
@@ -154,10 +214,12 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
         XAxis xAxis = graficoFaltaDiaSemana.getXAxis();
         xAxis.setValueFormatter(new IndexAxisValueFormatter(diasDaSemana));
         xAxis.setLabelCount(diasDaSemana.size()); // Isso faz com que todos os rótulos sejam visíveis.
+        Description description = new Description();
+        description.setText("Faltas por dia da semana");
+        graficoFaltaDiaSemana.setDescription(description);
 
 // Atualize o gráfico.
         graficoFaltaDiaSemana.invalidate();
-
     }
 
     private void atualizaPresenca(){
