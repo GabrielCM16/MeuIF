@@ -1,14 +1,18 @@
 package com.example.meuif.sepae.Portaria;
 
 import androidx.activity.result.ActivityResultLauncher;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -19,6 +23,8 @@ import com.example.meuif.databinding.FragmentInformacoesPessoaisBinding;
 import com.example.meuif.events.Events;
 import com.example.meuif.events.SalvarEvento;
 import com.example.meuif.events.TelaNovoEvento;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -29,17 +35,21 @@ import com.journeyapps.barcodescanner.ScanOptions;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class PassePortaria extends AppCompatActivity {
 
     private FirebaseFirestore db;
-    private Button botao;
+    private ConstraintLayout botao;
     private long tempoValidade = 30000;
     private MediaPlayer mediaPlayer;
+    private MediaPlayer sucessPlayer;
     final PassePortaria activity= this;
-    private Button botaoEvento;
+    private EditText entradaMatriculaAcesso;
+    private ConstraintLayout constraintRegistrarAcesso;
 
 
     @SuppressLint("MissingInflatedId")
@@ -48,8 +58,11 @@ public class PassePortaria extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passe_portaria);
         botao = findViewById(R.id.botaoPasse);
+        entradaMatriculaAcesso = findViewById(R.id.entradaMatriculaAcesso);
+        constraintRegistrarAcesso = findViewById(R.id.constraintRegistrarAcesso);
 
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.error);
+        sucessPlayer = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
 
         db = FirebaseFirestore.getInstance();
         botao.setOnClickListener(new View.OnClickListener() {
@@ -58,18 +71,23 @@ public class PassePortaria extends AppCompatActivity {
                 sCanCode();
             }
         });
-
-
-
-
-        botaoEvento = findViewById(R.id.botaoEvento);
-        botaoEvento.setOnClickListener(new View.OnClickListener() {
+        constraintRegistrarAcesso.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(getApplicationContext(), TelaNovoEvento.class);
-                startActivity(intent);
+                String data = diaAtual();
+                String aux = entradaMatriculaAcesso.getText().toString();
+                if (aux != null && !aux.equals("")){
+                    atualizarMatricula(aux, data);
+                    atualizarAcessoSepae(aux);
+                    Toast.makeText(getApplicationContext(), "Acesso de aux Registrado", Toast.LENGTH_LONG).show();
+                    entradaMatriculaAcesso.setText("");
+                } else {
+                    Toast.makeText(getApplicationContext(), "Matricula Invalida", Toast.LENGTH_LONG).show();
+                }
+
             }
         });
+
 
     }
 
@@ -84,9 +102,15 @@ public class PassePortaria extends AppCompatActivity {
         return data;
     }
 
-    private void playSuccessSound() {
+    private void playErrorSound() {
         if (mediaPlayer != null) {
             mediaPlayer.start();
+        }
+    }
+
+    private void playSucessSound() {
+        if (sucessPlayer != null) {
+            sucessPlayer.start();
         }
     }
 
@@ -97,6 +121,10 @@ public class PassePortaria extends AppCompatActivity {
         if (mediaPlayer != null) {
             mediaPlayer.release();
             mediaPlayer = null;
+        }
+        if (sucessPlayer != null) {
+            sucessPlayer.release();
+            sucessPlayer = null;
         }
     }
 
@@ -122,6 +150,7 @@ public class PassePortaria extends AppCompatActivity {
                // if ( System.currentTimeMillis() - valorCurrent <= tempoValidade){
                     String data = diaAtual();
                     atualizarMatricula(aux, data);
+                     atualizarAcessoSepae(aux);
                 //} else {
                //     playSuccessSound();
                // }
@@ -133,6 +162,49 @@ public class PassePortaria extends AppCompatActivity {
             }
         }
     });
+
+    private void atualizarAcessoSepae(String matricula){
+        String data = diaAtual();
+        Timestamp novoTimestamp = Timestamp.now();
+
+        DocumentReference docRef = db.collection("AcessosCampus").document("AcessosAlunos");
+        docRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                List<Map<String, Timestamp>> passes;
+
+                if (task.getResult().exists() && task.getResult().contains(data)) {
+                    passes = (List<Map<String, Timestamp>>) task.getResult().get(data);
+                    Log.d("sim", "sim " + passes.toString());
+                } else {
+                   passes = new ArrayList<>();
+                }
+
+                Map<String, Timestamp> a = new HashMap<>();
+                a.put(matricula, novoTimestamp);
+
+                passes.add(a);
+
+                Log.d("sim", "nao + " + passes.toString());
+
+                docRef.update(data, passes)
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                playSucessSound();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                playErrorSound();
+                            }
+                        });
+            } else {
+                System.out.println("Erro ao obter o documento: " + task.getException().getMessage());
+                playErrorSound();
+            }
+        });
+    }
 
     private void atualizarMatricula(String matricula, String data){
 
@@ -162,11 +234,22 @@ public class PassePortaria extends AppCompatActivity {
 
                         // Atualize o campo com o novo valor convertido em string
                         docRef.update("presencas", String.valueOf(valorAtualInt + 1))
-                                .addOnSuccessListener(aVoid -> System.out.println("Campo incrementado com sucesso!"))
-                                .addOnFailureListener(e -> System.out.println("Erro ao incrementar campo: " + e.getMessage()));
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        playSucessSound();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        playErrorSound();
+                                    }
+                                });
 
                     } else {
                         System.out.println("O documento não existe.");
+                        playErrorSound();
                     }
                 }
 
@@ -175,8 +258,18 @@ public class PassePortaria extends AppCompatActivity {
 
                 // Use o método update() para atualizar o campo "timestamps" no documento
                 docRef.update(data, timestampsList)
-                        .addOnSuccessListener(aVoid -> System.out.println("Timestamp adicionado com sucesso!"))
-                        .addOnFailureListener(e -> System.out.println("Erro ao adicionar timestamp: " + e.getMessage()));
+                        .addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                playSucessSound();
+                            }
+                        })
+                        .addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                playErrorSound();
+                            }
+                        });
 
                 if (task.getResult().exists() && task.getResult().contains("possivelStatus")){
                     DocumentSnapshot document = task.getResult();
@@ -184,16 +277,37 @@ public class PassePortaria extends AppCompatActivity {
 
                     if (status.equals("Entrada")){
                         docRef.update("possivelStatus", "Saida")
-                                .addOnSuccessListener(aVoid -> System.out.println("Campo incrementado com sucesso!"))
-                                .addOnFailureListener(e -> System.out.println("Erro ao incrementar campo: " + e.getMessage()));
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        playSucessSound();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        playErrorSound();
+                                    }
+                                });
                     } else if (status.equals("Saida")){
                         docRef.update("possivelStatus", "Entrada")
-                                .addOnSuccessListener(aVoid -> System.out.println("Campo incrementado com sucesso!"))
-                                .addOnFailureListener(e -> System.out.println("Erro ao incrementar campo: " + e.getMessage()));
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        playSucessSound();
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        playErrorSound();
+                                    }
+                                });
                     }
                 }
             } else {
                 System.out.println("Erro ao obter o documento: " + task.getException().getMessage());
+                playErrorSound();
             }
         });
     }

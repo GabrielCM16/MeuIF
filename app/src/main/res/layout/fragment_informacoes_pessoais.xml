@@ -9,8 +9,8 @@
 
     <TextView
         android:id="@+id/testeaaa"
-        android:layout_width="359dp"
-        android:layout_height="513dp"
+        android:layout_width="309dp"
+        android:layout_height="504dp"
         android:contextClickable="false"
         android:elegantTextHeight="true"
         android:fontFamily="@font/fira_mono_bold"

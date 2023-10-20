@@ -20,6 +20,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.example.meuif.R;
 import com.example.meuif.Tela_Principal;
@@ -36,6 +37,8 @@ import com.github.mikephil.charting.data.PieDataSet;
 import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
@@ -77,11 +80,10 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
         textViewSaidaDiaAcessosCarteirinha.setText(diaAtual());
         atualizaPresenca();
         atualizarGraficoSemanal();
-        pegarAcessosPorDia();
+        pegarAcessosPorDia(dia());
     }
 
-    private void pegarAcessosPorDia(){
-        String dia = dia();
+    private void pegarAcessosPorDia(String dia){
         String nMatricula = recuperarDados("matricula");
         DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("chamadaPessoal");
         docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -93,6 +95,9 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
                         if (document.contains(dia)){
                             List<Timestamp> lista = (List<Timestamp>) document.get(dia);
                             Log.d("lista", "lsita " + lista.toString());
+                            carregarAcessos(lista);
+                        } else {
+                            List<Timestamp> lista = new ArrayList<Timestamp>();
                             carregarAcessos(lista);
                         }
                     } else {
@@ -155,6 +160,123 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
         graficoFaltaDiaSemana = findViewById(R.id.graficoFaltaDiaSemana);
         textViewSaidaDiaAcessosCarteirinha = findViewById(R.id.textViewSaidaDiaAcessosCarteirinha);
         recyclerAcessosRegistrados = findViewById(R.id.recyclerAcessosRegistrados);
+
+        imageViewEsquerdaCarteirinha.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menosUmDia();
+            }
+        });
+        imageViewDireitaCarteirinha.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                maisUmDia();
+            }
+        });
+    }
+
+    private void menosUmDia(){
+        String diaHj = textViewSaidaDiaAcessosCarteirinha.getText().toString();
+        String dia = diaHj.substring(0,2);
+        if (!dia.contains("/")){
+            int i = Integer.valueOf(dia);
+            if (i > 1){
+                i -= 1;
+                String mesAno = diaHj.substring(2);
+                String aux = String.valueOf(i) + mesAno;
+                textViewSaidaDiaAcessosCarteirinha.setText(aux);
+            }
+        } else {
+            dia = diaHj.substring(0,1);
+            int i = Integer.valueOf(dia);
+            if (i > 1){
+                i -= 1;
+                String mesAno = diaHj.substring(1);
+                String aux = String.valueOf(i) + mesAno;
+                textViewSaidaDiaAcessosCarteirinha.setText(aux);
+            }
+        }
+        pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinha.getText().toString()));
+    }
+
+    private void maisUmDia(){
+        Map<Integer, Integer> meses = new HashMap<>();
+        meses.put(1,31);
+        meses.put(2,28);
+        meses.put(3,31);
+        meses.put(4,30);
+        meses.put(5,31);
+        meses.put(6,30);
+        meses.put(7,31);
+        meses.put(8,31);
+        meses.put(9,30);
+        meses.put(10,31);
+        meses.put(11,30);
+        meses.put(12,31);
+
+        String diaHj = textViewSaidaDiaAcessosCarteirinha.getText().toString();
+        String dia = diaHj.substring(0,2);
+
+        String mes = diaHj.substring(3,5);
+        if (!mes.contains("/")){
+            if (meses.containsKey(Integer.valueOf(mes))){
+                int num = meses.get(Integer.valueOf(mes));
+                if (!dia.contains("/")){
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(2);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaAcessosCarteirinha.setText(aux);
+                    }
+                } else {
+                    dia = diaHj.substring(0,1);
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(1);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaAcessosCarteirinha.setText(aux);
+                    }
+                }
+            }
+        } else {
+            mes = diaHj.substring(2,4);
+            if (meses.containsKey(Integer.valueOf(mes))){
+                int num = meses.get(Integer.valueOf(mes));
+                if (!dia.contains("/")){
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(2);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaAcessosCarteirinha.setText(aux);
+                    }
+                } else {
+                    dia = diaHj.substring(0,1);
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(1);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaAcessosCarteirinha.setText(aux);
+                    }
+                }
+            }
+        }
+        pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinha.getText().toString()));
+    }
+
+    public String formatarData(String data) {
+        // Remova as barras da data original
+        String dataFormatada = data.replace("/", "");
+
+        // Certifique-se de que a data tem pelo menos 8 caracteres (DDMMAAAA)
+        while (dataFormatada.length() < 8) {
+            dataFormatada = "0" + dataFormatada;
+        }
+
+        return dataFormatada;
     }
 
     private String diaAtual(){
@@ -261,21 +383,65 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
                 if (task.isSuccessful()) {
                     DocumentSnapshot document = task.getResult();
                     if (document.exists()) {
-                        Map<String, Integer> mapFaltas = (Map<String, Integer>) document.get("todos");
-                        Log.d("tagler", "map " + mapFaltas.toString() + " tipos " + String.valueOf(mapFaltas.get("Segunda-feira")));
-                        valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Segunda-feira"))));
-                        valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Terca-feira"))));
-                        valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Quarta-feira"))));
-                        valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Quinta-feira"))));
-                        valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Sexta-feira"))));
+                        if (document.contains("todos")) {
+                            Map<String, Integer> mapFaltas = (Map<String, Integer>) document.get("todos");
+                            Log.d("tagler", "map " + mapFaltas.toString() + " tipos " + String.valueOf(mapFaltas.get("Segunda-feira")));
+                            valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Segunda-feira"))));
+                            valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Terca-feira"))));
+                            valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Quarta-feira"))));
+                            valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Quinta-feira"))));
+                            valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Sexta-feira"))));
 
-                        mostrargraficoSemanal(valores);
+                            mostrargraficoSemanal(valores);
+                        } else {
+                            //precisa criar o campo "todos"
+                            criarTodos();
+                            valores.add(0);
+                            valores.add(0);
+                            valores.add(0);
+                            valores.add(0);
+                            valores.add(0);
+                            mostrargraficoSemanal(valores);
+                        }
+
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
                     }
                 } else {
                     Log.d("TAGLER", "Falhou em ", task.getException());
                 }
+            }
+        });
+    }
+
+    private void criarTodos(){
+        String matricula = recuperarDados("matricula");
+        Map<String , Integer> todos = new HashMap<>();
+        todos.put("Segunda-feira", 0);
+        todos.put("Terca-feira", 0);
+        todos.put("Quarta-feira", 0);
+        todos.put("Quinta-feira", 0);
+        todos.put("Sexta-feira", 0);
+        DocumentReference usuarioDocRef = db.collection("Usuarios").document("Alunos").collection(matricula).document("chamadaPessoal");
+
+        usuarioDocRef.get().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                DocumentSnapshot document = task.getResult();
+                if (document.exists()) {
+                    usuarioDocRef.update("todos", todos)
+                            .addOnSuccessListener(aVoid -> {
+                                // Sucesso ao adicionar o timestamp
+                                Log.d("Firestore", "Timestamp adicionado com sucesso");
+                            })
+                            .addOnFailureListener(e -> {
+                                // Falha ao adicionar o timestamp
+                                Log.e("Firestore", "Erro ao adicionar o timestamp", e);
+                            });
+                } else {
+                    Log.d("Firestore", "Documento não encontrado");
+                }
+            } else {
+                Log.d("Firestore", "Falha em obter o documento", task.getException());
             }
         });
     }
@@ -312,6 +478,7 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
         Description description = new Description();
         description.setText("Faltas por dia da semana");
         graficoFaltaDiaSemana.setDescription(description);
+        graficoFaltaDiaSemana.animateY(3000);
 
 // Atualize o gráfico.
         graficoFaltaDiaSemana.invalidate();
