@@ -3,6 +3,9 @@ package com.example.meuif.faltasPessoais;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,10 +17,13 @@ import android.text.TextUtils;
 import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.example.meuif.R;
 import com.example.meuif.Tela_Principal;
+import com.example.meuif.autorizacoes.AdapterAutorizacaoEntrada;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.components.Description;
@@ -31,14 +37,20 @@ import com.github.mikephil.charting.data.PieEntry;
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 public class telaVerFaltasPessoais extends AppCompatActivity {
     private String ausencias;
@@ -50,6 +62,10 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
     public PieChart pieChart;
     private BarChart graficoFaltaDiaSemana;
     private FirebaseFirestore db;
+    private ImageView imageViewEsquerdaCarteirinha;
+    private ImageView imageViewDireitaCarteirinha;
+    private RecyclerView recyclerAcessosRegistrados;
+    private TextView textViewSaidaDiaAcessosCarteirinha;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -58,8 +74,63 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
 
         db = FirebaseFirestore.getInstance();
         carregarComponentes();
+        textViewSaidaDiaAcessosCarteirinha.setText(diaAtual());
         atualizaPresenca();
         atualizarGraficoSemanal();
+        pegarAcessosPorDia();
+    }
+
+    private void pegarAcessosPorDia(){
+        String dia = dia();
+        String nMatricula = recuperarDados("matricula");
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("chamadaPessoal");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        if (document.contains(dia)){
+                            List<Timestamp> lista = (List<Timestamp>) document.get(dia);
+                            Log.d("lista", "lsita " + lista.toString());
+                            carregarAcessos(lista);
+                        }
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void carregarAcessos(List<Timestamp> lista){
+        List<ModelAcessoAluno> modelAcessoAlunos = new ArrayList<>();
+        int count = 1;
+        String nome = recuperarDados("nome");
+        String flag = "Entrada";
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT-3"));
+
+        for (Timestamp timestamp : lista) {
+            Date date = timestamp.toDate(); // Converta o Timestamp em um objeto Date
+            String formattedDate = sdf.format(date); // Agora você pode formatá-lo
+            ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flag);
+            modelAcessoAlunos.add(modelAcessoAluno);
+            count++;
+            if (flag.equals("Entrada")) {flag = "Saida";}
+            else {flag = "Entrada";}
+        }
+        AdapterAcessosAluno adapter = new AdapterAcessosAluno(modelAcessoAlunos);
+
+        //Configurar RecyclerView
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerAcessosRegistrados.setLayoutManager(layoutManager);
+        recyclerAcessosRegistrados.setHasFixedSize(true);
+        recyclerAcessosRegistrados.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayout.VERTICAL));
+        recyclerAcessosRegistrados.setAdapter(adapter);
+
     }
 
     private void carregarComponentes() {
@@ -79,7 +150,31 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
         saidaNumAusencias = findViewById(R.id.saidaNumAusencias2);
         saidaNumPresencas = findViewById(R.id.saidaNumPresencas2);
         pieChart = findViewById(R.id.pie_chart);
+        imageViewEsquerdaCarteirinha = findViewById(R.id.imageViewEsquerdaCarteirinha);
+        imageViewDireitaCarteirinha = findViewById(R.id.imageViewDireitaCarteirinha);
         graficoFaltaDiaSemana = findViewById(R.id.graficoFaltaDiaSemana);
+        textViewSaidaDiaAcessosCarteirinha = findViewById(R.id.textViewSaidaDiaAcessosCarteirinha);
+        recyclerAcessosRegistrados = findViewById(R.id.recyclerAcessosRegistrados);
+    }
+
+    private String diaAtual(){
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
+
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        int mes = calendar.get(Calendar.MONTH) + 1;
+        int ano = calendar.get(Calendar.YEAR);
+
+        String data = String.format("%02d/%02d/%d", dia, mes, ano);
+        return data;
+    }
+
+    private String dia(){
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        int mes = calendar.get(Calendar.MONTH) + 1;
+        int ano = calendar.get(Calendar.YEAR);
+        String data = String.format("%02d%02d%d", dia, mes, ano);
+        return data;
     }
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {

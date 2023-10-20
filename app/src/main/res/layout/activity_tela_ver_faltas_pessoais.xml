@@ -1,11 +1,41 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fundo_gradient"
     tools:context=".faltasPessoais.telaVerFaltasPessoais">
+
+    <TextView
+        android:id="@+id/textViewAcessos"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/fira_mono_bold"
+        android:text="Acessos Registrados"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/graficoFaltaDiaSemana" />
+
+    <TextView
+        android:id="@+id/textViewSaidaDiaAcessosCarteirinha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:fontFamily="@font/fira_mono_bold"
+        android:text="00/00/0000"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos" />
 
     <com.github.mikephil.charting.charts.BarChart
         android:id="@+id/graficoFaltaDiaSemana"
@@ -126,4 +156,46 @@
         app:layout_constraintHorizontal_bias="0.796"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/saidaNumAulas2" />
+
+    <ImageView
+        android:id="@+id/imageViewEsquerdaCarteirinha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toStartOf="@+id/textViewSaidaDiaAcessosCarteirinha"
+        app:layout_constraintHorizontal_bias="0.945"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos"
+        app:srcCompat="@drawable/baseline_arrow_back_ios_24" />
+
+    <ImageView
+        android:id="@+id/imageViewDireitaCarteirinha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.054"
+        app:layout_constraintStart_toEndOf="@+id/textViewSaidaDiaAcessosCarteirinha"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos"
+        app:srcCompat="@drawable/baseline_arrow_forward_ios_24" />
+
+    <ImageView
+        android:id="@+id/imageView10"
+        android:layout_width="36dp"
+        android:layout_height="29dp"
+        android:layout_marginTop="12dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.505"
+        app:layout_constraintStart_toEndOf="@+id/imageViewDireitaCarteirinha"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos"
+        app:srcCompat="@drawable/baseline_event_note_24" />
+
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerAcessosRegistrados"
+        android:layout_width="0dp"
+        android:layout_height="470dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSaidaDiaAcessosCarteirinha" />
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
