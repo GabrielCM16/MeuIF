@@ -16,9 +16,27 @@
         app:layout_constraintVertical_bias="0.0">
 
         <TextView
+            android:id="@+id/textSaidaTurmaAcesso"
+            android:layout_width="162dp"
+            android:layout_height="18dp"
+            android:ellipsize="end"
+            android:maxLines="1"
+            android:text="Flag"
+            android:textColor="@color/black"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.254"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textSaidaNome"
+            app:layout_constraintVertical_bias="0.0" />
+
+        <TextView
             android:id="@+id/textSaidaFlag"
-            android:layout_width="206dp"
-            android:layout_height="27dp"
+            android:layout_width="181dp"
+            android:layout_height="22dp"
             android:ellipsize="end"
             android:maxLines="1"
             android:text="Flag"
@@ -27,10 +45,9 @@
             android:textStyle="bold"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.318"
+            app:layout_constraintHorizontal_bias="0.278"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/textSaidaNome"
-            app:layout_constraintVertical_bias="0.25" />
+            app:layout_constraintTop_toBottomOf="@+id/textSaidaTurmaAcesso" />
 
         <TextView
             android:id="@+id/textSaidaNome"

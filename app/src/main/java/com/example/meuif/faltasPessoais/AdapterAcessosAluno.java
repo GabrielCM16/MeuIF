@@ -35,6 +35,10 @@ public class AdapterAcessosAluno extends RecyclerView.Adapter<AdapterAcessosAlun
         holder.textSaidaNome.setText(aluno.getNome());
         holder.textSaidaFlag.setText(aluno.getFlag());
         holder.horaAutorizacao.setText(aluno.getHora());
+        if (aluno.getTurma() != null && !aluno.getTurma().equals("")){
+            holder.textSaidaTurmaAcesso.setText(aluno.getTurma());
+            holder.textSaidaTurmaAcesso.setVisibility(View.VISIBLE);
+        }
     }
 
     @Override
@@ -47,6 +51,7 @@ public class AdapterAcessosAluno extends RecyclerView.Adapter<AdapterAcessosAlun
         TextView textSaidaNome;
         TextView textSaidaFlag;
         TextView horaAutorizacao;
+        TextView textSaidaTurmaAcesso;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -54,6 +59,7 @@ public class AdapterAcessosAluno extends RecyclerView.Adapter<AdapterAcessosAlun
             textSaidaNome = itemView.findViewById(R.id.textSaidaNome);
             textSaidaFlag = itemView.findViewById(R.id.textSaidaFlag);
             horaAutorizacao = itemView.findViewById(R.id.horaAutorizacao);
+            textSaidaTurmaAcesso = itemView.findViewById(R.id.textSaidaTurmaAcesso);
         }
     }
 }

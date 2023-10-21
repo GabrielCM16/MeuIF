@@ -5,12 +5,21 @@ public class ModelAcessoAluno {
     private String hora;
     private String numero;
     private String flag;
+    private String turma;
 
     public ModelAcessoAluno(String nome, String hora, String numero, String flag) {
         this.nome = nome;
         this.hora = hora;
         this.numero = numero;
         this.flag = flag;
+    }
+
+    public ModelAcessoAluno(String nome, String hora, String numero, String flag, String turma) {
+        this.nome = nome;
+        this.hora = hora;
+        this.numero = numero;
+        this.flag = flag;
+        this.turma = turma;
     }
 
     public String getNome() {
@@ -43,5 +52,13 @@ public class ModelAcessoAluno {
 
     public void setFlag(String flag) {
         this.flag = flag;
+    }
+
+    public String getTurma() {
+        return turma;
+    }
+
+    public void setTurma(String turma) {
+        this.turma = turma;
     }
 }

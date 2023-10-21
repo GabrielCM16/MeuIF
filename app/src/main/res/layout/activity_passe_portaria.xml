@@ -1,11 +1,72 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+<androidx.constraintlayout.widget.ConstraintLayout
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/fundo_gradient"
     tools:context=".sepae.Portaria.PassePortaria">
+
+    <TextView
+        android:id="@+id/textViewAcessos2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="28dp"
+        android:fontFamily="@font/fira_mono_bold"
+        android:text="Acessos Registrados"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/botaoPasse" />
+
+    <ImageView
+        android:id="@+id/imageViewCalendarioAcessoSEPAE"
+        android:layout_width="36dp"
+        android:layout_height="29dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toEndOf="@+id/imageViewDireitaCarteirinhaSEPAE"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos2"
+        app:srcCompat="@drawable/baseline_event_note_24" />
+
+    <ImageView
+        android:id="@+id/imageViewDireitaCarteirinhaSEPAE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/textViewSaidaDiaAcessosCarteirinhaSEPAE"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos2"
+        app:srcCompat="@drawable/baseline_arrow_forward_ios_24" />
+
+    <TextView
+        android:id="@+id/textViewSaidaDiaAcessosCarteirinhaSEPAE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="@font/fira_mono_bold"
+        android:text="00/00/0000"
+        android:textColor="@color/black"
+        android:textSize="18sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos2" />
+
+    <ImageView
+        android:id="@+id/imageViewEsquerdaCarteirinhaSEPAE"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="4dp"
+        app:layout_constraintEnd_toStartOf="@+id/textViewSaidaDiaAcessosCarteirinhaSEPAE"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos2"
+        app:srcCompat="@drawable/baseline_arrow_back_ios_24" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/botaoPasse"
@@ -102,4 +163,14 @@
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.041" />
 
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/recyclerViewAcessosRegistradosSEPAE"
+        android:layout_width="400dp"
+        android:layout_height="595dp"
+        android:layout_marginTop="20dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textViewSaidaDiaAcessosCarteirinhaSEPAE" />
+
 </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

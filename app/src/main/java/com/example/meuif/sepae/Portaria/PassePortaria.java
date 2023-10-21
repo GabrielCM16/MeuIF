@@ -4,6 +4,9 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.recyclerview.widget.DividerItemDecoration;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -13,6 +16,8 @@ import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,8 +28,13 @@ import com.example.meuif.databinding.FragmentInformacoesPessoaisBinding;
 import com.example.meuif.events.Events;
 import com.example.meuif.events.SalvarEvento;
 import com.example.meuif.events.TelaNovoEvento;
+import com.example.meuif.faltasPessoais.AdapterAcessosAluno;
+import com.example.meuif.faltasPessoais.ModelAcessoAluno;
+import com.example.meuif.sepae.telaMerendaEscolar;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -32,6 +42,8 @@ import com.google.firebase.firestore.FirebaseFirestore;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
+import java.sql.Time;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
@@ -50,6 +62,13 @@ public class PassePortaria extends AppCompatActivity {
     final PassePortaria activity= this;
     private EditText entradaMatriculaAcesso;
     private ConstraintLayout constraintRegistrarAcesso;
+    private ImageView imageViewEsquerdaCarteirinhaSEPAE;
+    private ImageView imageViewDireitaCarteirinhaSEPAE;
+    private TextView textViewSaidaDiaAcessosCarteirinhaSEPAE;
+    private ImageView imageViewCalendarioAcessoSEPAE;
+    private Map<String, String> nomesAlunos = new HashMap<>();
+    private Map<String, String> turmasAlunos = new HashMap<>();
+    private RecyclerView recyclerViewAcessosRegistradosSEPAE;
 
 
     @SuppressLint("MissingInflatedId")
@@ -57,18 +76,42 @@ public class PassePortaria extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_passe_portaria);
+        db = FirebaseFirestore.getInstance();
+        pegarNomesAlunos();
+        pegarTurmaAlunos();
+        carregarComponentes();
+
+    }
+
+    private void carregarComponentes(){
+        imageViewEsquerdaCarteirinhaSEPAE = findViewById(R.id.imageViewEsquerdaCarteirinhaSEPAE);
+        imageViewDireitaCarteirinhaSEPAE = findViewById(R.id.imageViewDireitaCarteirinhaSEPAE);
+        textViewSaidaDiaAcessosCarteirinhaSEPAE = findViewById(R.id.textViewSaidaDiaAcessosCarteirinhaSEPAE);
+        textViewSaidaDiaAcessosCarteirinhaSEPAE.setText(diaAtualB());
+        imageViewCalendarioAcessoSEPAE = findViewById(R.id.imageViewCalendarioAcessoSEPAE);
         botao = findViewById(R.id.botaoPasse);
         entradaMatriculaAcesso = findViewById(R.id.entradaMatriculaAcesso);
         constraintRegistrarAcesso = findViewById(R.id.constraintRegistrarAcesso);
+        recyclerViewAcessosRegistradosSEPAE = findViewById(R.id.recyclerViewAcessosRegistradosSEPAE);
 
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.error);
         sucessPlayer = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
-
-        db = FirebaseFirestore.getInstance();
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 sCanCode();
+            }
+        });
+        imageViewEsquerdaCarteirinhaSEPAE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menosUmDia();
+            }
+        });
+        imageViewDireitaCarteirinhaSEPAE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                maisUmDia();
             }
         });
         constraintRegistrarAcesso.setOnClickListener(new View.OnClickListener() {
@@ -81,6 +124,7 @@ public class PassePortaria extends AppCompatActivity {
                     atualizarAcessoSepae(aux);
                     Toast.makeText(getApplicationContext(), "Acesso de aux Registrado", Toast.LENGTH_LONG).show();
                     entradaMatriculaAcesso.setText("");
+                    pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString()));
                 } else {
                     Toast.makeText(getApplicationContext(), "Matricula Invalida", Toast.LENGTH_LONG).show();
                 }
@@ -88,7 +132,251 @@ public class PassePortaria extends AppCompatActivity {
             }
         });
 
+    }
 
+    private void menosUmDia(){
+        String diaHj = textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString();
+        String dia = diaHj.substring(0,2);
+        if (!dia.contains("/")){
+            int i = Integer.valueOf(dia);
+            if (i > 1){
+                i -= 1;
+                String mesAno = diaHj.substring(2);
+                String aux = String.valueOf(i) + mesAno;
+                textViewSaidaDiaAcessosCarteirinhaSEPAE.setText(aux);
+            }
+        } else {
+            dia = diaHj.substring(0,1);
+            int i = Integer.valueOf(dia);
+            if (i > 1){
+                i -= 1;
+                String mesAno = diaHj.substring(1);
+                String aux = String.valueOf(i) + mesAno;
+                textViewSaidaDiaAcessosCarteirinhaSEPAE.setText(aux);
+            }
+        }
+       pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString()));
+    }
+
+    public String formatarData(String data) {
+        // Remova as barras da data original
+        String dataFormatada = data.replace("/", "");
+
+        // Certifique-se de que a data tem pelo menos 8 caracteres (DDMMAAAA)
+        while (dataFormatada.length() < 8) {
+            dataFormatada = "0" + dataFormatada;
+        }
+
+        return dataFormatada;
+    }
+
+    private void pegarAcessosPorDia(String dia){
+        DocumentReference docRef = db.collection("AcessosCampus").document("AcessosAlunos");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        if (document.contains(dia)){
+                            List<Map<String, Timestamp>> lista = (List<Map<String, Timestamp>>) document.get(dia);
+                            carregarAcessos(lista);
+                        } else {
+                            List<Map<String, Timestamp>> lista  = new ArrayList<>();
+                            carregarAcessos(lista);
+                        }
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void carregarAcessos(List<Map<String, Timestamp>> lista){
+        List<ModelAcessoAluno> modelAcessoAlunos = new ArrayList<>();
+        int count = lista.size();
+        Map<String, String> flag = new HashMap<>();
+        SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
+        sdf.setTimeZone(TimeZone.getTimeZone("GMT-3"));
+
+// Primeiro loop para definir as flags pessoais
+        for (Map<String, Timestamp> map : lista) {
+            for (Map.Entry<String, Timestamp> entry : map.entrySet()) {
+                String matricula = entry.getKey();
+                String flagPessoal = flag.getOrDefault(matricula, "Saida"); // Obter a flag anterior ou "Saida" como padrão
+                flag.put(matricula, flagPessoal.equals("Entrada") ? "Saida" : "Entrada");
+            }
+        }
+
+        int lastIndex = lista.size() - 1;
+
+        for (int i = lastIndex; i >= 0; i--) {
+            Map<String, Timestamp> map = lista.get(i);
+
+            for (Map.Entry<String, Timestamp> entry : map.entrySet()) {
+                String matricula = entry.getKey();
+                Timestamp valor = entry.getValue();
+                Date date = valor.toDate();
+                String formattedDate = sdf.format(date);
+
+                String nome = nomesAlunos.getOrDefault(matricula, "Erro Em Nome");
+                String flagPessoal = flag.get(matricula);
+                String turmaAluno = turmasAlunos.getOrDefault(matricula, "Erro na Matricula");
+
+                String turmaMatricula = matricula + " - " + turmaAluno;
+
+                ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                modelAcessoAlunos.add(modelAcessoAluno);
+                count--;
+                flagPessoal = flagPessoal.equals("Entrada") ? "Saida" : "Entrada";
+                flag.put(matricula, flagPessoal);
+            }
+        }
+
+        AdapterAcessosAluno adapter = new AdapterAcessosAluno(modelAcessoAlunos);
+
+// Configurar RecyclerView
+        RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+        recyclerViewAcessosRegistradosSEPAE.setLayoutManager(layoutManager);
+        recyclerViewAcessosRegistradosSEPAE.setHasFixedSize(true);
+        recyclerViewAcessosRegistradosSEPAE.addItemDecoration(new DividerItemDecoration(getApplicationContext(), LinearLayout.VERTICAL));
+        recyclerViewAcessosRegistradosSEPAE.setAdapter(adapter);
+
+    }
+    private void pegarNomesAlunos(){
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos");
+
+// Obtém os dados do documento
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // Obtém o campo "NomesAlunos" como um Map<String, String>
+                        Map<String, String> nomesaux = (Map<String, String>) document.get("NomesAlunos");
+
+                        // Agora você pode iterar sobre o Map e acessar os nomes dos alunos
+                        for (Map.Entry<String, String> entry : nomesaux.entrySet()) {
+                            String matricula = entry.getKey();
+                            String nome = entry.getValue();
+                            // Faça algo com as informações...
+                            nomesAlunos.put(matricula, nome);
+                        }
+                        Log.d("TAG", "nomes alunos ==== " + nomesAlunos.toString());
+
+                    } else {
+                        // O documento não existe
+                    }
+                } else {
+                    // Falha ao obter o documento
+                }
+            }
+        });
+    }
+
+    private void pegarTurmaAlunos(){
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos");
+
+// Obtém os dados do documento
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        Map<String, String> turmaAux = (Map<String, String>) document.get("TurmasAlunos");
+
+                        // Agora você pode iterar sobre o Map e acessar os nomes dos alunos
+                        for (Map.Entry<String, String> entry : turmaAux.entrySet()) {
+                            String matricula = entry.getKey();
+                            String turma = entry.getValue();
+                            // Faça algo com as informações...
+                            turmasAlunos.put(matricula, turma);
+                        }
+                        Log.d("TAG", "turmas alunos ==== " + turmasAlunos.toString());
+                        pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString()));
+
+                    } else {
+                        // O documento não existe
+                    }
+                } else {
+                    // Falha ao obter o documento
+                }
+            }
+        });
+
+    }
+
+    private void maisUmDia(){
+        Map<Integer, Integer> meses = new HashMap<>();
+        meses.put(1,31);
+        meses.put(2,28);
+        meses.put(3,31);
+        meses.put(4,30);
+        meses.put(5,31);
+        meses.put(6,30);
+        meses.put(7,31);
+        meses.put(8,31);
+        meses.put(9,30);
+        meses.put(10,31);
+        meses.put(11,30);
+        meses.put(12,31);
+
+        String diaHj = textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString();
+        String dia = diaHj.substring(0,2);
+
+        String mes = diaHj.substring(3,5);
+        if (!mes.contains("/")){
+            if (meses.containsKey(Integer.valueOf(mes))){
+                int num = meses.get(Integer.valueOf(mes));
+                if (!dia.contains("/")){
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(2);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaAcessosCarteirinhaSEPAE.setText(aux);
+                    }
+                } else {
+                    dia = diaHj.substring(0,1);
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(1);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaAcessosCarteirinhaSEPAE.setText(aux);
+                    }
+                }
+            }
+        } else {
+            mes = diaHj.substring(2,4);
+            if (meses.containsKey(Integer.valueOf(mes))){
+                int num = meses.get(Integer.valueOf(mes));
+                if (!dia.contains("/")){
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(2);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaAcessosCarteirinhaSEPAE.setText(aux);
+                    }
+                } else {
+                    dia = diaHj.substring(0,1);
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(1);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaAcessosCarteirinhaSEPAE.setText(aux);
+                    }
+                }
+            }
+        }
+        pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString()));
     }
 
     private String diaAtual(){
@@ -99,6 +387,16 @@ public class PassePortaria extends AppCompatActivity {
         int ano = calendar.get(Calendar.YEAR);
 
         String data = String.format("%02d%02d%d", dia, mes, ano);
+        return data;
+    }
+    private String diaAtualB(){
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
+
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        int mes = calendar.get(Calendar.MONTH) + 1;
+        int ano = calendar.get(Calendar.YEAR);
+
+        String data = String.format("%02d/%02d/%d", dia, mes, ano);
         return data;
     }
 
