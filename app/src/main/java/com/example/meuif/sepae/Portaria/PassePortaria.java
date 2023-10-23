@@ -74,6 +74,7 @@ public class PassePortaria extends AppCompatActivity {
     private RecyclerView recyclerViewAcessosRegistradosSEPAE;
     private String lastedMatricula = "";
     private int countLastedMatricula = 0;
+    private ConstraintLayout botaoPassePortariaFrontal;
 
 
     @SuppressLint("MissingInflatedId")
@@ -95,6 +96,7 @@ public class PassePortaria extends AppCompatActivity {
         textViewSaidaDiaAcessosCarteirinhaSEPAE.setText(diaAtualB());
         imageViewCalendarioAcessoSEPAE = findViewById(R.id.imageViewCalendarioAcessoSEPAE);
         botao = findViewById(R.id.botaoPasse);
+        botaoPassePortariaFrontal = findViewById(R.id.botaoPassePortariaFrontal);
         entradaMatriculaAcesso = findViewById(R.id.entradaMatriculaAcesso);
         constraintRegistrarAcesso = findViewById(R.id.constraintRegistrarAcesso);
         recyclerViewAcessosRegistradosSEPAE = findViewById(R.id.recyclerViewAcessosRegistradosSEPAE);
@@ -106,6 +108,12 @@ public class PassePortaria extends AppCompatActivity {
         // Adiciona um ícone de ação à direita
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
         actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
+        botaoPassePortariaFrontal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scanCodeFrontal();
+            }
+        });
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -438,6 +446,44 @@ public class PassePortaria extends AppCompatActivity {
         }
     }
 
+    private void scanCodeFrontal(){
+        ScanOptions options = new ScanOptions();
+        options.setPrompt("Volume up to flash on");
+        options.setBeepEnabled(false);
+        options.setOrientationLocked(true);
+        options.setCameraId(1);
+        options.setCaptureActivity(CaptureAct.class);
+        barLaucherFrontal.launch(options);
+    }
+    ActivityResultLauncher<ScanOptions> barLaucherFrontal = registerForActivityResult(new ScanContract(), result->
+    {
+        if(result.getContents() !=null)
+        {
+            String aux = result.getContents();
+            if (aux.length() == 11 && (!lastedMatricula.equals(aux) || countLastedMatricula >= 2)) {
+                //String[] aux = result.getContents().split("/");
+
+                //long valorCurrent = Long.parseLong(aux[1]);
+
+                // if ( System.currentTimeMillis() - valorCurrent <= tempoValidade){
+                String data = diaAtual();
+                atualizarMatricula(aux, data);
+                atualizarAcessoSepae(aux);
+                //} else {
+                //     playSuccessSound();
+                // }
+                countLastedMatricula = 0;
+                lastedMatricula = aux;
+                scanCodeFrontal();
+            } else {
+                Toast.makeText(this,"QR-Code Invalido ou repetido", Toast.LENGTH_SHORT).show();;
+                countLastedMatricula++;
+               // playErrorSound();
+                scanCodeFrontal();
+            }
+        }
+    });
+
     @Override
     public void onDestroy() {
         super.onDestroy();
@@ -457,7 +503,6 @@ public class PassePortaria extends AppCompatActivity {
         options.setPrompt("Volume up to flash on");
         options.setBeepEnabled(false);
         options.setOrientationLocked(true);
-        options.setCameraId(1);
         options.setCaptureActivity(CaptureAct.class);
         barLaucher.launch(options);
     }
@@ -485,7 +530,7 @@ public class PassePortaria extends AppCompatActivity {
             } else {
                 Toast.makeText(this,"QR-Code Invalido ou repetido", Toast.LENGTH_SHORT).show();;
                 countLastedMatricula++;
-                playErrorSound();
+                //playErrorSound();
                 sCanCode();
             }
         }
@@ -519,6 +564,7 @@ public class PassePortaria extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void unused) {
                                 playSucessSound();
+                                pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString()));
                             }
                         })
                         .addOnFailureListener(new OnFailureListener() {

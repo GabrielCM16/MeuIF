@@ -1,13 +1,16 @@
 package com.example.meuif.sepae.Merenda;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.Manifest;
+import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -24,6 +27,7 @@ import pub.devrel.easypermissions.PermissionRequest;
 
 import com.example.meuif.R;
 import com.example.meuif.sepae.telaMerendaEscolar;
+import com.example.meuif.sepae.telaPrincipalSepae;
 import com.github.mikephil.charting.charts.BarChart;
 import com.github.mikephil.charting.components.AxisBase;
 import com.github.mikephil.charting.components.XAxis;
@@ -189,7 +193,28 @@ public class GraficosMerenda extends AppCompatActivity {
         progressBarGrafico = findViewById(R.id.progressBarGrafico);
         progressBarGrafico.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         baixargraficoPNAE = findViewById(R.id.baixargraficoPNAE);
+        ActionBar actionBar = getSupportActionBar();
+        setTitle("Graficos PNAE");
+        // Adiciona um ícone de ação à direita
+        actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
+        actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
 
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Verifica se o item clicado é o botão do ActionBar
+        if (item.getItemId() == android.R.id.home) {
+            // Chame o método que você deseja executar quando o ActionBar for clicado
+            telaVoltar();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void telaVoltar(){
+        // Criar a Intent
+        Intent intent = new Intent(this, telaMerendaEscolar.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
     private void carregarDiasMerenda(){

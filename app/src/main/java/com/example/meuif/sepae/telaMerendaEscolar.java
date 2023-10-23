@@ -38,6 +38,8 @@ import com.example.meuif.sepae.Merenda.GraficosMerenda;
 import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
 import com.example.meuif.sepae.recyclerMerenda.AlunoMerenda;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
@@ -87,6 +89,8 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private ImageView imageViewDireitaPNAESEPAE2;
     private EditText entradaMatriculaRegistroMerenda;
     private ConstraintLayout constraintRegistrarRegistroPNAE;
+    private ConstraintLayout botaoPassePNAEFrontal;
+    private ConstraintLayout ConstraintFiltros;
 
 
     @SuppressLint("MissingInflatedId")
@@ -120,6 +124,8 @@ public class telaMerendaEscolar extends AppCompatActivity {
         imageViewDireitaPNAESEPAE2 = findViewById(R.id.imageViewDireitaPNAESEPAE2);
         entradaMatriculaRegistroMerenda = findViewById(R.id.entradaMatriculaRegistroMerenda);
         constraintRegistrarRegistroPNAE = findViewById(R.id.constraintRegistrarRegistroPNAE);
+        ConstraintFiltros = findViewById(R.id.ConstraintFiltros);
+        botaoPassePNAEFrontal = findViewById(R.id.botaoPassePNAEFrontal);
         // Inicialize o MediaPlayer com o arquivo de som do sucesso (success_sound.mp3 ou success_sound.wav)
         somErro = MediaPlayer.create(getApplicationContext(), R.raw.error);
         somSucess = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
@@ -129,6 +135,13 @@ public class telaMerendaEscolar extends AppCompatActivity {
             public void onClick(View v) {
                 procurarDadosAluno(entradaMatriculaRegistroMerenda.getText().toString());
                 atualizarRecycler(diaAtual());
+            }
+        });
+
+        botaoPassePNAEFrontal.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                scanCodeFrontal();
             }
         });
 
@@ -182,6 +195,43 @@ public class telaMerendaEscolar extends AppCompatActivity {
         super.onStart();
 
     }
+    private void scanCodeFrontal(){
+        ScanOptions options = new ScanOptions();
+        options.setPrompt("Volume up to flash on");
+        options.setBeepEnabled(false);
+        options.setOrientationLocked(true);
+        options.setCameraId(1);
+        options.setCaptureActivity(CaptureAct.class);
+        barLaucherFrontal.launch(options);
+    }
+    ActivityResultLauncher<ScanOptions> barLaucherFrontal = registerForActivityResult(new ScanContract(), result->
+    {
+        if(result.getContents() !=null)
+        {
+            String aux = result.getContents();
+            isNumeric = (aux != null && p.matcher(aux).find());
+
+            if ( aux.length() == 11 && isNumeric){
+                if (!ultimaMatricula.equals(aux)){
+                    String data = diaAtual();
+                    atualizarMerenda(aux, data, new Callback() {
+                        @Override
+                        public void onComplete() {
+                            playSucessSound();
+                            ultimaMatricula = aux;
+                        }
+                    });
+                } else{
+                    playErrorSound();
+                }
+            } else {
+                playErrorSound();
+            }
+
+            scanCodeFrontal();
+
+        }
+    });
     private void menosUmDia(){
         String diaHj = textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString();
         String dia = diaHj.substring(0,2);
@@ -336,6 +386,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
                     public void onComplete() {
                         playSucessSound();
                         Toast.makeText(getApplicationContext(), "Registro Realizado com sucesso", Toast.LENGTH_SHORT).show();
+                        atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
                     }
                 });
             }
@@ -581,6 +632,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
                             public void onComplete() {
                                 playSucessSound();
                                 ultimaMatricula = aux;
+                                atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
                             }
                         });
                     } else{
@@ -629,7 +681,23 @@ public class telaMerendaEscolar extends AppCompatActivity {
 
                     existingList.add(aux);
 
-                    docRef.update("todos", existingList);
+                    docRef.update("todos", existingList).addOnSuccessListener(new OnSuccessListener<Void>() {
+                        @Override
+                        public void onSuccess(Void unused) {
+                            listarDiasMerendados(new Callback() {
+                                @Override
+                                public void onComplete() {
+                                    atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
+                                }
+                            });
+                        }
+                    }).addOnFailureListener(new OnFailureListener() {
+                        @Override
+                        public void onFailure(@NonNull Exception e) {
+                            playErrorSound();
+                            atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
+                        }
+                    });
                     callback.onComplete();
                 } else {
                     // O documento não existe, crie-o
@@ -648,6 +716,12 @@ public class telaMerendaEscolar extends AppCompatActivity {
                     docRef.set(mapaTodos)
                             .addOnSuccessListener(aVoid -> {
                                 // Sucesso ao criar o documento
+                                listarDiasMerendados(new Callback() {
+                                    @Override
+                                    public void onComplete() {
+                                        atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
+                                    }
+                                });
                             })
                             .addOnFailureListener(e -> {
                                 // Falha ao criar o documento
@@ -679,6 +753,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
                             .addOnSuccessListener(aVoid -> {
                                 // Sucesso ao atualizar a flag
                                 Log.d("Firestore", "Flag atualizada com sucesso");
+
                             })
                             .addOnFailureListener(e -> {
                                 // Falha ao atualizar a flag

@@ -3,8 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="70dp"
-    android:background="@color/azulFundo">
+    android:layout_height="70dp">
 
     <TextView
         android:id="@+id/nomeMerenda"

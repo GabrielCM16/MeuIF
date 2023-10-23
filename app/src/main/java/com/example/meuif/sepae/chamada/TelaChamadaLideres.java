@@ -27,6 +27,7 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.example.meuif.R;
@@ -53,8 +54,6 @@ import java.util.TimeZone;
 public class TelaChamadaLideres extends AppCompatActivity {
     private ActivityResultLauncher<String> requestPermissionLauncher;
     private static final int STORAGE_PERMISSION_CODE = 101;
-    private Spinner spinnerMeses;
-    private Spinner spinnerDias;
     private Spinner spinnerTurmas;
     private FirebaseFirestore db;
     private List<String> dias = new ArrayList<>();
@@ -66,6 +65,9 @@ public class TelaChamadaLideres extends AppCompatActivity {
     private String diaSelecionado;
     private List<String> nomesChamadas;
     private List<Integer> chamdaImages;
+    private TextView textViewSaidaDiaChamadaSEPAE;
+    private ImageView imageViewEsquerdaChamadaSEPAE;
+    private ImageView imageViewDireitaChamadaSEPAE;
 
 
     @Override
@@ -90,19 +92,7 @@ public class TelaChamadaLideres extends AppCompatActivity {
         super.onStart();
         atribuirMesesAno();
         carregarComponentes();
-        setarSpinnerTurmas(new Callback() {
-            @Override
-            public void onComplete() {
-                pegarDadosDias(new Callback() {
-                    @Override
-                    public void onComplete() {
-                        setarSpinnerMeses();
-                        setarSpinnerDias();
-                        setarRecyclerView(diaSelecionado);
-                    }
-                });
-            }
-        });
+        setarSpinnerTurmas();
 
     }
 
@@ -164,6 +154,16 @@ public class TelaChamadaLideres extends AppCompatActivity {
         recyclerViewChamadaSepae.setAdapter(adapter); //criar adapter
 
     }
+    private String diaAtualB(){
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
+
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        int mes = calendar.get(Calendar.MONTH) + 1;
+        int ano = calendar.get(Calendar.YEAR);
+
+        String data = String.format("%02d/%02d/%d", dia, mes, ano);
+        return data;
+    }
 
     private void atribuirMesesAno(){
         mesesAno.put("01", "Janeiro");
@@ -182,10 +182,13 @@ public class TelaChamadaLideres extends AppCompatActivity {
 
     private void carregarComponentes(){
         db = FirebaseFirestore.getInstance();
-        spinnerMeses = findViewById(R.id.spinnerMeses);
-        spinnerDias = findViewById(R.id.spinnerDias);
         spinnerTurmas = findViewById(R.id.spinnerTurmas);
         recyclerViewChamadaSepae = findViewById(R.id.recyclerViewChamadaSepae);
+        textViewSaidaDiaChamadaSEPAE = findViewById(R.id.textViewSaidaDiaChamadaSEPAE);
+        textViewSaidaDiaChamadaSEPAE.setText(diaAtualB());
+        diaSelecionado = diaAtualB();
+        imageViewEsquerdaChamadaSEPAE = findViewById(R.id.imageViewEsquerdaChamadaSEPAE);
+        imageViewDireitaChamadaSEPAE = findViewById(R.id.imageViewDireitaChamadaSEPAE);
 
         nomesChamadas = new ArrayList<>();
         chamdaImages = new ArrayList<>();
@@ -207,6 +210,126 @@ public class TelaChamadaLideres extends AppCompatActivity {
             @Override
             public void onClick(View v) {
                 abrirDialogPDF();
+            }
+        });
+        imageViewEsquerdaChamadaSEPAE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menosUmDia();
+            }
+        });
+        imageViewDireitaChamadaSEPAE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                maisUmDia();
+            }
+        });
+    }
+    private void menosUmDia(){
+        String diaHj = textViewSaidaDiaChamadaSEPAE.getText().toString();
+        String dia = diaHj.substring(0,2);
+        if (!dia.contains("/")){
+            int i = Integer.valueOf(dia);
+            if (i > 1){
+                i -= 1;
+                String mesAno = diaHj.substring(2);
+                String aux = String.valueOf(i) + mesAno;
+                textViewSaidaDiaChamadaSEPAE.setText(aux);
+                diaSelecionado = textViewSaidaDiaChamadaSEPAE.getText().toString();
+            }
+        } else {
+            dia = diaHj.substring(0,1);
+            int i = Integer.valueOf(dia);
+            if (i > 1){
+                i -= 1;
+                String mesAno = diaHj.substring(1);
+                String aux = String.valueOf(i) + mesAno;
+                textViewSaidaDiaChamadaSEPAE.setText(aux);
+                diaSelecionado = textViewSaidaDiaChamadaSEPAE.getText().toString();
+            }
+        }
+        pegarDadosDias(turma, new Callback() {
+            @Override
+            public void onComplete() {
+                setarRecyclerView(formatarData(diaSelecionado));
+                Log.d("diasel", "dia selecionado" + diaSelecionado);
+            }
+        });
+    }
+    private void maisUmDia(){
+        Map<Integer, Integer> meses = new HashMap<>();
+        meses.put(1,31);
+        meses.put(2,28);
+        meses.put(3,31);
+        meses.put(4,30);
+        meses.put(5,31);
+        meses.put(6,30);
+        meses.put(7,31);
+        meses.put(8,31);
+        meses.put(9,30);
+        meses.put(10,31);
+        meses.put(11,30);
+        meses.put(12,31);
+
+        String diaHj = textViewSaidaDiaChamadaSEPAE.getText().toString();
+        String dia = diaHj.substring(0,2);
+
+        String mes = diaHj.substring(3,5);
+        if (!mes.contains("/")){
+            if (meses.containsKey(Integer.valueOf(mes))){
+                int num = meses.get(Integer.valueOf(mes));
+                if (!dia.contains("/")){
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(2);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaChamadaSEPAE.setText(aux);
+                        diaSelecionado = textViewSaidaDiaChamadaSEPAE.getText().toString();
+                    }
+                } else {
+                    dia = diaHj.substring(0,1);
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(1);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaChamadaSEPAE.setText(aux);
+                        diaSelecionado = textViewSaidaDiaChamadaSEPAE.getText().toString();
+                    }
+                }
+            }
+        } else {
+            mes = diaHj.substring(2,4);
+            if (meses.containsKey(Integer.valueOf(mes))){
+                int num = meses.get(Integer.valueOf(mes));
+                if (!dia.contains("/")){
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(2);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaChamadaSEPAE.setText(aux);
+                        diaSelecionado = textViewSaidaDiaChamadaSEPAE.getText().toString();
+                    }
+                } else {
+                    dia = diaHj.substring(0,1);
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(1);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaChamadaSEPAE.setText(aux);
+                        diaSelecionado = textViewSaidaDiaChamadaSEPAE.getText().toString();
+                    }
+                }
+            }
+        }
+        pegarDadosDias(turma, new Callback() {
+            @Override
+            public void onComplete() {
+                setarRecyclerView(formatarData(diaSelecionado));
+                Log.d("diasel", "dia selecionado" + diaSelecionado);
             }
         });
     }
@@ -388,26 +511,22 @@ public class TelaChamadaLideres extends AppCompatActivity {
 
     }
 
-    private void setarSpinnerTurmas(Callback callback){
+    private void setarSpinnerTurmas(){
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.turmas, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerTurmas.setAdapter(adapter);
-
         spinnerTurmas.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                dias.clear();
                 String selectedTurma = parent.getItemAtPosition(position).toString();
 
                 turma = selectedTurma;
-                pegarDadosDias(new Callback() {
+                pegarDadosDias(turma, new Callback() {
                     @Override
                     public void onComplete() {
-                        setarSpinnerMeses();
-                        setarSpinnerDias();
+                        setarRecyclerView(formatarData(diaSelecionado));
                     }
                 });
-                callback.onComplete();
             }
 
             @Override
@@ -416,112 +535,23 @@ public class TelaChamadaLideres extends AppCompatActivity {
             }
         });
     }
+    public String formatarData(String data) {
+        if (data != null) {
+            // Remova as barras da data original
+            String dataFormatada = data.replace("/", "");
 
-    private void setarSpinnerMeses(){
-        meses.clear();
-        for (int i = 0; i < dias.size(); i++){
-            String dia = dias.get(i);
-            String subString = dia.substring(2, 4);
-            if (!meses.contains(mesesAno.getOrDefault(subString, "00"))){
-                meses.add(mesesAno.getOrDefault(subString, "00"));
+            // Certifique-se de que a data tem pelo menos 8 caracteres (DDMMAAAA)
+            while (dataFormatada.length() < 8) {
+                dataFormatada = "0" + dataFormatada;
             }
 
+            return dataFormatada;
+        } else {
+            // Trate o caso em que data é nulo (null)
+            return ""; // Ou outra ação apropriada
         }
-        Log.d("TAG", meses.toString());
-
-        // Converter a List<String> em um array de strings simples
-        String[] dataArray = new String[meses.size()];
-        meses.toArray(dataArray);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, dataArray);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerMeses.setAdapter(adapter);
-
     }
 
-    private void pegarDadosDias(Callback callback){
-
-        DocumentReference docRef = db.collection("ChamadaTurma").document(turma);
-
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        // Obtendo todos os campos do documento
-                        Map<String, Object> data = document.getData();
-
-                        dataGlobal = data;
-
-                        Log.d("TAG", "dataGlobal = " + dataGlobal.toString());
-
-                        Log.d("TAG", "completo "+data.toString());
-
-                        if (data != null) {
-                            // Iterando pelos campos e imprimindo seus nomes
-                            for (String fieldName : data.keySet()) {
-                                Log.d("TAG", "Campo: " + fieldName);
-                                if (!fieldName.equals("Lider") && !fieldName.equals("nomesSala") && !fieldName.equals("ViceLider")){
-                                    if (!dias.contains(fieldName)){
-                                        dias.add(fieldName);
-                                    }
-                                }
-                            }
-                            callback.onComplete();
-                        }
-                    } else {
-                        Log.d("TAG", "O documento não existe.");
-                        callback.onComplete();
-                    }
-                } else {
-                    Log.d("TAG", "Erro ao obter o documento: " + task.getException());
-                    callback.onComplete();
-                }
-            }
-        });
-
-
-    }
-
-    private void setarSpinnerDias(){
-        Log.d("TAG", " dias = " + dias.toString());
-
-        // Converter a List<String> em um array de strings simples
-        String[] dataArray = new String[dias.size()];
-        for(int i = 0; i< dias.size(); i++){
-            dataArray[i] = dias.get(i).substring(0, 2);
-        }
-
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, dataArray);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerDias.setAdapter(adapter);
-
-        spinnerDias.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                String selectedDia = parent.getItemAtPosition(position).toString();
-
-                for(int i = 0; i< dias.size(); i++){
-                    if (selectedDia.equals(dias.get(i).substring(0, 2))){
-                        diaSelecionado = dias.get(i);
-                        setarRecyclerView(diaSelecionado);
-                        break;
-                    }
-
-
-                }
-
-                Log.d("TAG", "dia selecionado" + diaSelecionado);
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Ação a ser tomada quando nada é selecionado (opcional)
-            }
-        });
-    }
 
     private interface Callback {
         void onComplete();

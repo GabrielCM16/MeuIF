@@ -12,6 +12,51 @@
     android:background="@drawable/fundo_gradient"
     tools:context=".sepae.Portaria.PassePortaria">
 
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/botaoPassePortariaFrontal"
+        android:layout_width="110dp"
+        android:layout_height="80dp"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/background_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.127"
+        app:layout_constraintStart_toEndOf="@+id/botaoPasse"
+        app:layout_constraintTop_toBottomOf="@+id/entradaMatriculaAcesso">
+
+        <ImageView
+            android:id="@+id/imageViewRegistrarEntradaQRcodeFrontal"
+            android:layout_width="38dp"
+            android:layout_height="32dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.125"
+            app:srcCompat="@drawable/baseline_camera_front_24" />
+
+        <TextView
+            android:id="@+id/textViewRegistrarEntradaQRcodeFrontal"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fira_mono_bold"
+            android:gravity="center"
+            android:text="Autorizar Carteirinha"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewRegistrarEntradaQRcodeFrontal" />
+
+        <ImageView
+            android:id="@+id/imageView88"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toTopOf="@+id/textViewRegistrarEntradaQRcodeFrontal"
+            app:layout_constraintStart_toEndOf="@+id/imageViewRegistrarEntradaQRcodeFrontal"
+            app:srcCompat="@drawable/baseline_credit_card_24" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
     <TextView
         android:id="@+id/textViewAcessos2"
         android:layout_width="wrap_content"
@@ -75,10 +120,10 @@
         android:background="@drawable/background_button"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintHorizontal_bias="0.139"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/entradaMatriculaAcesso"
-        app:layout_constraintVertical_bias="0.019">
+        app:layout_constraintVertical_bias="0.016">
 
         <ImageView
             android:id="@+id/imageViewRegistrarEntradaQRcode"

@@ -6,204 +6,289 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/azulFundo"
-    tools:context=".sepae.telaMerendaEscolar">
-
-    <TextView
-        android:id="@+id/textViewSaidaDiaRegistrosPNAESEPAE2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:fontFamily="@font/fira_mono_bold"
-        android:text="00/00/0000"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos3" />
-
-    <EditText
-        android:id="@+id/entradaMatriculaRegistroMerenda"
-        android:layout_width="260dp"
-        android:layout_height="52dp"
-        android:background="@drawable/edit_background"
-        android:drawableLeft="@drawable/baseline_list_alt_24"
-        android:ems="10"
-        android:fontFamily="@font/fira_mono_bold"
-        android:hint="Matricula"
-        android:inputType="number"
-        android:paddingLeft="10dp"
-        android:textColor="@color/black"
-        android:textColorHint="@color/black"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.152"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.022" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintRegistrarRegistroPNAE"
-        android:layout_width="111dp"
-        android:layout_height="79dp"
-        android:background="@drawable/background_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/entradaMatriculaRegistroMerenda"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.023">
-
-        <ImageView
-            android:id="@+id/imageViewRegistrarEntradaAcesso"
-            android:layout_width="38dp"
-            android:layout_height="32dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.104"
-            app:srcCompat="@drawable/baseline_list_alt_24" />
-
-        <TextView
-            android:id="@+id/textViewRegistrarEntradaAcesso"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/fira_mono_bold"
-            android:gravity="center"
-            android:text="Autorizar Matrícula"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewRegistrarEntradaAcesso" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <TextView
-        android:id="@+id/textViewAcessos3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:fontFamily="@font/fira_mono_bold"
-        android:text="Acessos Registrados"
-        android:textColor="@color/black"
-        android:textSize="18sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/botaoPassePNAE" />
-
-    <ImageView
-        android:id="@+id/imageViewCalendarioAcessoSEPAE2"
-        android:layout_width="36dp"
-        android:layout_height="29dp"
-        android:layout_marginStart="28dp"
-        android:layout_marginEnd="16dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/imageViewDireitaPNAESEPAE2"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos3"
-        app:srcCompat="@drawable/baseline_event_note_24" />
-
-    <ImageView
-        android:id="@+id/imageViewDireitaPNAESEPAE2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/textViewSaidaDiaRegistrosPNAESEPAE2"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos3"
-        app:srcCompat="@drawable/baseline_arrow_forward_ios_24" />
-
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/botaoPassePNAE"
-        android:layout_width="110dp"
-        android:layout_height="80dp"
-        android:layout_marginTop="4dp"
-        android:background="@drawable/background_button"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/entradaMatriculaRegistroMerenda">
-
-        <ImageView
-            android:id="@+id/imageViewRegistrarEntradaQRcode"
-            android:layout_width="38dp"
-            android:layout_height="32dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.125"
-            app:srcCompat="@drawable/ic_menu_camera" />
-
-        <TextView
-            android:id="@+id/textViewRegistrarEntradaQRcode"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/fira_mono_bold"
-            android:gravity="center"
-            android:text="Autorizar Carteirinha"
-            android:textColor="@color/black"
-            android:textSize="14sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewRegistrarEntradaQRcode" />
-
-        <ImageView
-            android:id="@+id/imageView8"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            app:layout_constraintBottom_toTopOf="@+id/textViewRegistrarEntradaQRcode"
-            app:layout_constraintStart_toEndOf="@+id/imageViewRegistrarEntradaQRcode"
-            app:srcCompat="@drawable/baseline_credit_card_24" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <ImageView
-        android:id="@+id/imageViewEsquerdaPNAESEPAE2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        app:layout_constraintEnd_toStartOf="@+id/textViewSaidaDiaRegistrosPNAESEPAE2"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewAcessos3"
-        app:srcCompat="@drawable/baseline_arrow_back_ios_24" />
-
-    <View
-        android:id="@+id/view"
         android:layout_width="match_parent"
-        android:layout_height="2dp"
-        android:background="@color/black"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        tools:ignore="MissingConstraints" />
+        android:layout_height="match_parent"
+        android:background="@drawable/fundo_gradient"
+        tools:context=".sepae.telaMerendaEscolar">
 
-    <TextView
-        android:id="@+id/saidaNumero"
-        android:layout_width="251dp"
-        android:layout_height="27dp"
-        android:gravity="center"
-        android:text="Total de Registros: 0"
-        android:textColor="@color/black"
-        android:textSize="16dp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textViewSaidaDiaRegistrosPNAESEPAE2" />
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/botaoPassePNAEFrontal"
+            android:layout_width="110dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/background_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.03"
+            app:layout_constraintStart_toEndOf="@+id/botaoPassePNAE"
+            app:layout_constraintTop_toBottomOf="@+id/entradaMatriculaRegistroMerenda">
 
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/listardiasMerenda"
-        android:layout_width="410dp"
-        android:layout_height="504dp"
-        android:layout_marginStart="15dp"
-        android:layout_marginTop="20dp"
-        android:layout_marginEnd="15dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/saidaNumero" />
+            <ImageView
+                android:id="@+id/imageViewRegistrarEntradaQRcodeFrontal"
+                android:layout_width="38dp"
+                android:layout_height="32dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.125"
+                app:srcCompat="@drawable/baseline_camera_front_24" />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+            <TextView
+                android:id="@+id/textViewRegistrarEntradaQRcodeFrontal"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/fira_mono_bold"
+                android:gravity="center"
+                android:text="Autorizar Carteirinha"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewRegistrarEntradaQRcodeFrontal" />
+
+            <ImageView
+                android:id="@+id/imageView88"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@+id/textViewRegistrarEntradaQRcodeFrontal"
+                app:layout_constraintStart_toEndOf="@+id/imageViewRegistrarEntradaQRcodeFrontal"
+                app:srcCompat="@drawable/baseline_credit_card_24" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/textViewSaidaDiaRegistrosPNAESEPAE2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fira_mono_bold"
+            android:text="00/00/0000"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAcessos3" />
+
+        <EditText
+            android:id="@+id/entradaMatriculaRegistroMerenda"
+            android:layout_width="260dp"
+            android:layout_height="52dp"
+            android:background="@drawable/edit_background"
+            android:drawableLeft="@drawable/baseline_list_alt_24"
+            android:ems="10"
+            android:fontFamily="@font/fira_mono_bold"
+            android:hint="Matricula"
+            android:inputType="number"
+            android:paddingLeft="10dp"
+            android:textColor="@color/black"
+            android:textColorHint="@color/black"
+            android:visibility="visible"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.152"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.022" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/constraintRegistrarRegistroPNAE"
+            android:layout_width="111dp"
+            android:layout_height="79dp"
+            android:background="@drawable/background_button"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/entradaMatriculaRegistroMerenda"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.023">
+
+            <ImageView
+                android:id="@+id/imageViewRegistrarEntradaAcesso"
+                android:layout_width="38dp"
+                android:layout_height="32dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.104"
+                app:srcCompat="@drawable/baseline_list_alt_24" />
+
+            <TextView
+                android:id="@+id/textViewRegistrarEntradaAcesso"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/fira_mono_bold"
+                android:gravity="center"
+                android:text="Autorizar Matrícula"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewRegistrarEntradaAcesso" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <TextView
+            android:id="@+id/textViewAcessos3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="4dp"
+            android:fontFamily="@font/fira_mono_bold"
+            android:text="Acessos Registrados"
+            android:textColor="@color/black"
+            android:textSize="18sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/botaoPassePNAE" />
+
+        <ImageView
+            android:id="@+id/imageViewCalendarioAcessoSEPAE2"
+            android:layout_width="36dp"
+            android:layout_height="29dp"
+            android:layout_marginStart="28dp"
+            android:layout_marginEnd="16dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/imageViewDireitaPNAESEPAE2"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAcessos3"
+            app:srcCompat="@drawable/baseline_event_note_24" />
+
+        <ImageView
+            android:id="@+id/imageViewDireitaPNAESEPAE2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/textViewSaidaDiaRegistrosPNAESEPAE2"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAcessos3"
+            app:srcCompat="@drawable/baseline_arrow_forward_ios_24" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/botaoPassePNAE"
+            android:layout_width="110dp"
+            android:layout_height="80dp"
+            android:layout_marginTop="8dp"
+            android:background="@drawable/background_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.166"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/entradaMatriculaRegistroMerenda">
+
+            <ImageView
+                android:id="@+id/imageViewRegistrarEntradaQRcode"
+                android:layout_width="38dp"
+                android:layout_height="32dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.125"
+                app:srcCompat="@drawable/ic_menu_camera" />
+
+            <TextView
+                android:id="@+id/textViewRegistrarEntradaQRcode"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/fira_mono_bold"
+                android:gravity="center"
+                android:text="Autorizar Carteirinha"
+                android:textColor="@color/black"
+                android:textSize="14sp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/imageViewRegistrarEntradaQRcode" />
+
+            <ImageView
+                android:id="@+id/imageView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                app:layout_constraintBottom_toTopOf="@+id/textViewRegistrarEntradaQRcode"
+                app:layout_constraintStart_toEndOf="@+id/imageViewRegistrarEntradaQRcode"
+                app:srcCompat="@drawable/baseline_credit_card_24" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+        <ImageView
+            android:id="@+id/imageViewEsquerdaPNAESEPAE2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintEnd_toStartOf="@+id/textViewSaidaDiaRegistrosPNAESEPAE2"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewAcessos3"
+            app:srcCompat="@drawable/baseline_arrow_back_ios_24" />
+
+        <View
+            android:id="@+id/view"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            tools:ignore="MissingConstraints" />
+
+        <TextView
+            android:id="@+id/saidaNumero"
+            android:layout_width="251dp"
+            android:layout_height="27dp"
+            android:gravity="center"
+            android:text="Total de Registros: 0"
+            android:textColor="@color/black"
+            android:textSize="16dp"
+            android:textStyle="bold"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/textViewSaidaDiaRegistrosPNAESEPAE2" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/listardiasMerenda"
+            android:layout_width="410dp"
+            android:layout_height="504dp"
+            android:layout_marginStart="15dp"
+            android:layout_marginTop="20dp"
+            android:layout_marginEnd="15dp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/saidaNumero" />
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:id="@+id/ConstraintFiltros"
+            android:layout_width="73dp"
+            android:layout_height="30dp"
+            android:layout_marginTop="28dp"
+            android:background="@drawable/bordas_arredondadas_filtros"
+            app:layout_constraintEnd_toStartOf="@+id/imageViewEsquerdaPNAESEPAE2"
+            app:layout_constraintHorizontal_bias="0.29"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/botaoPassePNAE">
+
+            <TextView
+                android:id="@+id/saidaNumero2"
+                android:layout_width="40dp"
+                android:layout_height="25dp"
+                android:gravity="center"
+                android:text="Filtros"
+                android:textColor="@color/black"
+                android:textSize="11dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <ImageView
+                android:id="@+id/imageView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="6dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.0"
+                app:layout_constraintStart_toEndOf="@+id/saidaNumero2"
+                app:layout_constraintTop_toTopOf="parent"
+                app:srcCompat="@drawable/baseline_circle_24" />
+        </androidx.constraintlayout.widget.ConstraintLayout>
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
 </ScrollView>
