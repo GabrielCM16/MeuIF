@@ -2,6 +2,7 @@ package com.example.meuif.sepae.Portaria;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DividerItemDecoration;
@@ -13,6 +14,7 @@ import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -31,6 +33,7 @@ import com.example.meuif.events.TelaNovoEvento;
 import com.example.meuif.faltasPessoais.AdapterAcessosAluno;
 import com.example.meuif.faltasPessoais.ModelAcessoAluno;
 import com.example.meuif.sepae.telaMerendaEscolar;
+import com.example.meuif.sepae.telaPrincipalSepae;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -69,6 +72,8 @@ public class PassePortaria extends AppCompatActivity {
     private Map<String, String> nomesAlunos = new HashMap<>();
     private Map<String, String> turmasAlunos = new HashMap<>();
     private RecyclerView recyclerViewAcessosRegistradosSEPAE;
+    private String lastedMatricula = "";
+    private int countLastedMatricula = 0;
 
 
     @SuppressLint("MissingInflatedId")
@@ -96,6 +101,11 @@ public class PassePortaria extends AppCompatActivity {
 
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.error);
         sucessPlayer = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
+        ActionBar actionBar = getSupportActionBar();
+        setTitle("Acessos Portaria");
+        // Adiciona um ícone de ação à direita
+        actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
+        actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
         botao.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -132,6 +142,22 @@ public class PassePortaria extends AppCompatActivity {
             }
         });
 
+    }
+    public boolean onOptionsItemSelected(MenuItem item) {
+        // Verifica se o item clicado é o botão do ActionBar
+        if (item.getItemId() == android.R.id.home) {
+            // Chame o método que você deseja executar quando o ActionBar for clicado
+            telaVoltar();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    private void telaVoltar(){
+        // Criar a Intent
+        Intent intent = new Intent(this, telaPrincipalSepae.class);
+        // Iniciar a atividade de destino
+        startActivity(intent);
     }
 
     private void menosUmDia(){
@@ -429,8 +455,9 @@ public class PassePortaria extends AppCompatActivity {
     private void sCanCode(){
         ScanOptions options = new ScanOptions();
         options.setPrompt("Volume up to flash on");
-        options.setBeepEnabled(true);
+        options.setBeepEnabled(false);
         options.setOrientationLocked(true);
+        options.setCameraId(1);
         options.setCaptureActivity(CaptureAct.class);
         barLaucher.launch(options);
     }
@@ -440,7 +467,7 @@ public class PassePortaria extends AppCompatActivity {
         if(result.getContents() !=null)
         {
             String aux = result.getContents();
-            if (aux.length() == 11) {
+            if (aux.length() == 11 && (!lastedMatricula.equals(aux) || countLastedMatricula >= 2)) {
                 //String[] aux = result.getContents().split("/");
 
                 //long valorCurrent = Long.parseLong(aux[1]);
@@ -452,11 +479,14 @@ public class PassePortaria extends AppCompatActivity {
                 //} else {
                //     playSuccessSound();
                // }
-
+                countLastedMatricula = 0;
+                lastedMatricula = aux;
                 sCanCode();
-            }
-            else {
-                Toast.makeText(this,"Nao tem barra", Toast.LENGTH_SHORT).show();;
+            } else {
+                Toast.makeText(this,"QR-Code Invalido ou repetido", Toast.LENGTH_SHORT).show();;
+                countLastedMatricula++;
+                playErrorSound();
+                sCanCode();
             }
         }
     });
