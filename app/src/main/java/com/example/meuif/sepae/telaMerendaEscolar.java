@@ -5,6 +5,7 @@ import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -62,7 +63,7 @@ import java.util.regex.Pattern;
 public class telaMerendaEscolar extends AppCompatActivity {
 
     private FirebaseFirestore db;
-    private Button botao;
+    private ConstraintLayout botao;
     private AdapterMerenda adapter;
     private TextView saidaNumero;
     private List<String> stringList = new ArrayList<>();
@@ -72,14 +73,8 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private MediaPlayer somSucess;
     private String ultimaMatricula = " ";
     private Boolean isNumeric;
-    private Spinner spinnerMesesMerenda;
-    private Spinner spinnerDiasMerenda;
-    private Spinner spinnerTurmasMerenda;
-    private List<String> dias = new ArrayList<>();
-    private List<String> meses = new ArrayList<>();
     private String turma = "";
     private Map<String, Object> dataGlobal = new HashMap<>();
-    private Map<String, String> mesesAno = new HashMap<>();
     private String diaSelecionado;
     private List<String> listDias = new ArrayList<>();
     private Map<String, Object> listar = new HashMap<>();
@@ -87,6 +82,11 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private List<AlunoMerenda> alunosList = new ArrayList<>();
     private final Map<String, String> nomesAlunos = new HashMap<>();
     private final Map<String, String> turmasAlunos = new HashMap<>();
+    private TextView textViewSaidaDiaRegistrosPNAESEPAE2;
+    private ImageView imageViewEsquerdaPNAESEPAE2;
+    private ImageView imageViewDireitaPNAESEPAE2;
+    private EditText entradaMatriculaRegistroMerenda;
+    private ConstraintLayout constraintRegistrarRegistroPNAE;
 
 
     @SuppressLint("MissingInflatedId")
@@ -95,39 +95,62 @@ public class telaMerendaEscolar extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_tela_merenda_escolar);
 
+        db = FirebaseFirestore.getInstance();
+        pegarNomesAlunos();
+        pegarTurmaAlunos();
         carregarComponentes();
-
-        carregarCamera();
+        listarDiasMerendados(new Callback() {
+            @Override
+            public void onComplete() {
+                Log.d("obj", "obj " + dataGlobal.toString());
+                Log.d("obj", "obj " + listar.get(diaAtual()));
+                atualizarRecycler(diaAtual());
+                atualizarRecycler(diaAtual());
+            }
+        });
     }
 
     private void carregarComponentes(){
-        botao = findViewById(R.id.botaoCamera);
-        db = FirebaseFirestore.getInstance();
+        botao = findViewById(R.id.botaoPassePNAE);
         saidaNumero = findViewById(R.id.saidaNumero);
-        spinnerDiasMerenda = findViewById(R.id.spinnerDiasMerenda);
-        spinnerMesesMerenda = findViewById(R.id.spinnerMesesMerenda);
-        spinnerTurmasMerenda = findViewById(R.id.spinnerTurmasMerenda);
         listardiasMerenda = findViewById(R.id.listardiasMerenda);
+        textViewSaidaDiaRegistrosPNAESEPAE2 = findViewById(R.id.textViewSaidaDiaRegistrosPNAESEPAE2);
+        textViewSaidaDiaRegistrosPNAESEPAE2.setText(diaAtualB());
+        imageViewEsquerdaPNAESEPAE2 = findViewById(R.id.imageViewEsquerdaPNAESEPAE2);
+        imageViewDireitaPNAESEPAE2 = findViewById(R.id.imageViewDireitaPNAESEPAE2);
+        entradaMatriculaRegistroMerenda = findViewById(R.id.entradaMatriculaRegistroMerenda);
+        constraintRegistrarRegistroPNAE = findViewById(R.id.constraintRegistrarRegistroPNAE);
+        // Inicialize o MediaPlayer com o arquivo de som do sucesso (success_sound.mp3 ou success_sound.wav)
+        somErro = MediaPlayer.create(getApplicationContext(), R.raw.error);
+        somSucess = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
+
+        constraintRegistrarRegistroPNAE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                procurarDadosAluno(entradaMatriculaRegistroMerenda.getText().toString());
+                atualizarRecycler(diaAtual());
+            }
+        });
+
+        botao.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                sCanCode();
+            }
+        });
 
         ActionBar actionBar = getSupportActionBar();
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setCustomView(R.layout.custom_actionbar);
         TextView titleText = findViewById(R.id.titleText);
         ImageView leftImage = findViewById(R.id.leftImage);
-        ImageView rightImage = findViewById(R.id.rightImage); //baixar pdf
-        ImageView imageTeclado = findViewById(R.id.imageTeclado);
-        imageTeclado.setVisibility(View.VISIBLE);
+        ImageView rightImage = findViewById(R.id.rightImage);
 
         rightImage.setImageResource(R.drawable.baseline_insert_chart_outlined_24);
 
         titleText.setText("Merenda Escolar");
 
-        imageTeclado.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                abrirTeclado();
-            }
-        });
+
 
         leftImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -141,57 +164,124 @@ public class telaMerendaEscolar extends AppCompatActivity {
             public void onClick(View v) { telaGraficos();
                             }
         });
+        imageViewEsquerdaPNAESEPAE2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                menosUmDia();
+            }
+        });
+        imageViewDireitaPNAESEPAE2.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                maisUmDia();
+            }
+        });
     }
 
     protected void onStart() {
-
         super.onStart();
-        pegarNomesAlunos(new Callback() {
-            @Override
-            public void onComplete() {
-                pegarTurmaAlunos(new Callback() {
-                    @Override
-                    public void onComplete() {
-                        setarSpinnerTurmas(new Callback() {
-                            @Override
-                            public void onComplete() {
-                                listarDiasMerendados(new Callback() {
-                                    @Override
-                                    public void onComplete() {
 
-                                        Log.d("TAG", "data" + dataGlobal.toString());
-
-                                    }
-                                });
-                            }
-                        });
-                    }
-                });
-            }
-        });
     }
-
-    private void abrirTeclado(){
-        Log.d("teclado", "teclado");
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        LayoutInflater inflater = getLayoutInflater();
-        View dialogView = inflater.inflate(R.layout.custom_dialog_entrada_merenda, null);
-        builder.setView(dialogView);
-
-        final EditText editText = dialogView.findViewById(R.id.editText);
-
-        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                String textoDigitado = editText.getText().toString();
-                // Faça algo com o texto inserido, por exemplo, exiba-o em um Toast
-                procurarDadosAluno(textoDigitado);
-                dialog.dismiss(); // Fecha o diálogo
+    private void menosUmDia(){
+        String diaHj = textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString();
+        String dia = diaHj.substring(0,2);
+        if (!dia.contains("/")){
+            int i = Integer.valueOf(dia);
+            if (i > 1){
+                i -= 1;
+                String mesAno = diaHj.substring(2);
+                String aux = String.valueOf(i) + mesAno;
+                textViewSaidaDiaRegistrosPNAESEPAE2.setText(aux);
             }
-        });
+        } else {
+            dia = diaHj.substring(0,1);
+            int i = Integer.valueOf(dia);
+            if (i > 1){
+                i -= 1;
+                String mesAno = diaHj.substring(1);
+                String aux = String.valueOf(i) + mesAno;
+                textViewSaidaDiaRegistrosPNAESEPAE2.setText(aux);
+            }
+        }
+        atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
+    }
+    private void maisUmDia(){
+        Map<Integer, Integer> meses = new HashMap<>();
+        meses.put(1,31);
+        meses.put(2,28);
+        meses.put(3,31);
+        meses.put(4,30);
+        meses.put(5,31);
+        meses.put(6,30);
+        meses.put(7,31);
+        meses.put(8,31);
+        meses.put(9,30);
+        meses.put(10,31);
+        meses.put(11,30);
+        meses.put(12,31);
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        String diaHj = textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString();
+        String dia = diaHj.substring(0,2);
+
+        String mes = diaHj.substring(3,5);
+        if (!mes.contains("/")){
+            if (meses.containsKey(Integer.valueOf(mes))){
+                int num = meses.get(Integer.valueOf(mes));
+                if (!dia.contains("/")){
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(2);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaRegistrosPNAESEPAE2.setText(aux);
+                    }
+                } else {
+                    dia = diaHj.substring(0,1);
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(1);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaRegistrosPNAESEPAE2.setText(aux);
+                    }
+                }
+            }
+        } else {
+            mes = diaHj.substring(2,4);
+            if (meses.containsKey(Integer.valueOf(mes))){
+                int num = meses.get(Integer.valueOf(mes));
+                if (!dia.contains("/")){
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(2);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaRegistrosPNAESEPAE2.setText(aux);
+                    }
+                } else {
+                    dia = diaHj.substring(0,1);
+                    int i = Integer.valueOf(dia);
+                    if (i < num){
+                        i += 1;
+                        String mesAno = diaHj.substring(1);
+                        String aux = String.valueOf(i) + mesAno;
+                        textViewSaidaDiaRegistrosPNAESEPAE2.setText(aux);
+                    }
+                }
+            }
+        }
+        atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
+    }
+    public String formatarData(String data) {
+        // Remova as barras da data original
+        String dataFormatada = data.replace("/", "");
+
+        // Certifique-se de que a data tem pelo menos 8 caracteres (DDMMAAAA)
+        while (dataFormatada.length() < 8) {
+            dataFormatada = "0" + dataFormatada;
+        }
+
+        return dataFormatada;
     }
 
     private void procurarDadosAluno(String matricula){
@@ -269,7 +359,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
         finish();
     }
 
-    private void pegarNomesAlunos(Callback callback){
+    private void pegarNomesAlunos(){
         DocumentReference docRef = db.collection("Usuarios").document("Alunos");
 
 // Obtém os dados do documento
@@ -290,21 +380,17 @@ public class telaMerendaEscolar extends AppCompatActivity {
                             nomesAlunos.put(matricula, nome);
                         }
                         Log.d("TAG", "nomes alunos ==== " + nomesAlunos.toString());
-                        callback.onComplete();
 
                     } else {
                         // O documento não existe
-                        callback.onComplete();
                     }
                 } else {
                     // Falha ao obter o documento
-                    callback.onComplete();
                 }
             }
         });
     }
-
-    private void pegarTurmaAlunos(Callback callback){
+    private void pegarTurmaAlunos(){
         DocumentReference docRef = db.collection("Usuarios").document("Alunos");
 
 // Obtém os dados do documento
@@ -324,83 +410,22 @@ public class telaMerendaEscolar extends AppCompatActivity {
                             turmasAlunos.put(matricula, turma);
                         }
                         Log.d("TAG", "turmas alunos ==== " + turmasAlunos.toString());
-                        callback.onComplete();
 
                     } else {
                         // O documento não existe
-                        callback.onComplete();
                     }
                 } else {
                     // Falha ao obter o documento
-                    callback.onComplete();
                 }
-            }
-        });
-    }
-
-    private void setarSpinnerTurmas(Callback callback){
-        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.turmas, android.R.layout.simple_spinner_item);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerTurmasMerenda.setAdapter(adapter);
-
-        spinnerTurmasMerenda.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                dias.clear();
-                String selectedTurma = parent.getItemAtPosition(position).toString();
-
-                turma = selectedTurma;
-                callback.onComplete();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Ação a ser tomada quando nada é selecionado (opcional)
-            }
-        });
-    }
-
-    private void setarSpinnerDias(List<String> lista){
-        // Converter a List<String> em um array de strings simples
-        Log.d("TAG", "lista por agrs" + lista.toString());
-        String[] dataArray = new String[listDias.size()];
-        listDias.toArray(dataArray);
-
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, dataArray);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerDiasMerenda.setAdapter(adapter);
-
-        spinnerDiasMerenda.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                //dias.clear();
-                String selectedDia = parent.getItemAtPosition(position).toString();
-
-                diaSelecionado = selectedDia;
-                Log.d("TAG", "dia sim " + diaSelecionado + lista.toString());
-                for (int i = 0; i<listDias.size(); i++){
-                    if (diaSelecionado.equals(dias.get(i).substring(0,2))){
-                        Log.d("TAG", "dia" + lista.get(i));
-                        atualizarRecycler(lista.get(i));
-                        break;
-                    }
-                }
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                // Ação a ser tomada quando nada é selecionado (opcional)
             }
         });
     }
 
     private void atualizarRecycler(String dia){
         alunosList.clear();
-        Log.d("TAG", "naos sei mais" + dia);
         Object objeto = listar.get(dia);
         if (objeto != null) {
-            Log.d("TAG", "teste22" + objeto.toString());
+            Log.d("obj", "obj " + objeto.toString());
             if (objeto instanceof List) {
                 // Defina o fuso horário UTC-3
                 TimeZone timeZone = TimeZone.getTimeZone("GMT-3");
@@ -424,24 +449,24 @@ public class telaMerendaEscolar extends AppCompatActivity {
                         String nome = nomesAlunos.getOrDefault(chave, "Erro em nome");
                         String turmaAux = turmasAlunos.getOrDefault(chave, "Erro Turma");
                         String aux = chave + " - " + turmaAux;
-                        if (turma.equals("Todas")) {
-                            AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
-                            alunosList.add(aluno);
-                        } else if (turma.equals(turmaAux)){
-                            AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
-                            alunosList.add(aluno);
-                        } else {
-                            continue;
-                        }
-
-
+                        AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
+                        alunosList.add(aluno);
+//                        if (turma.equals("Todas")) {
+//                            AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
+//                            alunosList.add(aluno);
+//                        } else if (turma.equals(turmaAux)){
+//                            AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
+//                            alunosList.add(aluno);
+//                        } else {
+//                            continue;
+//                        }
                     }
                 }
+                saidaNumero.setText(String.valueOf("Total de registros: " + alunosList.size()));
             } else {
                 Log.d("TAG", "Nao é um obj");
             }
 
-            //seta recycler
             saidaNumero.setText(String.valueOf("Total de registros: " + alunosList.size()));
             AdapterMerenda adapter = new AdapterMerenda(alunosList);
 
@@ -451,14 +476,30 @@ public class telaMerendaEscolar extends AppCompatActivity {
             listardiasMerenda.setLayoutManager(layoutManager);
             listardiasMerenda.setHasFixedSize(true);
             listardiasMerenda.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
-            listardiasMerenda.setAdapter(adapter); //criar adapter
-
+            listardiasMerenda.setAdapter(adapter);
 
         } else{
             Log.d("TAG", "nullo");
+            saidaNumero.setText(String.valueOf("Total de registros: " + alunosList.size()));
+            AdapterMerenda adapter = new AdapterMerenda(alunosList);
+
+            RecyclerView.LayoutManager layoutManager = new LinearLayoutManager(getApplicationContext());
+            listardiasMerenda.setLayoutManager(layoutManager);
+            listardiasMerenda.setHasFixedSize(true);
+            listardiasMerenda.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
+            listardiasMerenda.setAdapter(adapter);
         }
+    }
 
+    private String diaAtualB(){
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
 
+        int dia = calendar.get(Calendar.DAY_OF_MONTH);
+        int mes = calendar.get(Calendar.MONTH) + 1;
+        int ano = calendar.get(Calendar.YEAR);
+
+        String data = String.format("%02d/%02d/%d", dia, mes, ano);
+        return data;
     }
 
     @Override
@@ -514,19 +555,6 @@ public class telaMerendaEscolar extends AppCompatActivity {
             somSucess.release();
             somSucess = null;
         }
-    }
-
-    private void carregarCamera(){
-        // Inicialize o MediaPlayer com o arquivo de som do sucesso (success_sound.mp3 ou success_sound.wav)
-        somErro = MediaPlayer.create(getApplicationContext(), R.raw.error);
-        somSucess = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
-
-        botao.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                sCanCode();
-            }
-        });
     }
 
     private void sCanCode(){
@@ -687,7 +715,6 @@ public class telaMerendaEscolar extends AppCompatActivity {
 
     private void listarDiasMerendados(Callback callback){
 
-        dias.clear();
         listDias.clear();
 
         db.collection("MerendaEscolar")
@@ -701,29 +728,15 @@ public class telaMerendaEscolar extends AppCompatActivity {
                             dataGlobal = data;
 
                             String diaCompleto = document.getId();
-                            dias.add(diaCompleto);
-                            listDias.add(diaCompleto.substring(0, 2));
+                            listDias.add(diaCompleto);
 
-
-                            // Percorrer todas as chaves e valores do mapa
                             for (Map.Entry<String, Object> entry : data.entrySet()) {
                                 String chave = entry.getKey();
                                 Object valor = entry.getValue();
 
                                 listar.put(document.getId(), valor);
-
-                                Log.d("TAG", "onde = " + document.getId()+ " " + "Chave: " + chave + ", Valor: " + valor);
                             }
-
                         }
-                        Log.d("TAG", "listar listar" + listar.toString());
-                        Log.d("TAG", "diaslist" + listDias.toString());
-                        Log.d("TAG", "teste dia" + listar.get("14082023"));
-                        Log.d("TAG", "todos os dias = " + dias.toString());
-
-                        setarSpinnerDias(dias);
-
-
                         callback.onComplete();
                     } else {
                         // Tratar erro aqui, se necessário
