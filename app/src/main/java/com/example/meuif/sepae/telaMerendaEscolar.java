@@ -6,6 +6,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -26,6 +28,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.Spinner;
@@ -34,7 +37,9 @@ import android.widget.Toast;
 
 import com.example.meuif.CaptureAct;
 import com.example.meuif.R;
+import com.example.meuif.sepae.Merenda.FiltroFragmentPNAE;
 import com.example.meuif.sepae.Merenda.GraficosMerenda;
+import com.example.meuif.sepae.Merenda.OnTurmaSelectedListener;
 import com.example.meuif.sepae.recyclerMerenda.AdapterMerenda;
 import com.example.meuif.sepae.recyclerMerenda.AlunoMerenda;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -62,7 +67,7 @@ import java.util.Map;
 import java.util.TimeZone;
 import java.util.regex.Pattern;
 
-public class telaMerendaEscolar extends AppCompatActivity {
+public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSelectedListener {
 
     private FirebaseFirestore db;
     private ConstraintLayout botao;
@@ -92,6 +97,10 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private ConstraintLayout botaoPassePNAEFrontal;
     private ConstraintLayout ConstraintFiltros;
     private final List<String> matriculasPassadas = new ArrayList<String>();
+    private FrameLayout frameFiltros;
+    private String turmaSelect = "Todas";
+    private int NFiltros = 0;
+    private TextView saidaNumeroFiltros;
 
 
     @SuppressLint("MissingInflatedId")
@@ -124,6 +133,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
         imageViewEsquerdaPNAESEPAE2 = findViewById(R.id.imageViewEsquerdaPNAESEPAE2);
         imageViewDireitaPNAESEPAE2 = findViewById(R.id.imageViewDireitaPNAESEPAE2);
         entradaMatriculaRegistroMerenda = findViewById(R.id.entradaMatriculaRegistroMerenda);
+        saidaNumeroFiltros = findViewById(R.id.saidaNumeroFiltros);
         constraintRegistrarRegistroPNAE = findViewById(R.id.constraintRegistrarRegistroPNAE);
         ConstraintFiltros = findViewById(R.id.ConstraintFiltros);
         botaoPassePNAEFrontal = findViewById(R.id.botaoPassePNAEFrontal);
@@ -137,6 +147,12 @@ public class telaMerendaEscolar extends AppCompatActivity {
                 procurarDadosAluno(entradaMatriculaRegistroMerenda.getText().toString());
                 atualizarRecycler(diaAtual());
                 entradaMatriculaRegistroMerenda.setText("");
+            }
+        });
+        ConstraintFiltros.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarFragmentFiltros();
             }
         });
 
@@ -191,6 +207,35 @@ public class telaMerendaEscolar extends AppCompatActivity {
                 maisUmDia();
             }
         });
+    }
+
+    private void mostrarFragmentFiltros(){
+        // Crie uma instância do Fragment que deseja adicionar
+        FiltroFragmentPNAE fragment = new FiltroFragmentPNAE(turmaSelect);
+
+// Use um FragmentManager para começar uma transação
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+
+// Adicione o Fragment ao FrameLayout (substituindo qualquer Fragment existente, se houver)
+        transaction.replace(R.id.frameFiltros, fragment); // R.id.frameLayoutContainer é o ID do FrameLayout no seu layout XML
+
+// Finalize a transação
+        transaction.commit();
+    }
+    @Override
+    public void onTurmaSelected(String turma) {
+        // Faça o que desejar com a turma recebida do Fragment
+        // Por exemplo, exiba-a em um TextView ou use-a de alguma outra forma na atividade
+        Log.d("turma", "turma ac " + turma);
+        turmaSelect = turma;
+        if (!turmaSelect.equals("Todas")){
+            NFiltros = 1;
+        } else {
+            NFiltros = 0;
+        }
+        saidaNumeroFiltros.setText(String.valueOf(NFiltros));
+        atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
     }
 
     protected void onStart() {
@@ -502,17 +547,17 @@ public class telaMerendaEscolar extends AppCompatActivity {
                         String nome = nomesAlunos.getOrDefault(chave, "Erro em nome");
                         String turmaAux = turmasAlunos.getOrDefault(chave, "Erro Turma");
                         String aux = chave + " - " + turmaAux;
-                        AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
-                        alunosList.add(aluno);
-//                        if (turma.equals("Todas")) {
-//                            AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
-//                            alunosList.add(aluno);
-//                        } else if (turma.equals(turmaAux)){
-//                            AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
-//                            alunosList.add(aluno);
-//                        } else {
-//                            continue;
-//                        }
+                       // AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
+                        //alunosList.add(aluno);
+                        if (turmaSelect.equals("Todas")) {
+                            AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
+                            alunosList.add(aluno);
+                        } else if (turmaSelect.equals(turmaAux)){
+                            AlunoMerenda aluno = new AlunoMerenda(nome, aux, dataFormatada, String.valueOf(auxNumero));
+                            alunosList.add(aluno);
+                        } else {
+                            continue;
+                        }
                     }
                 }
                 saidaNumero.setText(String.valueOf("Total de registros: " + alunosList.size()));

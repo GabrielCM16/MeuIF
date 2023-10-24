@@ -263,6 +263,23 @@
             app:layout_constraintTop_toBottomOf="@+id/botaoPassePNAE">
 
             <TextView
+                android:id="@+id/saidaNumeroFiltros"
+                android:layout_width="22dp"
+                android:layout_height="19dp"
+                android:elevation="4dp"
+                android:gravity="center"
+                android:text="0"
+                android:textColor="@color/Laranja"
+                android:textSize="11dp"
+                android:textStyle="bold"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintHorizontal_bias="0.901"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent"
+                app:layout_constraintVertical_bias="0.545" />
+
+            <TextView
                 android:id="@+id/saidaNumero2"
                 android:layout_width="40dp"
                 android:layout_height="25dp"
@@ -290,5 +307,19 @@
                 app:srcCompat="@drawable/baseline_circle_24" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
+        <FrameLayout
+            android:id="@+id/frameFiltros"
+            android:layout_width="0dp"
+            android:layout_height="450dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.99">
+
+        </FrameLayout>
+
     </androidx.constraintlayout.widget.ConstraintLayout>
+
 </ScrollView>
