@@ -91,6 +91,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
     private ConstraintLayout constraintRegistrarRegistroPNAE;
     private ConstraintLayout botaoPassePNAEFrontal;
     private ConstraintLayout ConstraintFiltros;
+    private final List<String> matriculasPassadas = new ArrayList<String>();
 
 
     @SuppressLint("MissingInflatedId")
@@ -135,6 +136,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
             public void onClick(View v) {
                 procurarDadosAluno(entradaMatriculaRegistroMerenda.getText().toString());
                 atualizarRecycler(diaAtual());
+                entradaMatriculaRegistroMerenda.setText("");
             }
         });
 
@@ -212,7 +214,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
             isNumeric = (aux != null && p.matcher(aux).find());
 
             if ( aux.length() == 11 && isNumeric){
-                if (!ultimaMatricula.equals(aux)){
+                if (!ultimaMatricula.equals(aux) && !matriculasPassadas.contains(aux)){
                     String data = diaAtual();
                     atualizarMerenda(aux, data, new Callback() {
                         @Override
@@ -518,8 +520,17 @@ public class telaMerendaEscolar extends AppCompatActivity {
                 Log.d("TAG", "Nao é um obj");
             }
 
+            List<AlunoMerenda> novaList = new ArrayList<>();
+
+            if (alunosList.size() > 0) {
+                for (int i = alunosList.size() - 1; i >= 0; i--) {
+                    AlunoMerenda aluno = alunosList.get(i);
+                    novaList.add(aluno);
+                }
+            }
+
             saidaNumero.setText(String.valueOf("Total de registros: " + alunosList.size()));
-            AdapterMerenda adapter = new AdapterMerenda(alunosList);
+            AdapterMerenda adapter = new AdapterMerenda(novaList);
 
 
             //Configurar RecyclerView
@@ -625,7 +636,7 @@ public class telaMerendaEscolar extends AppCompatActivity {
                 isNumeric = (aux != null && p.matcher(aux).find());
 
                 if ( aux.length() == 11 && isNumeric){
-                    if (!ultimaMatricula.equals(aux)){
+                    if (!ultimaMatricula.equals(aux) && !matriculasPassadas.contains(aux)){
                         String data = diaAtual();
                         atualizarMerenda(aux, data, new Callback() {
                             @Override
@@ -678,6 +689,8 @@ public class telaMerendaEscolar extends AppCompatActivity {
 
                     Map<String, Timestamp> aux = new HashMap<String, Timestamp>();
                     aux.put(matricula, novoTimestamp);
+
+                    matriculasPassadas.add(matricula);
 
                     existingList.add(aux);
 
