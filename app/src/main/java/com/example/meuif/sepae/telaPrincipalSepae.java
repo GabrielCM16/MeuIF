@@ -180,7 +180,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
 
     private void contabilizarFaltas(){
         loadingSepae.setVisibility(View.VISIBLE);
-        ContabilizarFaltas contabil = new ContabilizarFaltas(getApplicationContext(), "04092023", diaAtualSemAcentos());
+        ContabilizarFaltas contabil = new ContabilizarFaltas("04092023", diaAtualSemAcentos());
         contabil.contarFaltas(new ContabilizarFaltas.Callback() {
             @Override
             public void onComplete() {

@@ -80,6 +80,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
     private ConstraintLayout botaoPassePortariaFrontal;
     private ConstraintLayout ConstraintFiltrosPortaria;
     private String selectedTurma = "Todas";
+    private ModelFiltroPortaria modelFiltroPortaria;
 
 
     @SuppressLint("MissingInflatedId")
@@ -164,21 +165,36 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
 
     }
     private void mostrarFragmentFiltros(){
-        // Crie uma instância do Fragment que deseja adicionar
-        FiltroFragmetPortaria fragment = new FiltroFragmetPortaria(selectedTurma);
-        FragmentManager fragmentManager = getSupportFragmentManager();
-        FragmentTransaction transaction = fragmentManager.beginTransaction();
-        transaction.replace(R.id.frameFiltrosPortaria, fragment);
-        transaction.commit();
+       if (modelFiltroPortaria != null){
+           FiltroFragmetPortaria fragment = new FiltroFragmetPortaria(modelFiltroPortaria);
+           Log.d("obs", "mostrar n" + modelFiltroPortaria.getManha() + " " + modelFiltroPortaria.getTarde() + " " + modelFiltroPortaria.getNoite());
+           FragmentManager fragmentManager = getSupportFragmentManager();
+           FragmentTransaction transaction = fragmentManager.beginTransaction();
+           transaction.replace(R.id.frameFiltrosPortaria, fragment);
+           transaction.commit();
+       } else {
+           modelFiltroPortaria = new ModelFiltroPortaria("","", true, true, true, "Todas");
+           FiltroFragmetPortaria fragment = new FiltroFragmetPortaria(modelFiltroPortaria);
+           FragmentManager fragmentManager = getSupportFragmentManager();
+           FragmentTransaction transaction = fragmentManager.beginTransaction();
+           transaction.replace(R.id.frameFiltrosPortaria, fragment);
+           transaction.commit();
+       }
+
     }
     @Override
     public void onObjSelected(ModelFiltroPortaria obj) {
+        modelFiltroPortaria = obj;
         Log.d("obj", "obj " + obj.getNome());
         Log.d("obj", "obj " + obj.getTurma());
         Log.d("obj", "obj " + obj.getManha());
         Log.d("obj", "obj " + obj.getTarde());
         Log.d("obj", "obj " + obj.getNoite());
         selectedTurma = obj.getTurma();
+        modelFiltroPortaria.setManha(obj.getManha());
+        modelFiltroPortaria.setTarde(obj.getTarde());
+        modelFiltroPortaria.setNoite(obj.getNoite());
+        Log.d("obs", "model" + modelFiltroPortaria.getManha() + " " + modelFiltroPortaria.getTarde() + " " + modelFiltroPortaria.getNoite());
         // Faça o que desejar com a turma recebida do Fragment
         // Por exemplo, exiba-a em um TextView ou use-a de alguma outra forma na atividade
        // Log.d("turma", "turma ac " + turma);
@@ -190,6 +206,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
 //        }
        // saidaNumeroFiltros.setText(String.valueOf(NFiltros));
        // atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
+        pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString()));
     }
     public boolean onOptionsItemSelected(MenuItem item) {
         // Verifica se o item clicado é o botão do ActionBar
@@ -275,6 +292,8 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         SimpleDateFormat sdf = new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");
         sdf.setTimeZone(TimeZone.getTimeZone("GMT-3"));
 
+        TimeZone timeZoneUtcMinus3 = TimeZone.getTimeZone("GMT-3");
+
 // Primeiro loop para definir as flags pessoais
         for (Map<String, Timestamp> map : lista) {
             for (Map.Entry<String, Timestamp> entry : map.entrySet()) {
@@ -295,14 +314,44 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
                 Date date = valor.toDate();
                 String formattedDate = sdf.format(date);
 
+                Calendar calendar = Calendar.getInstance(timeZoneUtcMinus3);
+                calendar.setTime(date);
+                int hour = calendar.get(Calendar.HOUR_OF_DAY);
+
                 String nome = nomesAlunos.getOrDefault(matricula, "Erro Em Nome");
                 String flagPessoal = flag.get(matricula);
-                String turmaAluno = turmasAlunos.getOrDefault(matricula, "Erro na Matricula");
+                String turmaAluno = turmasAlunos.getOrDefault(matricula, "Erro na Turma/Matricula");
 
                 String turmaMatricula = matricula + " - " + turmaAluno;
 
-                ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
-                modelAcessoAlunos.add(modelAcessoAluno);
+                Log.d("hours", "hora " + String.valueOf(hour));
+
+                if (modelFiltroPortaria != null) {
+                    if (modelFiltroPortaria.getManha() && hour >= 7 && hour < 13) { // Manhã
+                        if (selectedTurma.equals("Todas") || selectedTurma.equals(turmaAluno)) {
+                            ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                            modelAcessoAlunos.add(modelAcessoAluno);
+                        }
+                    }
+
+                    if (modelFiltroPortaria.getTarde() && hour >= 13 && hour < 18) { // Tarde
+                        if (selectedTurma.equals("Todas") || selectedTurma.equals(turmaAluno)) {
+                            ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                            modelAcessoAlunos.add(modelAcessoAluno);
+                        }
+                    }
+
+                    if (modelFiltroPortaria.getNoite() && hour >= 18 && hour <= 23) { // Noite
+                        if (selectedTurma.equals("Todas") || selectedTurma.equals(turmaAluno)) {
+                            ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                            modelAcessoAlunos.add(modelAcessoAluno);
+                        }
+                    }
+                } else {
+                    ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                    modelAcessoAlunos.add(modelAcessoAluno);
+                }
+
                 count--;
                 flagPessoal = flagPessoal.equals("Entrada") ? "Saida" : "Entrada";
                 flag.put(matricula, flagPessoal);

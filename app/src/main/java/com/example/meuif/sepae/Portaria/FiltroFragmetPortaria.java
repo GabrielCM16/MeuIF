@@ -29,9 +29,10 @@ public class FiltroFragmetPortaria extends Fragment  {
     private Switch manha;
     private Switch tarde;
     private Switch noite;
-    public FiltroFragmetPortaria(String turma) {
+    public FiltroFragmetPortaria(ModelFiltroPortaria modelFiltroPortaria) {
         // Required empty public constructor
-        this.Tturma = turma;
+        this.obj = modelFiltroPortaria;
+        Tturma = modelFiltroPortaria.getTurma();
     }
 
     @Override
@@ -62,8 +63,8 @@ public class FiltroFragmetPortaria extends Fragment  {
             // Defina a animação de saída do fragment
             transaction.setCustomAnimations(R.anim.slide_up, R.anim.slide_down);
 
-            obj = new ModelFiltroPortaria("Gabriel",
-                    "123",
+            obj = new ModelFiltroPortaria("",
+                    "",
                     manha.isChecked(),tarde.isChecked(),noite.isChecked(),
                     Tturma);
 
@@ -104,6 +105,26 @@ public class FiltroFragmetPortaria extends Fragment  {
         });
     }
 
+    private void setarSwitchTurmas(){
+        if (obj != null){
+            if (obj.getManha()){
+                manha.setChecked(true);
+            } else {
+                manha.setChecked(false);
+            }
+            if (obj.getTarde()){
+                tarde.setChecked(true);
+            } else {
+                tarde.setChecked(false);
+            }
+            if (obj.getNoite()){
+                noite.setChecked(true);
+            } else {
+                noite.setChecked(false);
+            }
+        }
+    }
+
     @SuppressLint("MissingInflatedId")
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -120,6 +141,7 @@ public class FiltroFragmetPortaria extends Fragment  {
         noite = view.findViewById(R.id.switchNoite);
 
         setarSpinnerTurmas();
+        setarSwitchTurmas();
 
         imageViewSairFragmentPortaria.setOnClickListener(new View.OnClickListener() {
             @Override

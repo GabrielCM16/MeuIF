@@ -34,14 +34,12 @@ import java.util.TimeZone;
 public class ContabilizarFaltas {
 
     private FirebaseFirestore db;
-    private Context context;
     private String diaSemana;
     private List<String> dias = new ArrayList<String>();
     private String dia;
     private final Map<String, String> nomesAlunos = new HashMap<>();
 
-    public ContabilizarFaltas(Context context, String dia, String diaSemana) {
-        this.context = context;
+    public ContabilizarFaltas( String dia, String diaSemana) {
         this.dia = dia;
         this.diaSemana = diaSemana;
     }
@@ -106,12 +104,12 @@ public class ContabilizarFaltas {
                                     Log.d("cont", chave);
                                 }
                                 atualizarDiasAulas();
-                                Toast.makeText(context, "As faltas foram contabilizadas!", Toast.LENGTH_SHORT).show();
+                               // Toast.makeText(context, "As faltas foram contabilizadas!", Toast.LENGTH_SHORT).show();
                                 callback.onComplete();
                             }
                         });
                     } else{
-                        Toast.makeText(context, "Hoje as faltas já foram contabilizadas!", Toast.LENGTH_SHORT).show();
+                       // Toast.makeText(context, "Hoje as faltas já foram contabilizadas!", Toast.LENGTH_SHORT).show();
                         callback.onComplete();
 
                     }
@@ -119,7 +117,7 @@ public class ContabilizarFaltas {
             });
         }else {
             //final de semana
-            Toast.makeText(context, "Final de Semana!", Toast.LENGTH_SHORT).show();
+          //  Toast.makeText(context, "Final de Semana!", Toast.LENGTH_SHORT).show();
             callback.onComplete();
 
         }
