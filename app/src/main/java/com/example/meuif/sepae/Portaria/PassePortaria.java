@@ -5,6 +5,8 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -32,6 +34,7 @@ import com.example.meuif.events.SalvarEvento;
 import com.example.meuif.events.TelaNovoEvento;
 import com.example.meuif.faltasPessoais.AdapterAcessosAluno;
 import com.example.meuif.faltasPessoais.ModelAcessoAluno;
+import com.example.meuif.sepae.Merenda.FiltroFragmentPNAE;
 import com.example.meuif.sepae.telaMerendaEscolar;
 import com.example.meuif.sepae.telaPrincipalSepae;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -55,7 +58,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
-public class PassePortaria extends AppCompatActivity {
+public class PassePortaria extends AppCompatActivity implements OnFiltroSelectedListener {
 
     private FirebaseFirestore db;
     private ConstraintLayout botao;
@@ -75,6 +78,8 @@ public class PassePortaria extends AppCompatActivity {
     private String lastedMatricula = "";
     private int countLastedMatricula = 0;
     private ConstraintLayout botaoPassePortariaFrontal;
+    private ConstraintLayout ConstraintFiltrosPortaria;
+    private String selectedTurma = "Todas";
 
 
     @SuppressLint("MissingInflatedId")
@@ -100,6 +105,7 @@ public class PassePortaria extends AppCompatActivity {
         entradaMatriculaAcesso = findViewById(R.id.entradaMatriculaAcesso);
         constraintRegistrarAcesso = findViewById(R.id.constraintRegistrarAcesso);
         recyclerViewAcessosRegistradosSEPAE = findViewById(R.id.recyclerViewAcessosRegistradosSEPAE);
+        ConstraintFiltrosPortaria = findViewById(R.id.ConstraintFiltrosPortaria);
 
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.error);
         sucessPlayer = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
@@ -108,6 +114,12 @@ public class PassePortaria extends AppCompatActivity {
         // Adiciona um ícone de ação à direita
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
         actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
+        ConstraintFiltrosPortaria.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mostrarFragmentFiltros();
+            }
+        });
         botaoPassePortariaFrontal.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -151,6 +163,34 @@ public class PassePortaria extends AppCompatActivity {
         });
 
     }
+    private void mostrarFragmentFiltros(){
+        // Crie uma instância do Fragment que deseja adicionar
+        FiltroFragmetPortaria fragment = new FiltroFragmetPortaria(selectedTurma);
+        FragmentManager fragmentManager = getSupportFragmentManager();
+        FragmentTransaction transaction = fragmentManager.beginTransaction();
+        transaction.replace(R.id.frameFiltrosPortaria, fragment);
+        transaction.commit();
+    }
+    @Override
+    public void onObjSelected(ModelFiltroPortaria obj) {
+        Log.d("obj", "obj " + obj.getNome());
+        Log.d("obj", "obj " + obj.getTurma());
+        Log.d("obj", "obj " + obj.getManha());
+        Log.d("obj", "obj " + obj.getTarde());
+        Log.d("obj", "obj " + obj.getNoite());
+        selectedTurma = obj.getTurma();
+        // Faça o que desejar com a turma recebida do Fragment
+        // Por exemplo, exiba-a em um TextView ou use-a de alguma outra forma na atividade
+       // Log.d("turma", "turma ac " + turma);
+//        turmaSelect = turma;
+//        if (!turmaSelect.equals("Todas")){
+//            NFiltros = 1;
+//        } else {
+//            NFiltros = 0;
+//        }
+       // saidaNumeroFiltros.setText(String.valueOf(NFiltros));
+       // atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
+    }
     public boolean onOptionsItemSelected(MenuItem item) {
         // Verifica se o item clicado é o botão do ActionBar
         if (item.getItemId() == android.R.id.home) {
@@ -160,7 +200,6 @@ public class PassePortaria extends AppCompatActivity {
         }
         return super.onOptionsItemSelected(item);
     }
-
     private void telaVoltar(){
         // Criar a Intent
         Intent intent = new Intent(this, telaPrincipalSepae.class);
