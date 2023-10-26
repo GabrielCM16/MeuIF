@@ -8,6 +8,35 @@
     tools:context=".MainActivity">
 
     <TextView
+        android:id="@+id/textViewSaidaDiaAcessosCarteirinhaSEPAE3"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/fira_mono_bold"
+        android:text="Código de Barras"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toEndOf="@+id/switchCarteirinha"
+        app:layout_constraintTop_toBottomOf="@+id/textCurso" />
+
+    <TextView
+        android:id="@+id/textViewSaidaDiaAcessosCarteirinhaSEPAE2"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="28dp"
+        android:layout_marginTop="8dp"
+        android:fontFamily="@font/fira_mono_bold"
+        android:text="QR-Code"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toStartOf="@+id/switchCarteirinha"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textCurso" />
+
+    <TextView
         android:id="@+id/saidaTempo"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -119,5 +148,15 @@
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
+
+    <Switch
+        android:id="@+id/switchCarteirinha"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.432"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textCurso" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

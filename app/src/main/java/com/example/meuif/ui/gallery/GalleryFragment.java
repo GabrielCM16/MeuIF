@@ -12,7 +12,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CompoundButton;
 import android.widget.ImageView;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -30,6 +32,8 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.zxing.BarcodeFormat;
+import com.google.zxing.MultiFormatWriter;
+import com.google.zxing.common.BitMatrix;
 import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import com.example.meuif.Notification;
@@ -57,6 +61,8 @@ public class GalleryFragment extends Fragment {
     public String nome;
     public String curso;
     public Tela_Principal tela_principal;
+    private Switch switchCarteirinha;
+    private Boolean qualCarteirinha;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -75,6 +81,8 @@ public class GalleryFragment extends Fragment {
         textNome = root.findViewById(R.id.textNome);
         textCurso = root.findViewById(R.id.textCurso);
         textMatricula = root.findViewById(R.id.textMatricula);
+        switchCarteirinha = root.findViewById(R.id.switchCarteirinha);
+        qualCarteirinha = switchCarteirinha.isChecked();
         botao = root.findViewById(R.id.button);
         qrCode.setVisibility(View.INVISIBLE);
         botao.setVisibility(View.VISIBLE);
@@ -121,6 +129,29 @@ public class GalleryFragment extends Fragment {
                     }
                 });
 
+            }
+        });
+
+        View view = getView();
+
+        switchCarteirinha.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                qualCarteirinha = isChecked;
+                apertado = false;
+                stopContador();
+                atualizarStatus(new Callback() {
+                    @Override
+                    public void onComplete() {
+                        atualizarFlag(matricula ,new Callback() {
+                            @Override
+                            public void onComplete() {
+                                possivelStatus = recuperarDados("possivelStatus");
+                                iniciarTempo(view);
+                            }
+                        });
+                    }
+                });
             }
         });
 
@@ -258,14 +289,40 @@ public class GalleryFragment extends Fragment {
     }
 
     public void iniciarTempo(View view){
+        qualCarteirinha = switchCarteirinha.isChecked();
         if (!apertado) {
             apertado = true;
             botao.setVisibility(View.INVISIBLE);
             contador(finalContador, intervaloContador);
             String qr = stringQRcode();
-            gerarQR(qr);
+            if (!qualCarteirinha){
+                gerarQR(qr);
+            } else {
+                gerarBarras(qr);
+            }
+
         } else {
             abrirToast("QR code já gerado!");
+        }
+    }
+
+    private void gerarBarras(String gerar){
+        try {
+            BarcodeFormat formato = BarcodeFormat.CODE_128; // Escolha o formato do código de barras desejado
+            int largura = 400; // Largura desejada em pixels
+            int altura = 200; // Altura desejada em pixels
+
+            MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
+            BitMatrix bitMatrix = multiFormatWriter.encode(gerar, formato, largura, altura);
+
+            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+            Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
+
+            ImageView imageViewCodigoBarras = (ImageView) qrCode;
+            imageViewCodigoBarras.setImageBitmap(bitmap);
+            qrCode.setVisibility(View.VISIBLE);
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 

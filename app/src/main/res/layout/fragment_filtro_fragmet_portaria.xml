@@ -12,6 +12,51 @@
         android:background="#DADADA">
 
         <TextView
+            android:id="@+id/turma11"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fira_mono_bold"
+            android:text="(18:00 até às 23:00)"
+            android:textColor="@color/black"
+            android:textSize="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.177"
+            app:layout_constraintStart_toEndOf="@+id/switchNoite"
+            app:layout_constraintTop_toBottomOf="@+id/turma10"
+            app:layout_constraintVertical_bias="0.018" />
+
+        <TextView
+            android:id="@+id/turma10"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fira_mono_bold"
+            android:text="(13:00 até às 18:00)"
+            android:textColor="@color/black"
+            android:textSize="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.177"
+            app:layout_constraintStart_toEndOf="@+id/switchTarde"
+            app:layout_constraintTop_toBottomOf="@+id/turma8"
+            app:layout_constraintVertical_bias="0.013" />
+
+        <TextView
+            android:id="@+id/turma8"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:fontFamily="@font/fira_mono_bold"
+            android:text="(7:00 até às 13:00)"
+            android:textColor="@color/black"
+            android:textSize="12dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.155"
+            app:layout_constraintStart_toEndOf="@+id/switchManha"
+            app:layout_constraintTop_toBottomOf="@+id/turma2"
+            app:layout_constraintVertical_bias="0.029" />
+
+        <TextView
             android:id="@+id/turma7"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
