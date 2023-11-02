@@ -38,10 +38,12 @@ public class ContabilizarFaltas {
     private List<String> dias = new ArrayList<String>();
     private String dia;
     private final Map<String, String> nomesAlunos = new HashMap<>();
+    private Context context;
 
-    public ContabilizarFaltas( String dia, String diaSemana) {
+    public ContabilizarFaltas( String dia, String diaSemana, Context context ) {
         this.dia = dia;
         this.diaSemana = diaSemana;
+        this.context = context;
     }
 
 
@@ -109,7 +111,7 @@ public class ContabilizarFaltas {
                             }
                         });
                     } else{
-                       // Toast.makeText(context, "Hoje as faltas já foram contabilizadas!", Toast.LENGTH_SHORT).show();
+                       Toast.makeText(context, "Hoje as faltas já foram contabilizadas!", Toast.LENGTH_SHORT).show();
                         callback.onComplete();
 
                     }
@@ -173,17 +175,23 @@ public class ContabilizarFaltas {
                         Map<String, String> todosMap = (Map<String, String>) document.get("todos");
 
                         // Verifique se a chave existe no mapa
-                        Log.d("cont", diaSemana);
-                        Log.d("cont", todosMap.toString());
-                        if (todosMap.containsKey(diaSemana)) {
-                            String valorAtual =  String.valueOf(todosMap.get(diaSemana));
+                       // Log.d("cont", diaSemana);
+                       // Log.d("cont", todosMap.toString());
+                        if (todosMap != null){
+                            if (todosMap.containsKey(diaSemana)) {
+                                String valorAtual =  String.valueOf(todosMap.get(diaSemana));
 
-                            // Converte o valorLong para Integer, incrementa e coloca de volta no mapa
-                            todosMap.put(diaSemana, String.valueOf(Integer.valueOf(valorAtual) + 1));
+                                // Converte o valorLong para Integer, incrementa e coloca de volta no mapa
+                                todosMap.put(diaSemana, String.valueOf(Integer.valueOf(valorAtual) + 1));
+                            } else {
+                                // Se a chave não existe no mapa, você pode simplesmente colocar o valorLong convertido em Integer no mapa
+                                todosMap.put(diaSemana, String.valueOf(1));
+                            }
                         } else {
-                            // Se a chave não existe no mapa, você pode simplesmente colocar o valorLong convertido em Integer no mapa
+                            todosMap = new HashMap<>();
                             todosMap.put(diaSemana, String.valueOf(1));
                         }
+
 
                         // Converta o valor atual para inteiro
                         int valorAtualInt = Integer.parseInt(valorPresenca);

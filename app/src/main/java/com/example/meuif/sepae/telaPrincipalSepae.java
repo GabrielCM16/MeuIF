@@ -40,10 +40,8 @@ import java.util.Locale;
 import java.util.TimeZone;
 
 public class telaPrincipalSepae extends AppCompatActivity {
-
-    private CRUD crud = new CRUD();
     private TextView textViewBemVindo;
-    private Button botaosair;
+    private ConstraintLayout botaosair;
     private ConstraintLayout cardapio;
     private ConstraintLayout constraintAutorizarSaida;
     private ProgressBar loadingSepae;
@@ -51,7 +49,6 @@ public class telaPrincipalSepae extends AppCompatActivity {
     private ConstraintLayout merenda;
     private ConstraintLayout carteirinha;
     private ConstraintLayout chamada;
-    private ConstraintLayout faltas;
     private ConstraintLayout constraintGerenciarUsers;
 
     @SuppressLint("MissingInflatedId")
@@ -74,13 +71,6 @@ public class telaPrincipalSepae extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 telaChamada();
-            }
-        });
-
-        faltas.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                contabilizarFaltas();
             }
         });
 
@@ -144,7 +134,6 @@ public class telaPrincipalSepae extends AppCompatActivity {
         loadingSepae = findViewById(R.id.loadingSepae);
         autorizarAula = findViewById(R.id.constraintAutorizarAula);
         constraintAutorizarSaida = findViewById(R.id.constraintAutorizarSaida);
-        faltas = findViewById(R.id.constraintFaltas);
         constraintGerenciarUsers = findViewById(R.id.constraintGerenciarUsers);
         chamada = findViewById(R.id.constraintChamada);
         loadingSepae.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
@@ -176,51 +165,6 @@ public class telaPrincipalSepae extends AppCompatActivity {
         Intent intent = new Intent(telaPrincipalSepae.this, PassePortaria.class);
         // Iniciar a atividade de destino
         startActivity(intent);
-    }
-
-    private void contabilizarFaltas(){
-        loadingSepae.setVisibility(View.VISIBLE);
-        ContabilizarFaltas contabil = new ContabilizarFaltas("04092023", diaAtualSemAcentos());
-        contabil.contarFaltas(new ContabilizarFaltas.Callback() {
-            @Override
-            public void onComplete() {
-                loadingSepae.setVisibility(View.INVISIBLE);
-            }
-        });
-
-    }
-
-        public String diaAtualSemAcentos() {
-            Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
-            int diaSemana = calendar.get(Calendar.DAY_OF_WEEK);
-
-            String nomeDiaSemana = "";
-
-            switch (diaSemana) {
-                case Calendar.SUNDAY:
-                    nomeDiaSemana = "Domingo";
-                    break;
-                case Calendar.MONDAY:
-                    nomeDiaSemana = "Segunda-feira";
-                    break;
-                case Calendar.TUESDAY:
-                    nomeDiaSemana = "Terca-feira";
-                    break;
-                case Calendar.WEDNESDAY:
-                    nomeDiaSemana = "Quarta-feira";
-                    break;
-                case Calendar.THURSDAY:
-                    nomeDiaSemana = "Quinta-feira";
-                    break;
-                case Calendar.FRIDAY:
-                    nomeDiaSemana = "Sexta-feira";
-                    break;
-                case Calendar.SATURDAY:
-                    nomeDiaSemana = "Sabado";
-                    break;
-            }
-
-            return nomeDiaSemana;
     }
 
     public void limparDados(){

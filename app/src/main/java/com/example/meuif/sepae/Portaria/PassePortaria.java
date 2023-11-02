@@ -12,6 +12,9 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
+import android.app.AlertDialog;
+import android.app.DatePickerDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.media.MediaPlayer;
 import android.os.Bundle;
@@ -19,6 +22,7 @@ import android.util.Log;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -108,13 +112,41 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         recyclerViewAcessosRegistradosSEPAE = findViewById(R.id.recyclerViewAcessosRegistradosSEPAE);
         ConstraintFiltrosPortaria = findViewById(R.id.ConstraintFiltrosPortaria);
 
+        imageViewCalendarioAcessoSEPAE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendarDialog(v);
+            }
+        });
+
         mediaPlayer = MediaPlayer.create(getApplicationContext(), R.raw.error);
         sucessPlayer = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
+
         ActionBar actionBar = getSupportActionBar();
-        setTitle("Acessos Portaria");
-        // Adiciona um ícone de ação à direita
-        actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
-        actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
+        actionBar.setDisplayShowCustomEnabled(true);
+        actionBar.setCustomView(R.layout.custom_actionbar);
+        TextView titleText = findViewById(R.id.titleText);
+        ImageView leftImage = findViewById(R.id.leftImage);
+        ImageView rightImage = findViewById(R.id.rightImage);
+
+        rightImage.setImageResource(R.drawable.baseline_insert_chart_outlined_24);
+
+        titleText.setText("Acessos ao Campus");
+        rightImage.setImageResource(R.drawable.baseline_free_cancellation_24);
+
+        leftImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                telaVoltar();
+            }
+        });
+
+        rightImage.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) { faltas();
+            }
+        });
+
         ConstraintFiltrosPortaria.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -162,7 +194,97 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
 
             }
         });
+    }
 
+    private void faltas(){
+        AlertDialog.Builder dialog = new AlertDialog.Builder(this);
+
+        //configurar titulo e mensagem
+        dialog.setTitle("Deseja Atribuir Faltas" );
+        dialog.setMessage("Deseja Atribuir Faltas?\n\n A ação se baseia em, quando o aluno não realizou o passe da portaria ao menos uma" +
+                " vez no dia é atribuida uma falta para o mesmo, caso tenha realizado o passe ao menos uma vez, " +
+                "a falta não é atribuida\n\n" +
+                "A falta será para o dia = " + diaAtualB() + " " + diaAtualSemAcentos() + "\n\n" +
+                "A ação não pode ser desfeita");
+
+        dialog.setCancelable(false);
+
+        dialog.setPositiveButton("Continuar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                ContabilizarFaltas contabil = new ContabilizarFaltas(diaAtual(), diaAtualSemAcentos(), getApplicationContext());
+                contabil.contarFaltas(new ContabilizarFaltas.Callback() {
+                    @Override
+                    public void onComplete() {
+                        Toast.makeText(getApplicationContext(), "Faltas atribuidas!", Toast.LENGTH_LONG).show();
+                    }
+                });
+            }
+        });
+        dialog.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                Toast.makeText(getApplicationContext(), "Ação cancelada", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        dialog.create();
+        dialog.show();
+
+    }
+    public String diaAtualSemAcentos() {
+        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
+        int diaSemana = calendar.get(Calendar.DAY_OF_WEEK);
+
+        String nomeDiaSemana = "";
+
+        switch (diaSemana) {
+            case Calendar.SUNDAY:
+                nomeDiaSemana = "Domingo";
+                break;
+            case Calendar.MONDAY:
+                nomeDiaSemana = "Segunda-feira";
+                break;
+            case Calendar.TUESDAY:
+                nomeDiaSemana = "Terca-feira";
+                break;
+            case Calendar.WEDNESDAY:
+                nomeDiaSemana = "Quarta-feira";
+                break;
+            case Calendar.THURSDAY:
+                nomeDiaSemana = "Quinta-feira";
+                break;
+            case Calendar.FRIDAY:
+                nomeDiaSemana = "Sexta-feira";
+                break;
+            case Calendar.SATURDAY:
+                nomeDiaSemana = "Sabado";
+                break;
+        }
+
+        return nomeDiaSemana;
+    }
+
+    public void calendarDialog(View view) {
+        // Get Current Date
+        final Calendar c = Calendar.getInstance();
+        int mYear = c.get(Calendar.YEAR);
+        int mMonth = c.get(Calendar.MONTH);
+        int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new
+                DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month,
+                                          int dayOfMonth) {
+                        String dateText = dayOfMonth + "/" + (month + 1) + "/" + year;
+                        // openConfirmationDialog(view);
+                        Log.d("calendario", "cal " + dateText);
+                        textViewSaidaDiaAcessosCarteirinhaSEPAE.setText(dateText);
+                        pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString()));
+                    }
+                }, mYear, mMonth, mDay);
+        datePickerDialog.show();
     }
     private void mostrarFragmentFiltros(){
        if (modelFiltroPortaria != null){

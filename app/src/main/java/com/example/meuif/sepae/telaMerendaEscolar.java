@@ -190,7 +190,7 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
 
         rightImage.setImageResource(R.drawable.baseline_insert_chart_outlined_24);
 
-        titleText.setText("Merenda Escolar");
+        titleText.setText("PNAE");
 
 
 

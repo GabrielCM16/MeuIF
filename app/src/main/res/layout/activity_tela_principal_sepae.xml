@@ -1,33 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<ScrollView
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
-<androidx.constraintlayout.widget.ConstraintLayout
-    android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/azulFundo"
+    android:background="@drawable/fundo_gradient"
     tools:context=".sepae.telaPrincipalSepae">
 
     <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintGerenciarUsers"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:id="@+id/botaoSair"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/background_button"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.527"
-        app:layout_constraintStart_toEndOf="@+id/constraintAutorizarSaida"
-        app:layout_constraintTop_toBottomOf="@+id/constraintCardapio"
-        app:layout_constraintVertical_bias="0.169">
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintGerenciarUsers">
+
+        <ImageView
+            android:id="@+id/imageViewbotaoSair"
+            android:layout_width="57dp"
+            android:layout_height="40dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.511"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.083"
+            app:srcCompat="@drawable/baseline_logout_24" />
+
+        <TextView
+            android:id="@+id/textViewbotaoSair"
+            android:layout_width="102dp"
+            android:layout_height="36dp"
+            android:fontFamily="@font/fira_mono_bold"
+            android:gravity="center"
+            android:text="Logout"
+            android:textColor="@color/black"
+            android:textSize="14sp"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewbotaoSair" />
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/constraintGerenciarUsers"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
+        android:background="@drawable/background_button"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.501"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintAutorizarAula">
 
         <ImageView
             android:id="@+id/imageViewGerenciarUsers"
-            android:layout_width="85dp"
-            android:layout_height="63dp"
+            android:layout_width="66dp"
+            android:layout_height="51dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.514"
@@ -52,20 +84,18 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintAutorizarSaida"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/background_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/constraintCardapio"
-        app:layout_constraintHorizontal_bias="0.396"
+        app:layout_constraintEnd_toStartOf="@+id/constraintAutorizarAula"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintAutorizarAula"
-        app:layout_constraintVertical_bias="0.165">
+        app:layout_constraintTop_toBottomOf="@+id/constraintChamada">
 
         <ImageView
             android:id="@+id/imageViewAutorizarSaida"
-            android:layout_width="85dp"
-            android:layout_height="63dp"
+            android:layout_width="71dp"
+            android:layout_height="47dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.514"
@@ -90,20 +120,18 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintAutorizarAula"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/background_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toStartOf="@+id/constraintCardapio"
-        app:layout_constraintHorizontal_bias="0.396"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintPasseCarteirinha"
-        app:layout_constraintVertical_bias="0.06">
+        app:layout_constraintTop_toBottomOf="@+id/constraintPasseCarteirinha">
 
         <ImageView
             android:id="@+id/imageViewAutorizarAula"
-            android:layout_width="85dp"
-            android:layout_height="63dp"
+            android:layout_width="71dp"
+            android:layout_height="47dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.514"
@@ -138,44 +166,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/constraintFaltas"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
-        android:background="@drawable/background_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.527"
-        app:layout_constraintStart_toEndOf="@+id/constraintPasseCarteirinha"
-        app:layout_constraintTop_toBottomOf="@+id/constraintMerenda"
-        app:layout_constraintVertical_bias="0.056">
-
-        <ImageView
-            android:id="@+id/imageViewFaltas"
-            android:layout_width="85dp"
-            android:layout_height="63dp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.457"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.087"
-            app:srcCompat="@drawable/baseline_table_restaurant_24" />
-
-        <TextView
-            android:id="@+id/textViewFaltas"
-            android:layout_width="119dp"
-            android:layout_height="45dp"
-            android:fontFamily="@font/fira_mono_bold"
-            android:gravity="center"
-            android:text="Contabilizar Faltas"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/imageViewFaltas" />
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
     <TextView
         android:id="@+id/textViewBemVindo"
         android:layout_width="wrap_content"
@@ -183,8 +173,8 @@
         android:layout_marginStart="164dp"
         android:layout_marginTop="33dp"
         android:layout_marginEnd="165dp"
-        android:text="TextView"
         android:fontFamily="@font/fira_mono_bold"
+        android:text="TextView"
         android:textColor="@color/black"
         android:textSize="20sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -192,38 +182,21 @@
         app:layout_constraintTop_toTopOf="parent" />
 
 
-    <Button
-        android:id="@+id/botaoSair"
-        android:layout_width="323dp"
-        android:layout_height="54dp"
-        android:background="@drawable/background_button"
-        android:fontFamily="@font/fira_mono_bold"
-        android:text="Sair"
-        android:textAllCaps="false"
-        android:textColor="@color/black"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintAutorizarSaida"
-        app:layout_constraintVertical_bias="0.0" />
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintChamada"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="36dp"
         android:background="@drawable/background_button"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.151"
+        app:layout_constraintEnd_toStartOf="@+id/constraintPasseCarteirinha"
+        app:layout_constraintHorizontal_bias="0.482"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.162">
+        app:layout_constraintTop_toBottomOf="@+id/textViewBemVindo">
 
         <ImageView
             android:id="@+id/imageView3"
-            android:layout_width="85dp"
-            android:layout_height="63dp"
+            android:layout_width="73dp"
+            android:layout_height="51dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.514"
@@ -239,7 +212,7 @@
             android:fontFamily="@font/fira_mono_bold"
             android:text="Chamada"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView3" />
@@ -247,20 +220,19 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintMerenda"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="36dp"
         android:background="@drawable/background_button"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.793"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.162">
+        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintStart_toEndOf="@+id/constraintPasseCarteirinha"
+        app:layout_constraintTop_toBottomOf="@+id/textViewBemVindo">
 
         <ImageView
             android:id="@+id/imageView4"
-            android:layout_width="85dp"
-            android:layout_height="63dp"
+            android:layout_width="72dp"
+            android:layout_height="49dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.514"
@@ -276,29 +248,26 @@
             android:fontFamily="@font/fira_mono_bold"
             android:text="PNAE"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageView4" />
     </androidx.constraintlayout.widget.ConstraintLayout>
 
-
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintPasseCarteirinha"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="36dp"
         android:background="@drawable/background_button"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.151"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/constraintChamada"
-        app:layout_constraintVertical_bias="0.056">
+        app:layout_constraintTop_toBottomOf="@+id/textViewBemVindo">
 
         <ImageView
             android:id="@+id/imageViewCarteirinha"
-            android:layout_width="85dp"
-            android:layout_height="63dp"
+            android:layout_width="78dp"
+            android:layout_height="55dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.514"
@@ -314,7 +283,7 @@
             android:fontFamily="@font/fira_mono_bold"
             android:text="Portaria"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:textSize="16sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageViewCarteirinha" />
@@ -322,20 +291,19 @@
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintCardapio"
-        android:layout_width="120dp"
-        android:layout_height="120dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="20dp"
         android:background="@drawable/background_button"
-        app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.527"
-        app:layout_constraintStart_toEndOf="@+id/constraintPasseCarteirinha"
-        app:layout_constraintTop_toBottomOf="@+id/constraintFaltas"
-        app:layout_constraintVertical_bias="0.06">
+        app:layout_constraintHorizontal_bias="0.454"
+        app:layout_constraintStart_toEndOf="@+id/constraintAutorizarAula"
+        app:layout_constraintTop_toBottomOf="@+id/constraintMerenda">
 
         <ImageView
             android:id="@+id/imageViewCardapio"
-            android:layout_width="85dp"
-            android:layout_height="63dp"
+            android:layout_width="72dp"
+            android:layout_height="49dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.457"
@@ -346,13 +314,13 @@
 
         <TextView
             android:id="@+id/textViewCardapio"
-            android:layout_width="119dp"
-            android:layout_height="45dp"
+            android:layout_width="104dp"
+            android:layout_height="47dp"
             android:fontFamily="@font/fira_mono_bold"
             android:gravity="center"
-            android:text="Cardápio"
+            android:text="Cardápio PNAE"
             android:textColor="@color/black"
-            android:textSize="18sp"
+            android:textSize="14sp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/imageViewCardapio" />
@@ -360,4 +328,3 @@
 
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>

@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -23,6 +24,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -68,6 +70,7 @@ public class TelaChamadaLideres extends AppCompatActivity {
     private TextView textViewSaidaDiaChamadaSEPAE;
     private ImageView imageViewEsquerdaChamadaSEPAE;
     private ImageView imageViewDireitaChamadaSEPAE;
+    private ImageView imageViewCalendarioChamadaLiderSEPAE;
 
 
     @Override
@@ -189,6 +192,7 @@ public class TelaChamadaLideres extends AppCompatActivity {
         diaSelecionado = diaAtualB();
         imageViewEsquerdaChamadaSEPAE = findViewById(R.id.imageViewEsquerdaChamadaSEPAE);
         imageViewDireitaChamadaSEPAE = findViewById(R.id.imageViewDireitaChamadaSEPAE);
+        imageViewCalendarioChamadaLiderSEPAE = findViewById(R.id.imageViewCalendarioChamadaLiderSEPAE);
 
         nomesChamadas = new ArrayList<>();
         chamdaImages = new ArrayList<>();
@@ -198,6 +202,13 @@ public class TelaChamadaLideres extends AppCompatActivity {
         actionBar.setCustomView(R.layout.custom_actionbar);
         ImageView leftImage = findViewById(R.id.leftImage);
         ImageView rightImage = findViewById(R.id.rightImage); //baixar pdf
+
+        imageViewCalendarioChamadaLiderSEPAE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendarDialog(v);
+            }
+        });
 
         leftImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -224,6 +235,35 @@ public class TelaChamadaLideres extends AppCompatActivity {
                 maisUmDia();
             }
         });
+    }
+
+    public void calendarDialog(View view) {
+        // Get Current Date
+        final Calendar c = Calendar.getInstance();
+        int mYear = c.get(Calendar.YEAR);
+        int mMonth = c.get(Calendar.MONTH);
+        int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new
+                DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month,
+                                          int dayOfMonth) {
+                        String dateText = dayOfMonth + "/" + (month + 1) + "/" + year;
+                        // openConfirmationDialog(view);
+                        Log.d("calendario", "cal " + dateText);
+                        textViewSaidaDiaChamadaSEPAE.setText(dateText);
+                        diaSelecionado = textViewSaidaDiaChamadaSEPAE.getText().toString();
+                        pegarDadosDias(turma, new Callback() {
+                            @Override
+                            public void onComplete() {
+                                setarRecyclerView(formatarData(diaSelecionado));
+                                Log.d("diasel", "dia selecionado" + diaSelecionado);
+                            }
+                        });
+                    }
+                }, mYear, mMonth, mDay);
+        datePickerDialog.show();
     }
     private void menosUmDia(){
         String diaHj = textViewSaidaDiaChamadaSEPAE.getText().toString();
