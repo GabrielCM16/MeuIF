@@ -69,7 +69,7 @@ public class TelaMerendaPessoal extends AppCompatActivity {
 
     private void carregarComponentes(){
         ActionBar actionBar = getSupportActionBar();
-        setTitle("Minha Merenda");
+        setTitle("Minhas retiradas PNAE");
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24);
         actionBar.setDisplayHomeAsUpEnabled(true);
 
@@ -154,7 +154,12 @@ public class TelaMerendaPessoal extends AppCompatActivity {
     }
 
     private void atualizarRecycler(List<AlunoMerenda> dias){
-        AdapterMerenda adapter = new AdapterMerenda(dias);
+        List<AlunoMerenda> diasInvertidos = new ArrayList<>();
+        for (int i = dias.size() - 1; i >= 0; i--) {
+            AlunoMerenda elemento = dias.get(i);
+            diasInvertidos.add(elemento);
+        }
+        AdapterMerenda adapter = new AdapterMerenda(diasInvertidos);
 
 
         //Configurar RecyclerView

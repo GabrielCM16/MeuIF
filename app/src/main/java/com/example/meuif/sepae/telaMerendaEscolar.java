@@ -14,6 +14,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
+import android.app.DatePickerDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
@@ -101,6 +103,7 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
     private String turmaSelect = "Todas";
     private int NFiltros = 0;
     private TextView saidaNumeroFiltros;
+    private ImageView imageViewCalendarioPNAESEPAE;
 
 
     @SuppressLint("MissingInflatedId")
@@ -132,6 +135,7 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
         textViewSaidaDiaRegistrosPNAESEPAE2.setText(diaAtualB());
         imageViewEsquerdaPNAESEPAE2 = findViewById(R.id.imageViewEsquerdaPNAESEPAE2);
         imageViewDireitaPNAESEPAE2 = findViewById(R.id.imageViewDireitaPNAESEPAE2);
+        imageViewCalendarioPNAESEPAE = findViewById(R.id.imageViewCalendarioPNAESEPAE);
         entradaMatriculaRegistroMerenda = findViewById(R.id.entradaMatriculaRegistroMerenda);
         saidaNumeroFiltros = findViewById(R.id.saidaNumeroFiltros);
         constraintRegistrarRegistroPNAE = findViewById(R.id.constraintRegistrarRegistroPNAE);
@@ -140,6 +144,13 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
         // Inicialize o MediaPlayer com o arquivo de som do sucesso (success_sound.mp3 ou success_sound.wav)
         somErro = MediaPlayer.create(getApplicationContext(), R.raw.error);
         somSucess = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
+
+        imageViewCalendarioPNAESEPAE.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                calendarDialog(v);
+            }
+        });
 
         constraintRegistrarRegistroPNAE.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -207,6 +218,28 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
                 maisUmDia();
             }
         });
+    }
+
+    public void calendarDialog(View view) {
+        // Get Current Date
+        final Calendar c = Calendar.getInstance();
+        int mYear = c.get(Calendar.YEAR);
+        int mMonth = c.get(Calendar.MONTH);
+        int mDay = c.get(Calendar.DAY_OF_MONTH);
+
+        DatePickerDialog datePickerDialog = new DatePickerDialog(this, new
+                DatePickerDialog.OnDateSetListener() {
+                    @Override
+                    public void onDateSet(DatePicker view, int year, int month,
+                                          int dayOfMonth) {
+                       String dateText = dayOfMonth + "/" + (month + 1) + "/" + year;
+                       // openConfirmationDialog(view);
+                        Log.d("calendario", "cal " + dateText);
+                        textViewSaidaDiaRegistrosPNAESEPAE2.setText(dateText);
+                        atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
+                    }
+                }, mYear, mMonth, mDay);
+        datePickerDialog.show();
     }
 
     private void mostrarFragmentFiltros(){

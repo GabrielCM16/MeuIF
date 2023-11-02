@@ -78,7 +78,7 @@ public class Informacoes_pessoais extends Fragment {
 
 
 
-        teste.setText("Falhas, Erros ou Sujestões, Contate-nos");
+        teste.setText("Falhas, Erros ou Sugestões, Contate-nos");
         db = FirebaseFirestore.getInstance();
         botao.setOnClickListener(new View.OnClickListener() {
             @Override

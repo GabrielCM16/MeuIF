@@ -15,7 +15,7 @@
         android:elegantTextHeight="true"
         android:fontFamily="@font/fira_mono_bold"
         android:freezesText="false"
-        android:text="Ola!\n Esta é a primeira versão do aplicativo MeuIF. Caso encontre erros, falhas ou queira deixar sugestões/feedback, agradecemos!\n\n entre em contato pelo email:\n\n gabrielcostademoraes13@gmail.com\n ou\n heloisaraquel1304@gmail.com"
+        android:text="."
         android:textAlignment="center"
         android:textColor="@color/black"
         android:textSize="24sp"
