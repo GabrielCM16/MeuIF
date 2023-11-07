@@ -55,7 +55,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toTopOf="@+id/textViewRegistrarEntradaQRcodeFrontal"
                 app:layout_constraintStart_toEndOf="@+id/imageViewRegistrarEntradaQRcodeFrontal"
-                app:srcCompat="@drawable/baseline_credit_card_24" />
+                app:srcCompat="@drawable/baseline_qr_code_scanner_24" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <TextView
@@ -204,7 +204,7 @@
                 android:layout_height="wrap_content"
                 app:layout_constraintBottom_toTopOf="@+id/textViewRegistrarEntradaQRcode"
                 app:layout_constraintStart_toEndOf="@+id/imageViewRegistrarEntradaQRcode"
-                app:srcCompat="@drawable/baseline_credit_card_24" />
+                app:srcCompat="@drawable/baseline_qr_code_scanner_24" />
         </androidx.constraintlayout.widget.ConstraintLayout>
 
         <ImageView
