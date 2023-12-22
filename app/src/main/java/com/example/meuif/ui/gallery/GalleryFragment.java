@@ -4,6 +4,7 @@ package com.example.meuif.ui.gallery;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.provider.DocumentsContract;
@@ -38,22 +39,19 @@ import com.journeyapps.barcodescanner.BarcodeEncoder;
 
 import com.example.meuif.Notification;
 
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+
 public class GalleryFragment extends Fragment {
 
     private FragmentGalleryBinding binding;
-    private TextView saidaTempo;
     private ImageView qrCode;
-    private Button botao;
     private FirebaseFirestore db;
-    private long finalContador = 20000; //milisegundos (15 segundos)
-    private long intervaloContador = 1000; //milisegundos (1 segundo)
-    private boolean apertado = false;
     private TextView textNome;
     private TextView textMatricula;
     private TextView textCurso;
     private Context contex;
-    private CountDownTimer countDownTimer;
-    private long auxVerificarQR;
     private String possivelStatus;
     private Boolean flag = true;
     private Notification notification;
@@ -61,13 +59,9 @@ public class GalleryFragment extends Fragment {
     public String nome;
     public String curso;
     public Tela_Principal tela_principal;
-    private Switch switchCarteirinha;
-    private Boolean qualCarteirinha;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        GalleryViewModel galleryViewModel =
-                new ViewModelProvider(this).get(GalleryViewModel.class);
 
         binding = FragmentGalleryBinding.inflate(inflater, container, false);
 
@@ -76,18 +70,11 @@ public class GalleryFragment extends Fragment {
         View root = binding.getRoot();
 
         db = FirebaseFirestore.getInstance();
-        saidaTempo = root.findViewById(R.id.saidaTempo);
         qrCode = root.findViewById(R.id.qrcode);
         textNome = root.findViewById(R.id.textNome);
         textCurso = root.findViewById(R.id.textCurso);
         textMatricula = root.findViewById(R.id.textMatricula);
-        switchCarteirinha = root.findViewById(R.id.switchCarteirinha);
-        qualCarteirinha = switchCarteirinha.isChecked();
-        botao = root.findViewById(R.id.button);
         qrCode.setVisibility(View.INVISIBLE);
-        botao.setVisibility(View.VISIBLE);
-
-
 
         contex = root.getContext();
 
@@ -113,52 +100,31 @@ public class GalleryFragment extends Fragment {
         textMatricula.setText("Matrícula: " + matricula);
         textCurso.setText("Curso: Ensino Médio Integrado ao Técnico em " + curso);
 
-        botao.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                atualizarStatus(new Callback() {
-                    @Override
-                    public void onComplete() {
-                        atualizarFlag(matricula ,new Callback() {
-                            @Override
-                            public void onComplete() {
-                                possivelStatus = recuperarDados("possivelStatus");
-                                iniciarTempo(view);
-                            }
-                        });
-                    }
-                });
+//        botao.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                atualizarStatus(new Callback() {
+//                    @Override
+//                    public void onComplete() {
+//                        atualizarFlag(matricula ,new Callback() {
+//                            @Override
+//                            public void onComplete() {
+//                                possivelStatus = recuperarDados("possivelStatus");
+//                                iniciarTempo(view);
+//                            }
+//                        });
+//                    }
+//                });
+//
+//            }
+//        });
 
-            }
-        });
+        gerarEExibirOuSalvarQR();
 
         View view = getView();
 
-        switchCarteirinha.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                qualCarteirinha = isChecked;
-                apertado = false;
-                stopContador();
-                atualizarStatus(new Callback() {
-                    @Override
-                    public void onComplete() {
-                        atualizarFlag(matricula ,new Callback() {
-                            @Override
-                            public void onComplete() {
-                                possivelStatus = recuperarDados("possivelStatus");
-                                iniciarTempo(view);
-                            }
-                        });
-                    }
-                });
-            }
-        });
-
-
         return root;
     }
-
 
 
     public String recuperarDados(String chave){
@@ -172,72 +138,13 @@ public class GalleryFragment extends Fragment {
         editor.putString(chave, valor);
         editor.commit();
     }
-
-
-
-    private void contador(long finalCont, long intervaloCont){
-        countDownTimer = new CountDownTimer(finalCont, intervaloCont) {
-
-            public void onTick(long millisUntilFinished) {
-                long segundos = millisUntilFinished / 1000;
-                long minutos = millisUntilFinished / 60000;
-                auxVerificarQR = segundos;
-                if (auxVerificarQR >= 1){
-                    String auxStatus = possivelStatus;
-                    Boolean auxFlag = flag;
-                    atualizarStatus(new Callback() {
-                        @Override
-                        public void onComplete() {
-                            possivelStatus = recuperarDados("possivelStatus");
-                            if (!possivelStatus.equals(auxStatus)){
-                                notification.showNotification(getContext(), "Ola! " + nome, "Passe Realizado");
-                            }
-                        }
-                    });
-
-                    atualizarFlag(matricula ,new Callback() {
-                        @Override
-                        public void onComplete() {
-                            flag = Boolean.parseBoolean(recuperarDados("flag"));
-                            Log.d("flag", "a" + flag + " b "+ auxFlag);
-                            if (flag != auxFlag){
-                                notification.showNotification(getContext(), "Ola! " + nome, "Passe da Merenda Realizado, Bom Lanche!");
-                            }
-                        }
-                    });
-                }
-                saidaTempo.setText("tempo restante: " + minutos + ":" + segundos);
-            }
-
-            public void onFinish() {
-                saidaTempo.setText("Fim!");
-                qrCode.setVisibility(View.INVISIBLE);
-                botao.setVisibility(View.VISIBLE);
-                apertado = false;
-            }
-        }.start();
-
-    }
-
     private interface Callback {
         void onComplete();
     }
-
-    private void stopContador() {
-        if (countDownTimer != null) {
-            countDownTimer.cancel();
-        }
-    }
-
     @Override
     public void onPause() {
         super.onPause();
-        // Interrompa o contador quando o fragmento estiver em pausa
-        stopContador();
     }
-
-
-
     private void atualizarStatus(Callback callback){
         String nMatricula = recuperarDados("matricula");
 
@@ -261,10 +168,7 @@ public class GalleryFragment extends Fragment {
                 }
             }
         });
-
-
     }
-
     private void atualizarFlag(String nMatricula, Callback callback ){
         DocumentReference docRefec = db.collection("Usuarios").document("Alunos").collection(nMatricula).document("merendaPessoal");
         docRefec.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
@@ -288,69 +192,61 @@ public class GalleryFragment extends Fragment {
         });
     }
 
-    public void iniciarTempo(View view){
-        qualCarteirinha = switchCarteirinha.isChecked();
-        if (!apertado) {
-            apertado = true;
-            botao.setVisibility(View.INVISIBLE);
-            contador(finalContador, intervaloContador);
-            String qr = stringQRcode();
-            if (!qualCarteirinha){
-                gerarQR(qr);
-            } else {
-                gerarBarras(qr);
-            }
+    public void gerarEExibirOuSalvarQR() {
+        matricula = recuperarDados("matricula");
 
+        String nomeDoArquivo = "QRCode_" + matricula + ".png";
+
+        // Tenta carregar a imagem do armazenamento interno
+        Bitmap imagemCarregada = carregarImagemDoArmazenamentoInterno(nomeDoArquivo);
+
+        if (imagemCarregada == null) {
+            // Se a imagem não existe, gera uma nova e salva
+            try {
+                BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
+                Bitmap bitmap = barcodeEncoder.encodeBitmap(matricula, BarcodeFormat.QR_CODE, 500, 500);
+
+                // Salvar a imagem internamente no diretório de arquivos privados
+                salvarImagemNoArmazenamentoInterno(bitmap, nomeDoArquivo);
+
+                // Exibir a imagem no ImageView
+                ImageView imageViewQrCode = (ImageView) qrCode;
+                imageViewQrCode.setImageBitmap(bitmap);
+                qrCode.setVisibility(View.VISIBLE);
+
+                // Notificar o usuário sobre o salvamento
+                Toast.makeText(getContext(), "QR Code gerado e salvo como " + nomeDoArquivo, Toast.LENGTH_SHORT).show();
+            } catch (Exception e) {
+                Toast.makeText(getContext(), "Ocorreu um Erro ao gerar o QR Code", Toast.LENGTH_SHORT).show();
+            }
         } else {
-            abrirToast("QR code já gerado!");
+            // Se a imagem já existe, exibe no ImageView
+            ImageView imageViewQrCode = (ImageView) qrCode;
+            imageViewQrCode.setImageBitmap(imagemCarregada);
+            qrCode.setVisibility(View.VISIBLE);
         }
     }
 
-    private void gerarBarras(String gerar){
+    private void salvarImagemNoArmazenamentoInterno(Bitmap bitmap, String nomeDoArquivo) {
         try {
-            BarcodeFormat formato = BarcodeFormat.CODE_128; // Escolha o formato do código de barras desejado
-            int largura = 400; // Largura desejada em pixels
-            int altura = 200; // Altura desejada em pixels
-
-            MultiFormatWriter multiFormatWriter = new MultiFormatWriter();
-            BitMatrix bitMatrix = multiFormatWriter.encode(gerar, formato, largura, altura);
-
-            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            Bitmap bitmap = barcodeEncoder.createBitmap(bitMatrix);
-
-            ImageView imageViewCodigoBarras = (ImageView) qrCode;
-            imageViewCodigoBarras.setImageBitmap(bitmap);
-            qrCode.setVisibility(View.VISIBLE);
-        } catch (Exception e) {
+            FileOutputStream outputStream = requireContext().openFileOutput(nomeDoArquivo, Context.MODE_PRIVATE);
+            bitmap.compress(Bitmap.CompressFormat.PNG, 100, outputStream);
+            outputStream.close();
+        } catch (IOException e) {
             e.printStackTrace();
         }
     }
 
-    public String stringQRcode(){
-        long currentAtual = System.currentTimeMillis();
-        String saidaQR = matricula + "/" + String.valueOf(currentAtual);
-        return matricula;
-    }
-
-    public void gerarQR(String textoAGerar){
+    private Bitmap carregarImagemDoArmazenamentoInterno(String nomeDoArquivo) {
         try {
-            BarcodeEncoder barcodeEncoder = new BarcodeEncoder();
-            Bitmap bitmap = barcodeEncoder.encodeBitmap(textoAGerar, BarcodeFormat.QR_CODE, 500, 500);
-            ImageView imageViewQrCode = (ImageView) qrCode;
-            imageViewQrCode.setImageBitmap(bitmap);
-            qrCode.setVisibility(View.VISIBLE);
-        } catch(Exception e) {
-            Toast.makeText(getContext(), "Ocorreu um Erro ao gerar o QR Code", Toast.LENGTH_SHORT).show();
+            FileInputStream inputStream = getContext().openFileInput(nomeDoArquivo);
+            return BitmapFactory.decodeStream(inputStream);
+        } catch (IOException e) {
+            // Se ocorrer uma exceção, a imagem não existe
+            return null;
         }
     }
 
-    public void abrirToast(String texto){
-        Toast.makeText(
-                contex,
-                texto,
-                Toast.LENGTH_LONG
-        ).show();
-    }
 
     @Override
     public void onDestroyView() {

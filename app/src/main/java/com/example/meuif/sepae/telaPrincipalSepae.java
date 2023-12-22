@@ -209,10 +209,7 @@ public class telaPrincipalSepae extends AppCompatActivity {
         String nomeCompleto = recuperarDados("nome");
         String[] primeiroNome = nomeCompleto.split(" ");
         textViewBemVindo.setText(ola + primeiroNome[0] + "!");
-
     }
-
-
 
     public String recuperarDados(String chave){
         SharedPreferences sharedPreferences = getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);

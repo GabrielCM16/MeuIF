@@ -7,49 +7,6 @@
     android:background="@color/azulFundo"
     tools:context=".MainActivity">
 
-    <TextView
-        android:id="@+id/textViewSaidaDiaAcessosCarteirinhaSEPAE3"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/fira_mono_bold"
-        android:text="Código de Barras"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.0"
-        app:layout_constraintStart_toEndOf="@+id/switchCarteirinha"
-        app:layout_constraintTop_toBottomOf="@+id/textCurso" />
-
-    <TextView
-        android:id="@+id/textViewSaidaDiaAcessosCarteirinhaSEPAE2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginStart="28dp"
-        android:layout_marginTop="8dp"
-        android:fontFamily="@font/fira_mono_bold"
-        android:text="QR-Code"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        app:layout_constraintEnd_toStartOf="@+id/switchCarteirinha"
-        app:layout_constraintHorizontal_bias="1.0"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textCurso" />
-
-    <TextView
-        android:id="@+id/saidaTempo"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Validade: "
-        android:textColor="#D50000"
-        android:textSize="16sp"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.799" />
-
     <ImageView
         android:id="@+id/qrcode"
         android:layout_width="300dp"
@@ -131,32 +88,5 @@
         app:layout_constraintHorizontal_bias="0.325"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textMatricula" />
-
-    <Button
-        android:id="@+id/button"
-        android:layout_width="161dp"
-        android:layout_height="52dp"
-        android:background="@drawable/background_button"
-        android:backgroundTint="@color/azulMaisEscuro"
-        android:backgroundTintMode="add"
-        android:text="Gerar código QR"
-        android:textAllCaps="false"
-        android:textColor="@color/black"
-        android:textSize="14sp"
-        android:visibility="visible"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <Switch
-        android:id="@+id/switchCarteirinha"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.432"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textCurso" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
