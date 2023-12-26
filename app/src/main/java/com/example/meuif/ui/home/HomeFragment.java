@@ -23,6 +23,7 @@ import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
+import androidx.navigation.fragment.NavHostFragment;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -35,6 +36,7 @@ import com.example.meuif.Tela_Principal;
 import com.example.meuif.databinding.FragmentHomeBinding;
 import com.example.meuif.faltasPessoais.telaVerFaltasPessoais;
 import com.example.meuif.tela_chamada_dia;
+import com.example.meuif.ui.gallery.CarteirinhaVazia;
 import com.github.mikephil.charting.charts.PieChart;
 import com.github.mikephil.charting.data.PieData;
 import com.github.mikephil.charting.data.PieDataSet;
@@ -87,15 +89,14 @@ public class HomeFragment extends Fragment {
     private ConstraintLayout layoutFaltas;
     private ConstraintLayout layoutMerenda;
 
+    private static boolean codigoExecutado = false;
+
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-
-
-
         progressBarCentral = root.findViewById(R.id.progressBarCentral);
 
         FloatingActionButton fabFragmentB = root.findViewById(R.id.fab_fragment_b);
@@ -174,6 +175,20 @@ public class HomeFragment extends Fragment {
         });
 
         return root;
+    }
+    @Override
+    public void onResume() {
+        super.onResume();
+        // O código aqui será executado toda vez que o fragmento se tornar visível novamente
+
+        Log.d("SeuFragmento", "O fragmento está visível novamente");
+        String qualTelaIniciar = recuperarDados("primeiraTela");
+
+        if (!codigoExecutado && qualTelaIniciar.equals("carteirinha")){
+            Intent intent = new Intent(getContext(), CarteirinhaVazia.class);
+            codigoExecutado = true;
+            startActivity(intent);
+        }
     }
 
     private void telaMerendaPessoal(){
