@@ -1,14 +1,21 @@
 package com.example.meuif.sepae.Merenda;
 
 import androidx.annotation.NonNull;
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -57,7 +64,6 @@ import java.util.Locale;
 import java.util.Map;
 
 public class GraficosMerenda extends AppCompatActivity {
-    public static final int REQUEST_STORAGE_PERMISSION = 123;
     FirebaseFirestore db;
     // variable for our bar chart
     BarChart barChart;
@@ -74,6 +80,8 @@ public class GraficosMerenda extends AppCompatActivity {
     private String turmaSelecionado = "";
     private ImageView baixargraficoPNAE;
     private Map<String, String> turmasAlunos = new HashMap<>();
+
+    private static final int REQUEST_PERMISSION_CODE = 4096;
 
 
     @Override
@@ -93,58 +101,107 @@ public class GraficosMerenda extends AppCompatActivity {
         baixargraficoPNAE.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                someMethodRequiringPermissions();
+                // Verifique se a permissão já foi concedida
+                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (checkPermission()) {
+                        baixarGrafico();
+                    } else {
+                        // Solicite permissão se ainda não foi concedida
+                        requestPermission();
+                    }
+                }
             }
         });
-
     }
     private interface Callback {
         void onComplete();
     }
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private boolean checkPermission() {
+        return ContextCompat.checkSelfPermission(GraficosMerenda.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+                == PackageManager.PERMISSION_GRANTED;
+    }
+
+    @RequiresApi(api = Build.VERSION_CODES.M)
+    private void requestPermission() {
+        Log.d("request", "requestPermission");
+
+        // Verifique se deve mostrar uma justificativa
+        if (ActivityCompat.shouldShowRequestPermissionRationale(GraficosMerenda.this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
+            // Exiba uma justificativa para o usuário
+            // Isso é opcional, mas pode ser uma boa prática para explicar a necessidade da permissão
+            showPermissionRationale();
+        } else {
+            // Solicite permissão se ainda não foi concedida
+            ActivityCompat.requestPermissions(GraficosMerenda.this,
+                    new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    REQUEST_PERMISSION_CODE);
+            ActivityCompat.requestPermissions(GraficosMerenda.this, new String[]{Manifest.permission.MANAGE_EXTERNAL_STORAGE}, REQUEST_PERMISSION_CODE);
+
+        }
+    }
+
+    // Método para exibir uma justificativa para a solicitação de permissão
+    private void showPermissionRationale() {
+        AlertDialog.Builder builder = new AlertDialog.Builder(this);
+        builder.setTitle("Permissão Necessária");
+        builder.setMessage("É necessário conceder permissão para salvar na galeria. Por favor, aceite a permissão.");
+
+        // Adicione um botão "OK" para fechar a caixa de diálogo
+        builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Solicite permissão após a explicação
+                ActivityCompat.requestPermissions(GraficosMerenda.this,
+                        new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                        REQUEST_PERMISSION_CODE);
+            }
+        });
+
+        // Adicione um botão "Cancelar" para fechar a caixa de diálogo sem solicitar permissão
+        builder.setNegativeButton("Cancelar", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int which) {
+                // Trate a situação em que o usuário cancelou a solicitação
+                Toast.makeText(GraficosMerenda.this, "Permissão negada. Não é possível salvar na galeria.", Toast.LENGTH_SHORT).show();
+            }
+        });
+
+        // Mostre a caixa de diálogo
+        builder.show();
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        Log.d("banana", "request " + requestCode + " permissions" + permissions);
+        Log.d("banana", "request " + REQUEST_PERMISSION_CODE);
+        if (requestCode == REQUEST_PERMISSION_CODE) { // Checking if it's the same request we made earlier
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permission granted! Do what you need to do.
+                baixarGrafico();
+            } else {
+                Log.d("banana", "permissao negada");
+                Toast.makeText(GraficosMerenda.this, "Permissão negada. Não é possível salvar na galeria.", Toast.LENGTH_SHORT).show();
+                baixarGrafico();
+            }
+        }
+    }
+
 
     private void baixarGrafico(){
         progressBarGrafico.setVisibility(View.VISIBLE);
         Toast.makeText(this, "Preparando Gráfico para download...", Toast.LENGTH_SHORT).show();
 
         String nomeArquivo = "PNAE" + turmaSelecionado + mesSelecionado;
-        barChart.saveToGallery(nomeArquivo, 100); // O segundo parâmetro é a qualidade da imagem (0-100).
+
+        //funciona apenas para android antigos
+        //barChart.saveToGallery(nomeArquivo, 100); // O segundo parâmetro é a qualidade da imagem (0-100).
+
+        ChartUtils.saveChartToGallery(this, barChart, nomeArquivo);
+
         Toast.makeText(this, "Salvo na galeria", Toast.LENGTH_SHORT).show();
         progressBarGrafico.setVisibility(View.INVISIBLE);
-    }
-
-    private void someMethodRequiringPermissions() {
-        String[] perms = {Manifest.permission.WRITE_EXTERNAL_STORAGE};
-        if (EasyPermissions.hasPermissions(this, perms)) {
-           baixarGrafico();
-        } else {
-            // A permissão ainda não foi concedida, solicite-a
-            EasyPermissions.requestPermissions(
-                    new PermissionRequest.Builder(this, REQUEST_STORAGE_PERMISSION, perms)
-                            .setRationale("Precisamos da permissão para acessar o armazenamento.")
-                            .setPositiveButtonText("Conceder")
-                            .setNegativeButtonText("Cancelar")
-                          //  .setTheme(R.style.AppTheme)
-                            .build()
-            );
-        }
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        // Passe os resultados para EasyPermissions para tratamento
-        EasyPermissions.onRequestPermissionsResult(requestCode, permissions, grantResults, this);
-    }
-
-    @AfterPermissionGranted(REQUEST_STORAGE_PERMISSION)
-    public void onPermissionGranted() {
-        // A permissão foi concedida, você pode prosseguir com a ação desejada.
-        baixarGrafico();
-    }
-
-    public void onPermissionDenied() {
-        // O usuário negou a permissão, você pode exibir uma mensagem ou tomar outra ação apropriada.
-        Toast.makeText(this, "A permissão foi negada.", Toast.LENGTH_SHORT).show();
     }
 
 
