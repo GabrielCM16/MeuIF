@@ -216,8 +216,37 @@ public class tela_entrar extends AppCompatActivity {
             abrirSnakbar(mensagens[0], v);
             progressBar.setVisibility(View.INVISIBLE);
         } else {
-            autenticarUsuario(v);
+            //autenticarUsuario(v);
+            conferirEmail(v);
         }
+    }
+
+    private void conferirEmail(View v){
+        String email = entradaEmail.getText().toString();
+
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(matricula).document("id");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String mail = document.getString("email");
+                        if (email.equals(mail)) {
+                            //email correto
+                            autenticarUsuario(v);
+                        } else {
+                            abrirSnakbar("email incorreto", v);
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
+                }
+            }
+        });
     }
 
     private void autenticarUsuario(View v){

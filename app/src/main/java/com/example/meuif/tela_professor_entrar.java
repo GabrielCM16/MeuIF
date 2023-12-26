@@ -87,7 +87,8 @@ public class tela_professor_entrar extends AppCompatActivity {
                     criarConta(view);
                 } else {
                     progressBar.setVisibility(View.VISIBLE);
-                    logarUsuario(view);
+                    //logarUsuario(view);
+                    verificarEmail(view);
                 }
             }
         });
@@ -148,6 +149,34 @@ public class tela_professor_entrar extends AppCompatActivity {
                         String SEPAE = document.getString("SEPAE");
                         salvarDados("SEPAE", SEPAE);
 
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
+                }
+            }
+        });
+    }
+
+    private void verificarEmail(View v){
+        String email = entradaEmail.getText().toString();
+
+        DocumentReference docRef = db.collection("Usuarios").document("Professores").collection(siape).document("id");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String mail = document.getString("email");
+                        if (email.equals(mail)) {
+                            //email correto
+                            logarUsuario(v);
+                        } else {
+                            abrirSnakbar("email incorreto", v);
+                            progressBar.setVisibility(View.INVISIBLE);
+                        }
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
                     }
