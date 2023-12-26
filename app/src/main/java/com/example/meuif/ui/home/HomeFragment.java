@@ -21,6 +21,8 @@ import androidx.annotation.NonNull;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DefaultItemAnimator;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -88,11 +90,11 @@ public class HomeFragment extends Fragment {
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel =
-                new ViewModelProvider(this).get(HomeViewModel.class);
 
         binding = FragmentHomeBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
+
+
 
         progressBarCentral = root.findViewById(R.id.progressBarCentral);
 
@@ -458,7 +460,7 @@ public class HomeFragment extends Fragment {
             pieChart.setTransparentCircleRadius(0f);
 
             pieChart.getDescription().setEnabled(false);
-            pieChart.animateY(3000);
+            pieChart.animateY(1500);
             pieChart.setHoleColor(Color.parseColor("#2196F3"));
             pieChart.invalidate();
         }

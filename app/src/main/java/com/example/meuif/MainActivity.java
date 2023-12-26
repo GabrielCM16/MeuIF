@@ -2,6 +2,8 @@ package com.example.meuif;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.annotation.SuppressLint;
 import android.content.Context;
@@ -46,7 +48,6 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
 
         entrada = findViewById(R.id.entradaSIAPE);
         progressBar = findViewById(R.id.progressBar);

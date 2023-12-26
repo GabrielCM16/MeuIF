@@ -55,8 +55,5 @@ dependencies {
     implementation 'com.github.PhilJay:MPAndroidChart:v3.1.0'
     implementation 'androidx.preference:preference:1.2.0'
     implementation 'pub.devrel:easypermissions:3.0.0'
-
-
-
-
+    implementation("androidx.core:core-splashscreen:1.0.0")
 }

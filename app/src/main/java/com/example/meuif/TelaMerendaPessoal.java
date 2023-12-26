@@ -13,6 +13,7 @@ import androidx.recyclerview.widget.RecyclerView;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -72,6 +73,12 @@ public class TelaMerendaPessoal extends AppCompatActivity {
         setTitle("Minhas retiradas PNAE");
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24);
         actionBar.setDisplayHomeAsUpEnabled(true);
+
+        if (actionBar != null) {
+            // Defina a cor de background desejada (por exemplo, cor vermelha)
+            ColorDrawable colorDrawable = new ColorDrawable(0xff23729a);
+            actionBar.setBackgroundDrawable(colorDrawable);
+        }
 
         layoutCarteirinha = findViewById(R.id.constraintIrCarteirinha);
         db = FirebaseFirestore.getInstance();

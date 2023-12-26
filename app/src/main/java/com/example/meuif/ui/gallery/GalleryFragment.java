@@ -22,6 +22,9 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.NavGraph;
+import androidx.navigation.Navigation;
 
 import com.example.meuif.R;
 import com.example.meuif.Tela_Principal;
@@ -59,6 +62,8 @@ public class GalleryFragment extends Fragment {
     public String nome;
     public String curso;
     public Tela_Principal tela_principal;
+    private Switch switchPrimeiraTela;
+    private int startDestinationId;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -75,26 +80,55 @@ public class GalleryFragment extends Fragment {
         textCurso = root.findViewById(R.id.textCurso);
         textMatricula = root.findViewById(R.id.textMatricula);
         qrCode.setVisibility(View.INVISIBLE);
+        switchPrimeiraTela = root.findViewById(R.id.switchPrimeiraTela);
 
         contex = root.getContext();
 
         nome = recuperarDados("nome");
         matricula = recuperarDados("matricula");
         curso = recuperarDados("curso");
-        atualizarStatus(new Callback() {
+
+        String qualTelaIniciar = recuperarDados("primeiraTela");
+
+        if (qualTelaIniciar.equals("carteirinha")){
+            switchPrimeiraTela.setChecked(true);
+        }else {
+            switchPrimeiraTela.setChecked(false);
+        }
+
+        switchPrimeiraTela.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
             @Override
-            public void onComplete() {
-                possivelStatus = recuperarDados("possivelStatus");
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+
+                if (isChecked){
+                    salvarDados("primeiraTela", "carteirinha");
+                    Log.d("telachamada", "carteirinha");
+                    startDestinationId = R.id.nav_gallery;
+                } else{
+                    salvarDados("primeiraTela", "home");
+                    startDestinationId = R.id.nav_home;
+                }
+
 
             }
         });
 
-        atualizarFlag(matricula ,new Callback() {
-            @Override
-            public void onComplete() {
-                flag = Boolean.parseBoolean(recuperarDados("flag"));
-            }
-        });
+
+
+//        atualizarStatus(new Callback() {
+//            @Override
+//            public void onComplete() {
+//                possivelStatus = recuperarDados("possivelStatus");
+//
+//            }
+//        });
+//
+//        atualizarFlag(matricula ,new Callback() {
+//            @Override
+//            public void onComplete() {
+//                flag = Boolean.parseBoolean(recuperarDados("flag"));
+//            }
+//        });
 
         textNome.setText("Nome: " + nome);
         textMatricula.setText("Matrícula: " + matricula);
