@@ -16,6 +16,7 @@ import android.app.AlertDialog;
 import android.app.DatePickerDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
@@ -123,6 +124,11 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         sucessPlayer = MediaPlayer.create(getApplicationContext(), R.raw.sucess);
 
         ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            // Defina a cor de background desejada (por exemplo, cor vermelha)
+            ColorDrawable colorDrawable = new ColorDrawable(0xff23729a);
+            actionBar.setBackgroundDrawable(colorDrawable);
+        }
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setCustomView(R.layout.custom_actionbar);
         TextView titleText = findViewById(R.id.titleText);

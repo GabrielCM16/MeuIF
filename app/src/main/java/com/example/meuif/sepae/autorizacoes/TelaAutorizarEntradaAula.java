@@ -16,6 +16,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.util.Log;
@@ -111,6 +112,11 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
         constraintRegistrarEntradaQRcode = findViewById(R.id.constraintRegistrarEntradaQRcode);
         progressBarRegistrarEntrada.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            // Defina a cor de background desejada (por exemplo, cor vermelha)
+            ColorDrawable colorDrawable = new ColorDrawable(0xff23729a);
+            actionBar.setBackgroundDrawable(colorDrawable);
+        }
         setTitle("Autorizar Entrada Atrasada");
         // Adiciona um ícone de ação à direita
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação

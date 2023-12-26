@@ -10,6 +10,7 @@ import androidx.fragment.app.FragmentTransaction;
 import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -57,6 +58,11 @@ public class GestaoUsuarios extends AppCompatActivity {
         progressBarAlunosTotal.getProgressDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
         setTitle("Gestão de Usuários");
         ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            // Defina a cor de background desejada (por exemplo, cor vermelha)
+            ColorDrawable colorDrawable = new ColorDrawable(0xff23729a);
+            actionBar.setBackgroundDrawable(colorDrawable);
+        }
         actionBar.setHomeAsUpIndicator(R.drawable.baseline_arrow_back_ios_24); // Define o ícone de ação
         actionBar.setDisplayHomeAsUpEnabled(true); // Habilita o botão de navegação
 

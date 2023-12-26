@@ -1,6 +1,7 @@
 package com.example.meuif;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -12,6 +13,7 @@ import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.graphics.PorterDuff;
 import android.graphics.Typeface;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.text.Spannable;
 import android.text.SpannableStringBuilder;
@@ -19,6 +21,7 @@ import android.text.Spanned;
 import android.text.style.StyleSpan;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -48,6 +51,23 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setDisplayShowTitleEnabled(false);
+
+            // Inflar o layout personalizado
+            actionBar.setDisplayShowCustomEnabled(true);
+            LayoutInflater inflater = (LayoutInflater) getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+            View customActionBarView = inflater.inflate(R.layout.action_bar_logo_view, null);
+
+            // Defina o layout personalizado na ActionBar
+            actionBar.setCustomView(customActionBarView);
+
+            // Defina a cor de background desejada (por exemplo, cor vermelha)
+            ColorDrawable colorDrawable = new ColorDrawable(0xff23729a);
+            actionBar.setBackgroundDrawable(colorDrawable);
+        }
 
         entrada = findViewById(R.id.entradaSIAPE);
         progressBar = findViewById(R.id.progressBar);

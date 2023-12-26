@@ -18,6 +18,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.MenuItem;
@@ -198,6 +199,11 @@ public class TelaChamadaLideres extends AppCompatActivity {
         chamdaImages = new ArrayList<>();
 
         ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            // Defina a cor de background desejada (por exemplo, cor vermelha)
+            ColorDrawable colorDrawable = new ColorDrawable(0xff23729a);
+            actionBar.setBackgroundDrawable(colorDrawable);
+        }
         actionBar.setDisplayShowCustomEnabled(true);
         actionBar.setCustomView(R.layout.custom_actionbar);
         ImageView leftImage = findViewById(R.id.leftImage);
