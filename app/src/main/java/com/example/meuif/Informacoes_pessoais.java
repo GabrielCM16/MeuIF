@@ -4,8 +4,11 @@ import static com.google.common.collect.ComparisonChain.start;
 
 import android.app.Activity;
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.graphics.Color;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 
@@ -16,15 +19,19 @@ import androidx.fragment.app.Fragment;
 
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.widget.VideoView;
 
 import com.example.meuif.databinding.FragmentInformacoesPessoaisBinding;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
@@ -44,15 +51,14 @@ import java.util.TimeZone;
 
 public class Informacoes_pessoais extends Fragment {
 
-    private TextView teste;
+    private TextView mostrarEmail;
+    private TextView mostrarNome;
+    private TextView mostrarIDUser;
+    private TextView mostrarTurma;
+    private TextView mostrarMatricula;
     private FirebaseFirestore db;
     private FragmentInformacoesPessoaisBinding binding;
-    private Button botao;
-    private long tempoValidade = 30000;
-    private MediaPlayer mediaPlayer;
-    TextView textView;
-    final Informacoes_pessoais activity= this;
-
+    private VideoView vv;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -66,150 +72,104 @@ public class Informacoes_pessoais extends Fragment {
         // Inflate the layout for this fragment
         binding = FragmentInformacoesPessoaisBinding.inflate(inflater, container, false);
 
-
         View root = binding.getRoot();
 
-
-        teste = root.findViewById(R.id.testeaaa);
-        botao = root.findViewById(R.id.botao);
-        botao.setVisibility(View.GONE);
-        // Inicialize o MediaPlayer com o arquivo de som do sucesso (success_sound.mp3 ou success_sound.wav)
-        mediaPlayer = MediaPlayer.create(getContext(), R.raw.error);
-
-
-
-        teste.setText("Falhas, Erros ou Sugestões, Contate-nos");
         db = FirebaseFirestore.getInstance();
-        botao.setOnClickListener(new View.OnClickListener() {
+
+        vv = root.findViewById(R.id.videoViewInformacoes);
+        mostrarEmail = root.findViewById(R.id.mostrarEmail);
+        mostrarNome = root.findViewById(R.id.mostrarNome);
+        mostrarIDUser = root.findViewById(R.id.mostrarIDUser);
+        mostrarTurma = root.findViewById(R.id.mostrarTurma);
+        mostrarMatricula = root.findViewById(R.id.mostrarMatricula);
+
+        carregarVideo();
+        carregarDados();
+
+        return root;
+    }
+
+    private void carregarVideo() {
+        vv.setBackgroundColor(Color.TRANSPARENT);
+        vv.setVideoPath("android.resource://" + requireContext().getPackageName() + "/" + R.raw.introducaofundoazulfracomaiortempo);
+
+        // Desativa os controles padrão do VideoView
+        vv.setMediaController(null);
+
+        // Define um listener para detectar o término do vídeo
+        vv.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
             @Override
-            public void onClick(View view) {
-                sCanCode();
+            public void onCompletion(MediaPlayer mp) {
+                vv.seekTo(0);
+                vv.start();
             }
         });
 
-        return root;
-
-    }
-
-    private String diaAtual(){
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("GMT-3"));
-
-        int dia = calendar.get(Calendar.DAY_OF_MONTH);
-        int mes = calendar.get(Calendar.MONTH) + 1;
-        int ano = calendar.get(Calendar.YEAR);
-
-        String data = String.format("%02d%02d%d", dia, mes, ano);
-        return data;
-    }
-
-    private void playSuccessSound() {
-        if (mediaPlayer != null) {
-            mediaPlayer.start();
-        }
-    }
-
-    @Override
-    public void onDestroy() {
-        super.onDestroy();
-        // Libere os recursos do MediaPlayer ao encerrar a atividade
-        if (mediaPlayer != null) {
-            mediaPlayer.release();
-            mediaPlayer = null;
-        }
-    }
-
-    private void sCanCode(){
-        ScanOptions options = new ScanOptions();
-        options.setPrompt("Volume up to flash on");
-        options.setBeepEnabled(true);
-        options.setOrientationLocked(true);
-        options.setCaptureActivity(CaptureAct.class);
-        barLaucher.launch(options);
-    }
-
-    ActivityResultLauncher<ScanOptions> barLaucher = registerForActivityResult(new ScanContract(), result->
-    {
-        if(result.getContents() !=null)
-        {
-            if (result.getContents().contains("/")) {
-                String[] aux = result.getContents().split("/");
-
-                long valorCurrent = Long.parseLong(aux[1]);
-
-                if ( System.currentTimeMillis() - valorCurrent <= tempoValidade){
-                    String data = diaAtual();
-                    atualizarMatricula(aux[0], data);
-                } else {
-                    playSuccessSound();
-                }
-
-                sCanCode();
+        // Desativa a interação com o VideoView
+        vv.setOnTouchListener(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                return true; // Impede que o usuário toque no VideoView
             }
-        }
-    });
+        });
 
-    private void atualizarMatricula(String matricula, String data){
+        vv.setVisibility(View.VISIBLE);
+        vv.start();
+    }
 
-        Timestamp novoTimestamp = Timestamp.now();
+    private void carregarDados(){
+        String matricula = recuperarDados("matricula");
 
-        // Envie os dados para o Firestore
-        DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(matricula)
-                .document("chamadaPessoal");
+        mostrarMatricula.setText("Matrícula: " + matricula);
 
-            docRef.get().addOnCompleteListener(task -> {
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos").collection(matricula).document("id");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
                 if (task.isSuccessful()) {
-                    List<Timestamp> timestampsList;
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String mail = document.getString("email");
+                        String id = document.getString("idUser");
+                        mostrarEmail.setText("Email: " + mail);
+                        mostrarIDUser.setText("ID-User: " + id);
 
-                    // Verifique se o documento existe e se o campo "timestamps" já foi criado
-                    if (task.getResult().exists() && task.getResult().contains(data)) {
-                        timestampsList = (List<Timestamp>) task.getResult().get(data);
                     } else {
-                        // Se o documento não existir ou o campo da data não tiver sido criado, crie uma nova lista vazia
-                        timestampsList = new ArrayList<>();
-                        //adicionando uma presença a mais
-                        if (task.getResult().exists() && task.getResult().contains("presencas")){
-                            DocumentSnapshot document = task.getResult();
-                            String valorPresenca = document.getString("presencas");
-
-                            // Converta o valor atual para inteiro
-                            int valorAtualInt = Integer.parseInt(valorPresenca);
-
-                            // Atualize o campo com o novo valor convertido em string
-                            docRef.update("presencas", String.valueOf(valorAtualInt + 1))
-                                    .addOnSuccessListener(aVoid -> System.out.println("Campo incrementado com sucesso!"))
-                                    .addOnFailureListener(e -> System.out.println("Erro ao incrementar campo: " + e.getMessage()));
-
-                        } else {
-                        System.out.println("O documento não existe.");
-                        }
-                    }
-
-                    // Adicione o novo timestamp à lista
-                    timestampsList.add(novoTimestamp);
-
-                    // Use o método update() para atualizar o campo "timestamps" no documento
-                    docRef.update(data, timestampsList)
-                            .addOnSuccessListener(aVoid -> System.out.println("Timestamp adicionado com sucesso!"))
-                            .addOnFailureListener(e -> System.out.println("Erro ao adicionar timestamp: " + e.getMessage()));
-
-                    if (task.getResult().exists() && task.getResult().contains("possivelStatus")){
-                        DocumentSnapshot document = task.getResult();
-                        String status = document.getString("possivelStatus");
-
-                        if (status.equals("Entrada")){
-                            docRef.update("possivelStatus", "Saida")
-                                    .addOnSuccessListener(aVoid -> System.out.println("Campo incrementado com sucesso!"))
-                                    .addOnFailureListener(e -> System.out.println("Erro ao incrementar campo: " + e.getMessage()));
-                        } else if (status.equals("Saida")){
-                            docRef.update("possivelStatus", "Entrada")
-                                    .addOnSuccessListener(aVoid -> System.out.println("Campo incrementado com sucesso!"))
-                                    .addOnFailureListener(e -> System.out.println("Erro ao incrementar campo: " + e.getMessage()));
-                        }
+                        Log.d("TAGLER", "Documento não encontrado");
                     }
                 } else {
-                    System.out.println("Erro ao obter o documento: " + task.getException().getMessage());
+                    Log.d("TAGLER", "Falhou em ", task.getException());
                 }
-            });
-        }
+            }
+        });
+
+        docRef = db.collection("Usuarios").document("Alunos").collection(matricula).document("dados");
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        String nome = document.getString("nome");
+                        String turma = document.getString("turma");
+                        mostrarNome.setText("Nome: " + nome);
+                        mostrarTurma.setText("Turma: " + turma);
+
+                    } else {
+                        Log.d("TAGLER", "Documento não encontrado");
+                    }
+                } else {
+                    Log.d("TAGLER", "Falhou em ", task.getException());
+                }
+            }
+        });
     }
+
+    public String recuperarDados(String chave){
+        SharedPreferences sharedPreferences = getActivity().getSharedPreferences(getString(R.string.preference_file_key), Context.MODE_PRIVATE);
+        String aux = sharedPreferences.getString(chave, "");
+        return aux;
+    }
+
+}
 
