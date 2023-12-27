@@ -1,19 +1,25 @@
 package com.example.meuif.sepae.chamada;
 
 
+import static androidx.core.content.ContextCompat.startActivity;
+
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.media.MediaScannerConnection;
+import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 import android.widget.Toast;
 
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 import com.example.meuif.R;
 import com.itextpdf.io.font.FontConstants;
@@ -65,7 +71,7 @@ public class RecyclerViewToPdf {
         if (diasParaPdf != null) {
             // Iterando pelos campos e imprimindo seus nomes
             for (String fieldName : diasParaPdf.keySet()) {
-                if (!fieldName.equals("Lider") && !fieldName.equals("ViceLider") && !fieldName.equals("nomesSala")){
+                if (!fieldName.equals("Lider") && !fieldName.equals("ViceLider") && !fieldName.equals("nomesSala")) {
                     dias.add(fieldName);
                 }
             }
@@ -78,28 +84,19 @@ public class RecyclerViewToPdf {
     }
 
     public static void createPdf(Context context, String pdfFileName) {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-            Log.d("pdf", "tem permissao");
-            generatePdf(context, pdfFileName);
-        } else {
-            Log.d("pdf", "sem permissao");
-            Toast.makeText(context, "PERMISSÃO NEGADA DE ARQUIVOS", Toast.LENGTH_SHORT).show();
-            Toast.makeText(context, "Não foi possivel gerar o pdf", Toast.LENGTH_SHORT).show();
-            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
-        }
-    }
+        generatePdf(context, pdfFileName);
 
-    public static void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults, Context context, String pdfFileName) {
-        if (requestCode == STORAGE_PERMISSION_CODE) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                generatePdf(context, pdfFileName);
-            } else {
-                // Permissão negada pelo usuário
-            }
-        }
+//        if (ContextCompat.checkSelfPermission(context, Manifest.permission.WRITE_EXTERNAL_STORAGE)
+//                == PackageManager.PERMISSION_GRANTED) {
+//            Log.d("pdf", "tem permissao");
+//            generatePdf(context, pdfFileName);
+//        } else {
+//            Log.d("pdf", "sem permissao");
+//            Toast.makeText(context, "PERMISSÃO NEGADA DE ARQUIVOS", Toast.LENGTH_SHORT).show();
+//            Toast.makeText(context, "Não foi possivel gerar o pdf", Toast.LENGTH_SHORT).show();
+//            ActivityCompat.requestPermissions((Activity) context, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
+//        }
     }
-
 
     private static void generatePdf(Context context, String pdfFileName) {
         // Nome do arquivo PDF
@@ -107,12 +104,13 @@ public class RecyclerViewToPdf {
         Toast.makeText(context, "Gerando PDF e Salvando", Toast.LENGTH_SHORT).show();
 
         try {
-            // Diretório onde o arquivo PDF será salvo
-            File directory = new File(Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS), "MeuIF_Docs");
-            if (!directory.exists()) {
-                directory.mkdirs();
+            File pastaDownloads = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS);
+
+            if (!pastaDownloads.exists()) {
+                pastaDownloads.mkdirs(); // Cria a pasta se ela não existir
             }
-            File pdfFile = new File(directory, pdfFileName);
+
+            File pdfFile = new File(pastaDownloads, pdfFileName);
 
             PdfWriter pdfWriter = new PdfWriter(pdfFile);
             PdfDocument pdfDocument = new PdfDocument(pdfWriter);
@@ -169,7 +167,7 @@ public class RecyclerViewToPdf {
                             !fieldName.equals("ViceLider") &&
                             !fieldName.equals("nomesSala") &&
                             fieldName.substring(fieldName.length() - 1).charAt(0) != 'T' &&
-                            fieldName.substring(2,4).equals(mes)){
+                            fieldName.substring(2, 4).equals(mes)) {
                         contT++;
                     }
                 }
@@ -189,8 +187,8 @@ public class RecyclerViewToPdf {
                             !fieldName.equals("ViceLider") &&
                             !fieldName.equals("nomesSala") &&
                             fieldName.substring(fieldName.length() - 1).charAt(0) != 'T' &&
-                            fieldName.substring(2,4).equals(mes)){
-                        dias.add(fieldName.substring(0,2));
+                            fieldName.substring(2, 4).equals(mes)) {
+                        dias.add(fieldName.substring(0, 2));
                     }
                 }
             }
@@ -206,7 +204,7 @@ public class RecyclerViewToPdf {
                 }
             });
 
-            for (String dia: dias) {
+            for (String dia : dias) {
                 table.addCell(createCell(dia, font, 8f, TextAlignment.LEFT, VerticalAlignment.MIDDLE));
             }
             Log.d("dias", "dias ordenados = " + dias.toString());
@@ -215,17 +213,17 @@ public class RecyclerViewToPdf {
             Map<String, List<List<Boolean>>> nomesChamada = new HashMap<>();
 
             if (diasParaPdf != null) {
-                for (String dia: dias){
+                for (String dia : dias) {
                     for (String fieldName : diasParaPdf.keySet()) {
 
-                        Log.d("dias", "filedname" + fieldName.substring(0,2));
-                        if (fieldName.substring(2,4).equals(mes) &&
+                        Log.d("dias", "filedname" + fieldName.substring(0, 2));
+                        if (fieldName.substring(2, 4).equals(mes) &&
                                 fieldName.substring(fieldName.length() - 1).charAt(0) != 'T' &&
-                                dia.equals(fieldName.substring(0,2))){
+                                dia.equals(fieldName.substring(0, 2))) {
                             Object value = diasParaPdf.get(fieldName);
 
                             if (value instanceof Map) {
-                                if (diasParaPdf.containsKey(fieldName + "T")){
+                                if (diasParaPdf.containsKey(fieldName + "T")) {
                                     Object value2 = diasParaPdf.get(fieldName + "T");
                                     // É um mapa, faça o cast e processe os valores
                                     Map<String, Object> diaAtualT = (Map<String, Object>) value2;
@@ -329,25 +327,25 @@ public class RecyclerViewToPdf {
 
                 // Iterar sobre os elementos da lista
                 for (List<Boolean> valor : lista) {
-                    if (valor.get(0) != null && valor.get(1) != null){
-                        if (valor.get(0) && valor.get(1)){
+                    if (valor.get(0) != null && valor.get(1) != null) {
+                        if (valor.get(0) && valor.get(1)) {
                             Cell cell = createCustomCell("P", "P");
                             table.addCell(cell);
-                        }else if(!valor.get(0) && !valor.get(1)) {
+                        } else if (!valor.get(0) && !valor.get(1)) {
                             Cell cell = createCustomCell("F", "F");
                             table.addCell(cell);
-                        } else if (valor.get(0) && !valor.get(1)){
+                        } else if (valor.get(0) && !valor.get(1)) {
                             Cell cell = createCustomCell("P", "F");
                             table.addCell(cell);
                         } else if (!valor.get(0) && valor.get(1)) {
                             Cell cell = createCustomCell("F", "P");
                             table.addCell(cell);
                         }
-                    }else {
+                    } else {
                         if (valor.get(0) != null && !valor.get(0) && valor.get(1) == null) {
                             Cell cell = createCustomCell("F", "");
                             table.addCell(cell);
-                        }else if (valor.get(0) != null && valor.get(0) && valor.get(1) == null) {
+                        } else if (valor.get(0) != null && valor.get(0) && valor.get(1) == null) {
                             Cell cell = createCustomCell("P", "");
                             table.addCell(cell);
                         } else {
@@ -363,7 +361,7 @@ public class RecyclerViewToPdf {
             document.add(table);
 
             // Crie um parágrafo para o rodapé
-            Paragraph footer = new Paragraph("Planilha MeuIF Gerada Em " + diaGerada );
+            Paragraph footer = new Paragraph("Planilha MeuIF Gerada Em " + diaGerada);
             footer.setFont(font); // Defina a fonte para o rodapé
             footer.setFontSize(10f); // Defina o tamanho da fonte para o rodapé
             footer.setTextAlignment(TextAlignment.CENTER); // Centralize o rodapé
@@ -374,17 +372,21 @@ public class RecyclerViewToPdf {
 // Adicione o rodapé ao documento
             document.add(footer);
 
+            MediaScannerConnection.scanFile(context, new String[]{pdfFile.getAbsolutePath()}, null, null);
+
             // Feche o documento PDF
             document.close();
 
             Log.d("PDF", "PDF gerado com sucesso: " + pdfFile.getAbsolutePath());
             Toast.makeText(context, "PDF gerado", Toast.LENGTH_SHORT).show();
-            openPdf(pdfFile.getAbsolutePath());
+
+            openPdf(context);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
     }
+
     private static byte[] toByteArray(Bitmap bitmap) {
         ByteArrayOutputStream stream = new ByteArrayOutputStream();
         bitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
@@ -397,7 +399,7 @@ public class RecyclerViewToPdf {
         // Crie um Paragraph para a célula
         Paragraph paragraph = new Paragraph();
 
-        if (a1.equals("P")){
+        if (a1.equals("P")) {
             // Adicione o "F" em vermelho
             Text textoF = new Text(a1)
                     .setFontColor(verde)
@@ -413,7 +415,7 @@ public class RecyclerViewToPdf {
             paragraph.add(textoF);
         }
 
-        if (!a2.equals("")){
+        if (!a2.equals("")) {
             // Adicione a barra ("/") em preto
             Text barra = new Text("/")
                     .setFontSize(8f)
@@ -421,7 +423,7 @@ public class RecyclerViewToPdf {
             paragraph.add(barra);
         }
 
-        if (a2.equals("P")){
+        if (a2.equals("P")) {
             // Adicione o "P" em verde
             Text textoP = new Text(a2)
                     .setFontColor(verde)
@@ -445,6 +447,7 @@ public class RecyclerViewToPdf {
 
         return cell;
     }
+
     private static Cell createCell(String text, PdfFont font, float fontSize, TextAlignment alignment, VerticalAlignment verticalAlignment) {
         return new Cell()
                 .setFont(font)
@@ -455,17 +458,26 @@ public class RecyclerViewToPdf {
     }
 
 
-    public static void openPdf(String filePath) {
-        try {
-            File pdfFile = new File(filePath);
-            if (pdfFile.exists()) {
-                Process process = Runtime.getRuntime().exec("cmd.exe /c start " + filePath);
-                process.waitFor();
-            } else {
-                Log.d("PDF", "Arquivo PDF não encontrado: " + filePath);
-            }
-        } catch (IOException | InterruptedException e) {
-            e.printStackTrace();
+    public static void openPdf(Context context) {
+        // Caminho para o diretório de downloads
+        String pathToDownloads = "/sdcard/Download";
+
+        // Crie um intent com a ação ACTION_VIEW
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+
+        // Obtém o URI do diretório
+        Uri uri = Uri.parse("file://" + pathToDownloads);
+
+        // Define o tipo de dados do intent para indicar que é um diretório
+        intent.setDataAndType(uri, "resource/folder");
+
+        // Verifica se há atividades que podem lidar com o intent
+        if (intent.resolveActivity(context.getPackageManager()) != null) {
+            // Inicia a atividade para visualizar o diretório
+            context.startActivity(intent);
+        } else {
+            // Se não houver atividade para lidar com o intent, você pode exibir uma mensagem ao usuário
         }
+
     }
 }

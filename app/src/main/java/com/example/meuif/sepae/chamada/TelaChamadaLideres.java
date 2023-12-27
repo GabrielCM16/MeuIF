@@ -73,6 +73,11 @@ public class TelaChamadaLideres extends AppCompatActivity {
     private ImageView imageViewDireitaChamadaSEPAE;
     private ImageView imageViewCalendarioChamadaLiderSEPAE;
 
+    private static final int REQUEST_STORAGE_PERMISSION = 1;
+    private String turmaDownload;
+    private String mesDowload;
+
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -80,7 +85,6 @@ public class TelaChamadaLideres extends AppCompatActivity {
         setContentView(R.layout.activity_tela_chamada_lideres);
 
         carregarComponentes();
-        setupPermissionLauncher();
     }
 
 
@@ -413,9 +417,13 @@ public class TelaChamadaLideres extends AppCompatActivity {
                 String turmaSelecionada = spinnerTurma.getSelectedItem().toString();
                 String mesSelecionado = spinnerMes.getSelectedItem().toString();
 
+                turmaDownload = turmaSelecionada;
+                mesDowload = mesSelecionado;
+
                 // Agora você pode usar turmaSelecionada e mesSelecionado como desejado
 
-                requestWriteExternalStoragePermission(turmaSelecionada, mesSelecionado);
+               // baixarPDF(turmaSelecionada, mesSelecionado);
+                requestStoragePermission();
             }
         });
 
@@ -429,30 +437,6 @@ public class TelaChamadaLideres extends AppCompatActivity {
         dialog2.create();
         dialog2.show();
 
-    }
-
-    private void setupPermissionLauncher() {
-        requestPermissionLauncher = registerForActivityResult(new RequestPermission(), isGranted -> {
-            if (isGranted) {
-                // A permissão foi concedida, você pode prosseguir com a operação que exigia a permissão.
-
-            } else {
-                //requestWriteExternalStoragePermission();
-                // A permissão foi negada pelo usuário.
-
-            }
-        });
-    }
-    // Para solicitar a permissão em algum lugar do seu código
-    private void requestWriteExternalStoragePermission(String turmaSelecionada, String mesSelecionado) {
-        if (ContextCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
-                == PackageManager.PERMISSION_GRANTED) {
-            // A permissão já foi concedida, prossiga com a operação.
-            baixarPDF(turmaSelecionada, mesSelecionado);
-        } else {
-            // Solicitar a permissão usando ActivityCompat.requestPermissions
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE}, STORAGE_PERMISSION_CODE);
-        }
     }
 
 
@@ -490,7 +474,27 @@ public class TelaChamadaLideres extends AppCompatActivity {
                         recyclerViewToPdf.createPdf(context, nome);
                     }
                 });
+    }
+    private void requestStoragePermission() {
+        ActivityCompat.requestPermissions(this,
+                new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                REQUEST_STORAGE_PERMISSION);
+    }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        if (requestCode == REQUEST_STORAGE_PERMISSION) {
+            // Verifique se a permissão foi concedida
+            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                // Permissão concedida, prossiga com a lógica do seu aplicativo.
+                baixarPDF(turmaDownload, mesDowload);
+            } else {
+                // Permissão negada. Você pode exibir uma mensagem ou tomar outra ação apropriada.
+                baixarPDF(turmaDownload, mesDowload);
+            }
+        }
     }
     public static List<String> obterDiasUteisDoMes() {
         List<String> diasUteis = new ArrayList<>();
