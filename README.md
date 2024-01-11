@@ -1,5 +1,5 @@
 # MeuIF
-<img src="logogif.gif" alt="logo animada" style="max-width:30%;">
+<img src="logogif.gif" alt="logo animada" width="100">
 
 Link de download do apk: https://github.com/GabrielCM16/MeuIF_apk
 
