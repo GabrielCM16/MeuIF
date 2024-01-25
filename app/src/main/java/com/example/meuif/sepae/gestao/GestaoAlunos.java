@@ -14,9 +14,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.meuif.R;
+import com.example.meuif.sepae.gestao.aluno.GerenciarAluno;
 
 public class GestaoAlunos extends Fragment {
     private ConstraintLayout constraintLayoutGestaoLideres;
+    private ConstraintLayout constraintLayoutGestaoUsuario;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -30,6 +32,7 @@ public class GestaoAlunos extends Fragment {
         View root = inflater.inflate(R.layout.fragment_gestao_alunos, container, false);
 
         constraintLayoutGestaoLideres = root.findViewById(R.id.constraintLayoutGestaoLideres);
+        constraintLayoutGestaoUsuario = root.findViewById(R.id.constraintLayoutGestaoUsuario);
 
         constraintLayoutGestaoLideres.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -38,7 +41,19 @@ public class GestaoAlunos extends Fragment {
             }
         });
 
+        constraintLayoutGestaoUsuario.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                gestaoAluno();
+            }
+        });
+
         return root;
+    }
+
+    private void gestaoAluno() {
+        Intent intent = new Intent(getContext(), GerenciarAluno.class);
+        startActivity(intent);
     }
 
     private void gestaoLideres(){
