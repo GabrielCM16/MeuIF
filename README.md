@@ -1,5 +1,5 @@
 # MeuIF
-
+<img src="logogif.gif" alt="logo animada" width="400">
 Link de download do apk: https://github.com/GabrielCM16/MeuIF_apk
 
 ## MEUIF: UM APLICATIVO PARA O GERENCIAMENTO DE ATIVIDADES ACADÊMICAS, FREQUÊNCIA ESCOLAR E OTIMIZAÇÃO DOS PROCEDIMENTOS DA SEÇÃO PEDAGÓGICA DO IFPR CAMPUS CASCAVEL
