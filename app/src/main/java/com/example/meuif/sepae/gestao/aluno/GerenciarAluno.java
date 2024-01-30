@@ -6,6 +6,7 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -81,7 +82,15 @@ public class GerenciarAluno extends AppCompatActivity {
                 listagemGerenciarNomes, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
+                String matricula = listaFiltrada.get(position).getMatricula();
 
+                String primeiraParte = matricula.substring(0);
+
+                Intent intent = new Intent(getApplicationContext(), MostrarDadosPorMatricula.class);
+
+                intent.putExtra("matricula", primeiraParte);
+
+                startActivity(intent);
             }
 
             @Override
