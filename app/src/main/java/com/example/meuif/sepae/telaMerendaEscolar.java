@@ -3,6 +3,7 @@ package com.example.meuif.sepae;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -53,9 +54,12 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
+import com.google.firebase.firestore.QuerySnapshot;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
@@ -887,16 +891,20 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
         return aux;
     }
 
-    private void listarDiasMerendados(Callback callback){
-
+    private void listarDiasMerendados(Callback callback) {
         listDias.clear();
 
         db.collection("MerendaEscolar")
-                .get()
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful()) {
-                        for (QueryDocumentSnapshot document : task.getResult()) {
-                            // Obter um mapa de campos e valores do documento
+                .addSnapshotListener(new EventListener<QuerySnapshot>() {
+                    @Override
+                    public void onEvent(@Nullable QuerySnapshot snapshot, @Nullable FirebaseFirestoreException e) {
+                        if (e != null) {
+                            // Tratar erro aqui, se necessário
+                            callback.onComplete();
+                            return;
+                        }
+
+                        for (QueryDocumentSnapshot document : snapshot) {
                             Map<String, Object> data = document.getData();
 
                             dataGlobal = data;
@@ -911,11 +919,11 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
                                 listar.put(document.getId(), valor);
                             }
                         }
-                        callback.onComplete();
-                    } else {
-                        // Tratar erro aqui, se necessário
+
+                        // Chamar a callback para indicar que a operação está completa
                         callback.onComplete();
                     }
                 });
     }
+
 }
