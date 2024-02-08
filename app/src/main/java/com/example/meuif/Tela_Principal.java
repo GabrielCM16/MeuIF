@@ -1,13 +1,16 @@
 package com.example.meuif;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.Menu;
 import android.widget.TextView;
 
+import com.example.meuif.configs.Tela_Config;
 import com.google.android.material.snackbar.Snackbar;
 import com.google.android.material.navigation.NavigationView;
 
@@ -84,6 +87,21 @@ public class Tela_Principal extends AppCompatActivity {
         return NavigationUI.navigateUp(navController, mAppBarConfiguration)
                 || super.onSupportNavigateUp();
     }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+
+        if (id == R.id.action_settings) {
+            // Abra a nova Activity de configurações
+            Intent intent = new Intent(this, Tela_Config.class);
+            startActivity(intent);
+            return true;
+        }
+
+        return super.onOptionsItemSelected(item);
+    }
+
 
     public void updateNavHeader(){
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);

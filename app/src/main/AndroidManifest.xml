@@ -21,6 +21,9 @@
         android:theme="@style/Theme.MeuIF"
         tools:targetApi="31">
         <activity
+            android:name=".configs.Tela_Config"
+            android:exported="false" />
+        <activity
             android:name=".sepae.gestao.aluno.MostrarDadosPorMatricula"
             android:exported="false" />
         <activity
