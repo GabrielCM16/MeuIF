@@ -387,7 +387,7 @@ public class telaVerFaltasPessoais extends AppCompatActivity {
                             Map<String, Integer> mapFaltas = (Map<String, Integer>) document.get("todos");
                             Log.d("tagler", "map " + mapFaltas.toString() + " tipos " + String.valueOf(mapFaltas.get("Segunda-feira")));
                             valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Segunda-feira"))));
-                            valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Terca-feira"))));
+                            valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Terça-feira"))));
                             valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Quarta-feira"))));
                             valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Quinta-feira"))));
                             valores.add(Integer.parseInt(String.valueOf(mapFaltas.get("Sexta-feira"))));

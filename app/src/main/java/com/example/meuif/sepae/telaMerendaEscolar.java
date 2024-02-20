@@ -301,24 +301,20 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
         if(result.getContents() !=null)
         {
             String aux = result.getContents();
-            isNumeric = (aux != null && p.matcher(aux).find());
 
-            if ( aux.length() == 11 && isNumeric){
                 if (!ultimaMatricula.equals(aux) && !matriculasPassadas.contains(aux)){
                     String data = diaAtual();
                     atualizarMerenda(aux, data, new Callback() {
                         @Override
                         public void onComplete() {
-                            playSucessSound();
+
                             ultimaMatricula = aux;
                         }
                     });
                 } else{
                     playErrorSound();
                 }
-            } else {
-                playErrorSound();
-            }
+
 
             scanCodeFrontal();
 
@@ -725,13 +721,13 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
                 String aux = result.getContents();
                 isNumeric = (aux != null && p.matcher(aux).find());
 
-                if ( aux.length() == 11 && isNumeric){
+
                     if (!ultimaMatricula.equals(aux) && !matriculasPassadas.contains(aux)){
                         String data = diaAtual();
                         atualizarMerenda(aux, data, new Callback() {
                             @Override
                             public void onComplete() {
-                                playSucessSound();
+
                                 ultimaMatricula = aux;
                                 atualizarRecycler(formatarData(textViewSaidaDiaRegistrosPNAESEPAE2.getText().toString()));
                             }
@@ -739,9 +735,7 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
                     } else{
                         playErrorSound();
                     }
-                } else {
-                    playErrorSound();
-                }
+
 
                 sCanCode();
 
@@ -787,6 +781,7 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
                     docRef.update("todos", existingList).addOnSuccessListener(new OnSuccessListener<Void>() {
                         @Override
                         public void onSuccess(Void unused) {
+
                             listarDiasMerendados(new Callback() {
                                 @Override
                                 public void onComplete() {
@@ -846,22 +841,22 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
             if (task.isSuccessful()) {
                 DocumentSnapshot document = task.getResult();
                 if (document.exists()) {
-                    boolean flagAtual = document.getBoolean("flag");
-
-                    // Criar um novo valor para a flag (inverter o valor booleano)
-                    boolean novoValorFlag = !flagAtual;
-
-                    // Atualizar a flag no documento
-                    usuarioDocRef.update("flag", novoValorFlag)
-                            .addOnSuccessListener(aVoid -> {
-                                // Sucesso ao atualizar a flag
-                                Log.d("Firestore", "Flag atualizada com sucesso");
-
-                            })
-                            .addOnFailureListener(e -> {
-                                // Falha ao atualizar a flag
-                                Log.e("Firestore", "Erro ao atualizar a flag", e);
-                            });
+//                    boolean flagAtual = document.getBoolean("flag");
+//
+//                    // Criar um novo valor para a flag (inverter o valor booleano)
+//                    boolean novoValorFlag = !flagAtual;
+//
+//                    // Atualizar a flag no documento
+//                    usuarioDocRef.update("flag", novoValorFlag)
+//                            .addOnSuccessListener(aVoid -> {
+//                                // Sucesso ao atualizar a flag
+//                                Log.d("Firestore", "Flag atualizada com sucesso");
+//
+//                            })
+//                            .addOnFailureListener(e -> {
+//                                // Falha ao atualizar a flag
+//                                Log.e("Firestore", "Erro ao atualizar a flag", e);
+//                            });
 
                     // Adicionar um timestamp ao array "passes"
                     List<String> passes = (List<String>) document.get("passes");
@@ -869,17 +864,21 @@ public class telaMerendaEscolar extends AppCompatActivity implements OnTurmaSele
                     usuarioDocRef.update("passes", passes)
                             .addOnSuccessListener(aVoid -> {
                                 // Sucesso ao adicionar o timestamp
+                                playSucessSound();
                                 Log.d("Firestore", "Timestamp adicionado com sucesso");
                             })
                             .addOnFailureListener(e -> {
                                 // Falha ao adicionar o timestamp
+                                playErrorSound();
                                 Log.e("Firestore", "Erro ao adicionar o timestamp", e);
                             });
                 } else {
                     Log.d("Firestore", "Documento não encontrado");
+                    playErrorSound();
                 }
             } else {
                 Log.d("Firestore", "Falha em obter o documento", task.getException());
+                playErrorSound();
             }
         });
 
