@@ -81,7 +81,7 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
             public void onClick(View v) {
                 progressBarRegistrarEntrada.setVisibility(View.VISIBLE);
                 String matricula = entradaMatriculaAtrasada.getText().toString();
-                if (!matricula.equals("") && matricula != null && matricula.length() > 10) {
+                if (!matricula.equals("") && matricula != null) {
                     progressBarRegistrarEntrada.setVisibility(View.VISIBLE);
                     procurarDadosAluno(matricula);
                 } else{
@@ -514,12 +514,9 @@ public class TelaAutorizarEntradaAula extends AppCompatActivity {
         if(result.getContents() !=null)
         {
             String aux = result.getContents();
-            if (aux.length() == 11) {
+
                 procurarDadosAluno(aux.toString());
-            }
-            else {
-                Toast.makeText(this,"Matrícula invalida", Toast.LENGTH_SHORT).show();;
-            }
+
         }
     });
 

@@ -2,6 +2,7 @@ package com.example.meuif.sepae.Portaria;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.constraintlayout.widget.ConstraintLayout;
@@ -49,7 +50,9 @@ import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.EventListener;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.journeyapps.barcodescanner.ScanContract;
 import com.journeyapps.barcodescanner.ScanOptions;
 
@@ -390,24 +393,24 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
 
     private void pegarAcessosPorDia(String dia){
         DocumentReference docRef = db.collection("AcessosCampus").document("AcessosAlunos");
-        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+        docRef.addSnapshotListener(new EventListener<DocumentSnapshot>() {
             @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
-                    DocumentSnapshot document = task.getResult();
-                    if (document.exists()) {
-                        if (document.contains(dia)){
-                            List<Map<String, Timestamp>> lista = (List<Map<String, Timestamp>>) document.get(dia);
-                            carregarAcessos(lista);
-                        } else {
-                            List<Map<String, Timestamp>> lista  = new ArrayList<>();
-                            carregarAcessos(lista);
-                        }
+            public void onEvent(@Nullable DocumentSnapshot snapshot, @Nullable FirebaseFirestoreException e) {
+                if (e != null) {
+                    Log.w("TAGLER", "Erro ao escutar as mudanças", e);
+                    return;
+                }
+
+                if (snapshot != null && snapshot.exists()) {
+                    if (snapshot.contains(dia)) {
+                        List<Map<String, Timestamp>> lista = (List<Map<String, Timestamp>>) snapshot.get(dia);
+                        carregarAcessos(lista);
                     } else {
-                        Log.d("TAGLER", "Documento não encontrado");
+                        List<Map<String, Timestamp>> lista  = new ArrayList<>();
+                        carregarAcessos(lista);
                     }
                 } else {
-                    Log.d("TAGLER", "Falhou em ", task.getException());
+                    Log.d("TAGLER", "Documento não encontrado");
                 }
             }
         });
@@ -676,7 +679,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         if(result.getContents() !=null)
         {
             String aux = result.getContents();
-            if (aux.length() == 11 && (!lastedMatricula.equals(aux) || countLastedMatricula >= 2)) {
+            if (!lastedMatricula.equals(aux) || countLastedMatricula >= 2) {
                 //String[] aux = result.getContents().split("/");
 
                 //long valorCurrent = Long.parseLong(aux[1]);
@@ -728,7 +731,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         if(result.getContents() !=null)
         {
             String aux = result.getContents();
-            if (aux.length() == 11 && (!lastedMatricula.equals(aux) || countLastedMatricula >= 2)) {
+            if (!lastedMatricula.equals(aux) || countLastedMatricula >= 2) {
                 //String[] aux = result.getContents().split("/");
 
                 //long valorCurrent = Long.parseLong(aux[1]);

@@ -75,7 +75,7 @@ public class AutorizarSaidaAntecipada extends AppCompatActivity {
             public void onClick(View v) {
                 progressBarRegistrarSaida.setVisibility(View.VISIBLE);
                 String matricula = entradaMatriculaSaida.getText().toString();
-                if (!matricula.equals("") && matricula != null && matricula.length() > 10) {
+                if (!matricula.equals("") && matricula != null) {
                     progressBarRegistrarSaida.setVisibility(View.VISIBLE);
                     procurarDadosAluno(matricula);
                 } else{
@@ -498,12 +498,9 @@ public class AutorizarSaidaAntecipada extends AppCompatActivity {
         if(result.getContents() !=null)
         {
             String aux = result.getContents();
-            if (aux.length() == 11) {
+
                 procurarDadosAluno(aux.toString());
-            }
-            else {
-                Toast.makeText(this,"Matrícula invalida", Toast.LENGTH_SHORT).show();;
-            }
+
         }
     });
 
