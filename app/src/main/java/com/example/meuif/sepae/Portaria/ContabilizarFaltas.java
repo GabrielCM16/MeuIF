@@ -14,6 +14,8 @@ import androidx.annotation.NonNull;
 
 import com.example.meuif.sepae.telaMerendaEscolar;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
@@ -209,6 +211,26 @@ public class ContabilizarFaltas {
                                     System.out.println("Erro ao atualizar campo 'todos': " + e.getMessage());
                                 });
 
+                    }
+                }
+                if (task.getResult().exists() && task.getResult().contains("possivelStatus")){
+                    DocumentSnapshot document = task.getResult();
+                    String status = document.getString("possivelStatus");
+
+                    if (status.equals("Saida")){
+                        docRef.update("possivelStatus", "Entrada")
+                                .addOnSuccessListener(new OnSuccessListener<Void>() {
+                                    @Override
+                                    public void onSuccess(Void unused) {
+                                        //erro
+                                    }
+                                })
+                                .addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                       //erro
+                                    }
+                                });
                     }
                 }
             }

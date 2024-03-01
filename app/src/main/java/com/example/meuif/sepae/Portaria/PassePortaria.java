@@ -191,7 +191,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
             public void onClick(View v) {
                 String data = diaAtual();
                 String aux = entradaMatriculaAcesso.getText().toString();
-                if (aux != null && !aux.equals("")){
+                if (aux != null && !aux.equals("") && aux.length() > 10) {
                     atualizarMatricula(aux, data);
                     atualizarAcessoSepae(aux);
                     Toast.makeText(getApplicationContext(), "Acesso de aux Registrado", Toast.LENGTH_LONG).show();
@@ -679,7 +679,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         if(result.getContents() !=null)
         {
             String aux = result.getContents();
-            if (!lastedMatricula.equals(aux) || countLastedMatricula >= 2) {
+            if ((!lastedMatricula.equals(aux) || countLastedMatricula >= 2) && aux.length() >= 10) {
                 //String[] aux = result.getContents().split("/");
 
                 //long valorCurrent = Long.parseLong(aux[1]);
@@ -697,7 +697,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
             } else {
                 Toast.makeText(this,"QR-Code Invalido ou repetido", Toast.LENGTH_SHORT).show();;
                 countLastedMatricula++;
-               // playErrorSound();
+               playErrorSound();
                 scanCodeFrontal();
             }
         }
@@ -731,7 +731,9 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         if(result.getContents() !=null)
         {
             String aux = result.getContents();
-            if (!lastedMatricula.equals(aux) || countLastedMatricula >= 2) {
+            Log.d("tamanho", "tamanho " + aux.length() );
+            if ((!lastedMatricula.equals(aux) || countLastedMatricula >= 2) && aux.length() >= 10) {
+                Log.d("tamanho", "entrou " + aux.length() );
                 //String[] aux = result.getContents().split("/");
 
                 //long valorCurrent = Long.parseLong(aux[1]);
@@ -749,7 +751,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
             } else {
                 Toast.makeText(this,"QR-Code Invalido ou repetido", Toast.LENGTH_SHORT).show();;
                 countLastedMatricula++;
-                //playErrorSound();
+                playErrorSound();
                 sCanCode();
             }
         }
