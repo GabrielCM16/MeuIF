@@ -382,13 +382,22 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
     }
 
     public String formatarData(String data) {
-        // Remova as barras da data original
-        String dataFormatada = data.replace("/", "");
+        // Divida a data pelos /
+        String[] partesData = data.split("/");
+        String dia = partesData[0];
+        String mes = partesData[1];
+        String ano = partesData[2];
 
-        // Certifique-se de que a data tem pelo menos 8 caracteres (DDMMAAAA)
-        while (dataFormatada.length() < 8) {
-            dataFormatada = "0" + dataFormatada;
+        // Adicione zeros à esquerda, se necessário
+        if (dia.length() == 1) {
+            dia = "0" + dia;
         }
+        if (mes.length() == 1) {
+            mes = "0" + mes;
+        }
+
+        // Combine dia, mês e ano no formato desejado
+        String dataFormatada = dia + mes + ano;
 
         return dataFormatada;
     }
