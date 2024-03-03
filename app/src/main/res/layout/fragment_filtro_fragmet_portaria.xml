@@ -11,6 +11,18 @@
         android:layout_height="match_parent"
         android:background="#DADADA">
 
+        <Switch
+            android:id="@+id/switchManha"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:checked="true"
+            android:clickable="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/turma5"
+            app:layout_constraintTop_toBottomOf="@+id/turma2" />
+
         <TextView
             android:id="@+id/turma11"
             android:layout_width="wrap_content"
@@ -21,10 +33,10 @@
             android:textSize="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.177"
+            app:layout_constraintHorizontal_bias="0.026"
             app:layout_constraintStart_toEndOf="@+id/switchNoite"
             app:layout_constraintTop_toBottomOf="@+id/turma10"
-            app:layout_constraintVertical_bias="0.018" />
+            app:layout_constraintVertical_bias="0.019" />
 
         <TextView
             android:id="@+id/turma10"
@@ -36,10 +48,10 @@
             android:textSize="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.177"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/switchTarde"
             app:layout_constraintTop_toBottomOf="@+id/turma8"
-            app:layout_constraintVertical_bias="0.013" />
+            app:layout_constraintVertical_bias="0.014" />
 
         <TextView
             android:id="@+id/turma8"
@@ -51,10 +63,10 @@
             android:textSize="12dp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.155"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/switchManha"
             app:layout_constraintTop_toBottomOf="@+id/turma2"
-            app:layout_constraintVertical_bias="0.029" />
+            app:layout_constraintVertical_bias="0.031" />
 
         <TextView
             android:id="@+id/turma7"
@@ -66,10 +78,10 @@
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.063"
-            app:layout_constraintStart_toEndOf="@+id/turma4"
+            app:layout_constraintHorizontal_bias="0.319"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/turma6"
-            app:layout_constraintVertical_bias="0.007" />
+            app:layout_constraintVertical_bias="0.0" />
 
         <TextView
             android:id="@+id/turma6"
@@ -81,10 +93,10 @@
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.063"
-            app:layout_constraintStart_toEndOf="@+id/turma4"
+            app:layout_constraintHorizontal_bias="0.319"
+            app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/turma5"
-            app:layout_constraintVertical_bias="0.003" />
+            app:layout_constraintVertical_bias="0.001" />
 
         <TextView
             android:id="@+id/turma5"
@@ -96,25 +108,10 @@
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.063"
-            app:layout_constraintStart_toEndOf="@+id/turma4"
-            app:layout_constraintTop_toBottomOf="@+id/turma2"
-            app:layout_constraintVertical_bias="0.029" />
-
-        <TextView
-            android:id="@+id/turma4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:fontFamily="@font/fira_mono_bold"
-            android:text="Periodo:"
-            android:textColor="@color/black"
-            android:textSize="16sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.107"
+            app:layout_constraintHorizontal_bias="0.319"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toBottomOf="@+id/turma2"
-            app:layout_constraintVertical_bias="0.029" />
+            app:layout_constraintVertical_bias="0.031" />
 
         <ImageView
             android:id="@+id/imageViewSairFragmentPortaria"
@@ -125,7 +122,7 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.0" />
+            app:layout_constraintVertical_bias="0.004" />
 
         <TextView
             android:id="@+id/turma2"
@@ -137,10 +134,10 @@
             android:textSize="16sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.104"
+            app:layout_constraintHorizontal_bias="0.337"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.099" />
+            app:layout_constraintTop_toBottomOf="@+id/buscaNomeMatriculaPortaria"
+            app:layout_constraintVertical_bias="0.022" />
 
         <Spinner
             android:id="@+id/spinnerTurmasPortaria"
@@ -151,30 +148,8 @@
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/turma2"
-            app:layout_constraintTop_toTopOf="parent"
-            app:layout_constraintVertical_bias="0.099" />
-
-        <Switch
-            android:id="@+id/switchManha"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:clickable="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.037"
-            app:layout_constraintStart_toEndOf="@+id/turma5"
-            app:layout_constraintTop_toTopOf="@+id/turma5" />
-
-        <Switch
-            android:id="@+id/switchTarde"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:checked="true"
-            android:clickable="true"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.037"
-            app:layout_constraintStart_toEndOf="@+id/turma6"
-            app:layout_constraintTop_toBottomOf="@+id/switchManha" />
+            app:layout_constraintTop_toBottomOf="@+id/buscaNomeMatriculaPortaria"
+            app:layout_constraintVertical_bias="0.021" />
 
         <Switch
             android:id="@+id/switchNoite"
@@ -183,9 +158,44 @@
             android:checked="true"
             android:clickable="true"
             app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintHorizontal_bias="0.037"
+            app:layout_constraintHorizontal_bias="0.0"
             app:layout_constraintStart_toEndOf="@+id/turma7"
             app:layout_constraintTop_toBottomOf="@+id/switchTarde" />
+
+        <Switch
+            android:id="@+id/switchTarde"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:clickable="true"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toEndOf="@+id/turma6"
+            app:layout_constraintTop_toBottomOf="@+id/switchManha" />
+
+        <EditText
+            android:id="@+id/buscaNomeMatriculaPortaria"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:ems="10"
+            android:hint="Nome ou Matrícula"
+            android:inputType="text"
+            android:textColorHint="@color/black"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.502"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/imageViewSairFragmentPortaria" />
+
+        <ImageView
+            android:id="@+id/imageView14"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="56dp"
+            android:src="@drawable/baseline_person_search_24"
+            app:layout_constraintEnd_toStartOf="@+id/buscaNomeMatriculaPortaria"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
 
     </androidx.constraintlayout.widget.ConstraintLayout>
 </FrameLayout>

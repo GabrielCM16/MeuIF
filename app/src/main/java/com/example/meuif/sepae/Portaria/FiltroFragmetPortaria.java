@@ -15,6 +15,7 @@ import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Spinner;
 import android.widget.Switch;
@@ -29,6 +30,7 @@ public class FiltroFragmetPortaria extends Fragment  {
     private Switch manha;
     private Switch tarde;
     private Switch noite;
+    private EditText nomeOuMatricula;
     public FiltroFragmetPortaria(ModelFiltroPortaria modelFiltroPortaria) {
         // Required empty public constructor
         this.obj = modelFiltroPortaria;
@@ -63,8 +65,8 @@ public class FiltroFragmetPortaria extends Fragment  {
             // Defina a animação de saída do fragment
             transaction.setCustomAnimations(R.anim.slide_up, R.anim.slide_down);
 
-            obj = new ModelFiltroPortaria("",
-                    "",
+            obj = new ModelFiltroPortaria(nomeOuMatricula.getText().toString(),
+                    nomeOuMatricula.getText().toString(),
                     manha.isChecked(),tarde.isChecked(),noite.isChecked(),
                     Tturma);
 
@@ -139,6 +141,7 @@ public class FiltroFragmetPortaria extends Fragment  {
         manha = view.findViewById(R.id.switchManha);
         tarde = view.findViewById(R.id.switchTarde);
         noite = view.findViewById(R.id.switchNoite);
+        nomeOuMatricula = view.findViewById(R.id.buscaNomeMatriculaPortaria);
 
         setarSpinnerTurmas();
         setarSwitchTurmas();

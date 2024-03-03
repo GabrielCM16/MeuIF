@@ -89,6 +89,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
     private ConstraintLayout ConstraintFiltrosPortaria;
     private String selectedTurma = "Todas";
     private ModelFiltroPortaria modelFiltroPortaria;
+    private String buscaNome = "";
 
 
     @SuppressLint("MissingInflatedId")
@@ -322,6 +323,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         Log.d("obj", "obj " + obj.getTarde());
         Log.d("obj", "obj " + obj.getNoite());
         selectedTurma = obj.getTurma();
+        buscaNome = obj.getNome();
         modelFiltroPortaria.setManha(obj.getManha());
         modelFiltroPortaria.setTarde(obj.getTarde());
         modelFiltroPortaria.setNoite(obj.getNoite());
@@ -456,26 +458,58 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
                 String turmaMatricula = matricula + " - " + turmaAluno;
 
                 Log.d("hours", "hora " + String.valueOf(hour));
+                Log.d("buscaNome", "a " + buscaNome);
 
                 if (modelFiltroPortaria != null) {
                     if (modelFiltroPortaria.getManha() && hour >= 7 && hour < 13) { // Manhã
                         if (selectedTurma.equals("Todas") || selectedTurma.equals(turmaAluno)) {
-                            ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
-                            modelAcessoAlunos.add(modelAcessoAluno);
+                            if (!buscaNome.equals("") ){
+                                if (nome.toLowerCase().contains(buscaNome.toLowerCase()) || matricula.contains(buscaNome.toLowerCase()) ){
+                                    Log.d("buscaNome", "buscou " + nome);
+                                    ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                                    modelAcessoAlunos.add(modelAcessoAluno);
+                                }
+
+                            } else {
+                                Log.d("buscaNome", "sem busca " + nome);
+                                ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                                modelAcessoAlunos.add(modelAcessoAluno);
+                            }
+
                         }
                     }
 
                     if (modelFiltroPortaria.getTarde() && hour >= 13 && hour < 18) { // Tarde
                         if (selectedTurma.equals("Todas") || selectedTurma.equals(turmaAluno)) {
-                            ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
-                            modelAcessoAlunos.add(modelAcessoAluno);
+                            if (!buscaNome.equals("") ){
+                                if (nome.toLowerCase().contains(buscaNome.toLowerCase()) || matricula.contains(buscaNome.toLowerCase()) ){
+                                    Log.d("buscaNome", "buscou " + nome);
+                                    ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                                    modelAcessoAlunos.add(modelAcessoAluno);
+                                }
+
+                            } else {
+                                Log.d("buscaNome", "sem busca " + nome);
+                                ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                                modelAcessoAlunos.add(modelAcessoAluno);
+                            }
                         }
                     }
 
                     if (modelFiltroPortaria.getNoite() && hour >= 18 && hour <= 23) { // Noite
                         if (selectedTurma.equals("Todas") || selectedTurma.equals(turmaAluno)) {
-                            ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
-                            modelAcessoAlunos.add(modelAcessoAluno);
+                            if (!buscaNome.equals("") ){
+                                if (nome.toLowerCase().contains(buscaNome.toLowerCase()) || matricula.contains(buscaNome.toLowerCase()) ){
+                                    Log.d("buscaNome", "buscou " + nome);
+                                    ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                                    modelAcessoAlunos.add(modelAcessoAluno);
+                                }
+
+                            } else {
+                                Log.d("buscaNome", "sem busca " + nome);
+                                ModelAcessoAluno modelAcessoAluno = new ModelAcessoAluno(nome, formattedDate, String.valueOf(count), flagPessoal, turmaMatricula);
+                                modelAcessoAlunos.add(modelAcessoAluno);
+                            }
                         }
                     }
                 } else {
