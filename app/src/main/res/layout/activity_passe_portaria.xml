@@ -12,6 +12,21 @@
     android:background="@drawable/fundo_gradient"
     tools:context=".sepae.Portaria.PassePortaria">
 
+    <TextView
+        android:id="@+id/textViewAlunosPresentesNoCampus"
+        android:layout_width="124dp"
+        android:layout_height="57dp"
+        android:layout_marginTop="20dp"
+        android:fontFamily="@font/fira_mono_bold"
+        android:gravity="center"
+        android:text="Alunos presentes no campus: 000"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.666"
+        app:layout_constraintStart_toEndOf="@+id/botaoPassePortariaFrontal"
+        app:layout_constraintTop_toBottomOf="@+id/constraintRegistrarAcesso" />
+
     <FrameLayout
         android:id="@+id/frameFiltrosPortaria"
         android:layout_width="409dp"

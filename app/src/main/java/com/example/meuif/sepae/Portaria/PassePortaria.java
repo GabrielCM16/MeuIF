@@ -34,13 +34,10 @@ import android.widget.Toast;
 import com.example.meuif.CaptureAct;
 import com.example.meuif.Informacoes_pessoais;
 import com.example.meuif.R;
-import com.example.meuif.databinding.FragmentInformacoesPessoaisBinding;
-import com.example.meuif.events.Events;
-import com.example.meuif.events.SalvarEvento;
-import com.example.meuif.events.TelaNovoEvento;
 import com.example.meuif.faltasPessoais.AdapterAcessosAluno;
 import com.example.meuif.faltasPessoais.ModelAcessoAluno;
 import com.example.meuif.sepae.Merenda.FiltroFragmentPNAE;
+import com.example.meuif.sepae.gestao.GestaoUsuarios;
 import com.example.meuif.sepae.telaMerendaEscolar;
 import com.example.meuif.sepae.telaPrincipalSepae;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -71,10 +68,8 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
 
     private FirebaseFirestore db;
     private ConstraintLayout botao;
-    private long tempoValidade = 30000;
     private MediaPlayer mediaPlayer;
     private MediaPlayer sucessPlayer;
-    final PassePortaria activity= this;
     private EditText entradaMatriculaAcesso;
     private ConstraintLayout constraintRegistrarAcesso;
     private ImageView imageViewEsquerdaCarteirinhaSEPAE;
@@ -91,6 +86,8 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
     private String selectedTurma = "Todas";
     private ModelFiltroPortaria modelFiltroPortaria;
     private String buscaNome = "";
+    private TextView textViewAlunosPresentesNoCampus;
+    private Map<String, String> nomes = new HashMap<>();
 
 
     @SuppressLint("MissingInflatedId")
@@ -102,6 +99,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         pegarNomesAlunos();
         pegarTurmaAlunos();
         carregarComponentes();
+        retornaNumeroAlunosComConta();
 
     }
 
@@ -117,6 +115,7 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         constraintRegistrarAcesso = findViewById(R.id.constraintRegistrarAcesso);
         recyclerViewAcessosRegistradosSEPAE = findViewById(R.id.recyclerViewAcessosRegistradosSEPAE);
         ConstraintFiltrosPortaria = findViewById(R.id.ConstraintFiltrosPortaria);
+        textViewAlunosPresentesNoCampus = findViewById(R.id.textViewAlunosPresentesNoCampus);
 
         imageViewCalendarioAcessoSEPAE.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -205,6 +204,93 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
 
             }
         });
+    }
+
+    public void retornaNumeroAlunosComConta(){
+        final int[] num = {0};
+
+        pegarTurmasAlunos(new Callback() {
+            @Override
+            public void onComplete() {
+                Log.d("alunos", nomes.toString());
+
+                DocumentReference docRef = db.collection("Usuarios").document("Alunos");
+
+                for (String key: nomes.keySet()){
+                    Log.d("chave", key);
+                    DocumentReference docRef2 = docRef.collection(key).document("chamadaPessoal");
+                    docRef2.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                        @Override
+                        public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                            if (task.isSuccessful()) {
+                                DocumentSnapshot document = task.getResult();
+                                if (document.exists()) {
+                                    // Verifique se o campo "TurmasAlunos" existe no documento
+                                    if (document.contains("possivelStatus")) {
+                                        if (!document.get("possivelStatus").equals("") && document.get("possivelStatus").equals("Entrada")){
+                                            num[0]++;
+                                            Log.d("key", "soma");
+                                            textViewAlunosPresentesNoCampus.setText("Alunos presentes no campus: "+
+                                                    num[0]);
+                                        }
+                                    } else {
+
+                                    }
+                                } else {
+                                    // O documento não existe
+                                    Log.d("Documento", "Não encontrado");
+                                }
+                            } else {
+                                // Falha ao obter o documento
+                                Log.d("Firestore", "Falha na leitura do documento", task.getException());
+                            }
+                        }
+                    });
+
+                }
+            }
+        });
+
+    }
+    public interface Callback {
+        void onComplete();
+    }
+
+    public void pegarTurmasAlunos(Callback callback){
+
+        DocumentReference docRef = db.collection("Usuarios").document("Alunos");
+
+        docRef.get().addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+            @Override
+            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                if (task.isSuccessful()) {
+                    DocumentSnapshot document = task.getResult();
+                    if (document.exists()) {
+                        // Verifique se o campo "TurmasAlunos" existe no documento
+                        if (document.contains("TurmasAlunos")) {
+                            Map<String, String> turmasAlunos = (Map<String, String>) document.get("TurmasAlunos");
+                            Log.d("alunos", "TurmasAlunos existe" + turmasAlunos.toString());
+
+                            nomes.putAll(turmasAlunos);
+                            callback.onComplete();
+                        } else {
+                            // O campo "TurmasAlunos" não existe no documento
+                            Log.d("TurmasAlunos", "Campo não encontrado");
+                            callback.onComplete();
+                        }
+                    } else {
+                        // O documento não existe
+                        Log.d("Documento", "Não encontrado");
+                        callback.onComplete();
+                    }
+                } else {
+                    // Falha ao obter o documento
+                    Log.d("Firestore", "Falha na leitura do documento", task.getException());
+                    callback.onComplete();
+                }
+            }
+        });
+
     }
 
     private void faltas(){
