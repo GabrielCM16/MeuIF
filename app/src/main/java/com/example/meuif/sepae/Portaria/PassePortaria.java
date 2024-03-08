@@ -51,6 +51,7 @@ import com.google.firebase.Timestamp;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.EventListener;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.journeyapps.barcodescanner.ScanContract;
@@ -800,49 +801,35 @@ public class PassePortaria extends AppCompatActivity implements OnFiltroSelected
         }
     });
 
-    private void atualizarAcessoSepae(String matricula){
+    private void atualizarAcessoSepae(String matricula) {
         String data = diaAtual();
+        //String data = "diaTeste";
         Timestamp novoTimestamp = Timestamp.now();
 
         DocumentReference docRef = db.collection("AcessosCampus").document("AcessosAlunos");
-        docRef.get().addOnCompleteListener(task -> {
-            if (task.isSuccessful()) {
-                List<Map<String, Timestamp>> passes;
 
-                if (task.getResult().exists() && task.getResult().contains(data)) {
-                    passes = (List<Map<String, Timestamp>>) task.getResult().get(data);
-                    Log.d("sim", "sim " + passes.toString());
-                } else {
-                   passes = new ArrayList<>();
-                }
+        // Cria um novo mapa representando o novo registro de acesso
+        Map<String, Timestamp> novoRegistro = new HashMap<>();
+        novoRegistro.put(matricula, novoTimestamp);
 
-                Map<String, Timestamp> a = new HashMap<>();
-                a.put(matricula, novoTimestamp);
+        // Atualiza o campo "data" com o novo registro usando arrayUnion
+        // Atualiza o documento com o novo registro usando a função de atualização atômica
+        Map<String, Object> updates = new HashMap<>();
+        //FieldValue.arrayUnion() para garantir que o novo registro seja adicionado à lista
+        //sem substituir ou perder os dados já existentes.
+        updates.put(data, FieldValue.arrayUnion(novoRegistro));
 
-                passes.add(a);
-
-                Log.d("sim", "nao + " + passes.toString());
-
-                docRef.update(data, passes)
-                        .addOnSuccessListener(new OnSuccessListener<Void>() {
-                            @Override
-                            public void onSuccess(Void unused) {
-                                playSucessSound();
-                                pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString()));
-                            }
-                        })
-                        .addOnFailureListener(new OnFailureListener() {
-                            @Override
-                            public void onFailure(@NonNull Exception e) {
-                                playErrorSound();
-                            }
-                        });
-            } else {
-                System.out.println("Erro ao obter o documento: " + task.getException().getMessage());
-                playErrorSound();
-            }
-        });
+        // Executa a atualização
+        docRef.update(updates)
+                .addOnSuccessListener(aVoid -> {
+                    playSucessSound();
+                    pegarAcessosPorDia(formatarData(textViewSaidaDiaAcessosCarteirinhaSEPAE.getText().toString()));
+                })
+                .addOnFailureListener(e -> {
+                    playErrorSound();
+                });
     }
+
 
     private void atualizarMatricula(String matricula, String data){
 
