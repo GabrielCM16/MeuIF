@@ -217,8 +217,8 @@ public class ContabilizarFaltas {
                     DocumentSnapshot document = task.getResult();
                     String status = document.getString("possivelStatus");
 
-                    if (status.equals("Saida")){
-                        docRef.update("possivelStatus", "Entrada")
+                    if (status.equals("Entrada")){
+                        docRef.update("possivelStatus", "Saida")
                                 .addOnSuccessListener(new OnSuccessListener<Void>() {
                                     @Override
                                     public void onSuccess(Void unused) {
