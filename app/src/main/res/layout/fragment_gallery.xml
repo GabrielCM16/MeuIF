@@ -62,7 +62,6 @@
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/textMatricula"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.109"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageView2" />
 
@@ -74,7 +73,6 @@
         android:textColor="@color/black"
         app:layout_constraintBottom_toTopOf="@+id/textCurso"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.108"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textNome" />
 
@@ -85,7 +83,6 @@
         android:text="Curso: Ensino Médio Integrado ao Técnico em curso"
         android:textColor="@color/black"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.325"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/textMatricula" />
 

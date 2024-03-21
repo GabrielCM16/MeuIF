@@ -135,7 +135,7 @@ public class GalleryFragment extends Fragment {
 
         textNome.setText("Nome: " + nome);
         textMatricula.setText("Matrícula: " + matricula);
-        textCurso.setText("Curso: Ensino Médio Integrado ao Técnico em " + curso);
+        textCurso.setText(curso);
 
 //        botao.setOnClickListener(new View.OnClickListener() {
 //            @Override

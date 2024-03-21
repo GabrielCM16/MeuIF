@@ -426,11 +426,13 @@ public class tela_entrar extends AppCompatActivity {
                         salvarDados("flag","true");
                         String curso = turma.substring(1);
                         if (curso.equals("INF")){
-                            salvarDados("curso", "Informatica");
+                            salvarDados("curso", "Curso: Ensino Médio Integrado ao Técnico em Informatica");
                         } else if (curso.equals("QUI")){
-                            salvarDados("curso", "Quimica");
+                            salvarDados("curso", "Curso: Ensino Médio Integrado ao Técnico em Quimica");
+                        } else if (curso.equals("EDI")){
+                            salvarDados("curso", "Curso: Ensino Médio Integrado ao Técnico em Edificações");
                         } else {
-                            salvarDados("curso", "Edificações");
+                            salvarDados("curso", "Curso: " + turma);
                         }
                     } else {
                         Log.d("TAGLER", "Documento não encontrado");
