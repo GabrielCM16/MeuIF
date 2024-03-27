@@ -7,6 +7,8 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.PorterDuff;
 import android.os.Bundle;
 import android.os.Handler;
 import android.text.Editable;
@@ -16,6 +18,7 @@ import android.view.View;
 import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 
 import com.example.meuif.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -40,11 +43,16 @@ public class GerenciarAluno extends AppCompatActivity {
     private List<ModelGerenciarAluno> listagem = new ArrayList<>();
     private  AdapterGerenciarAluno adapter = new AdapterGerenciarAluno(new ArrayList<>());
     private List<ModelGerenciarAluno> listaFiltrada = new ArrayList<>();
+    private ProgressBar progressBarGrafico;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_gerenciar_aluno);
+
+        progressBarGrafico = findViewById(R.id.progressBarGrafico);
+        progressBarGrafico.getIndeterminateDrawable().setColorFilter(Color.BLACK, PorterDuff.Mode.SRC_IN);
+        progressBarGrafico.setVisibility(View.VISIBLE);
 
         db = FirebaseFirestore.getInstance();
         pegarNomesAlunos();
@@ -74,6 +82,7 @@ public class GerenciarAluno extends AppCompatActivity {
     private void inicializarComponents() {
         listagemGerenciarNomes = findViewById(R.id.listagemGerenciarNomes);
 
+
         editTextBusca = findViewById(R.id.editTextBusca);
 
         //evento recyclerView
@@ -82,15 +91,22 @@ public class GerenciarAluno extends AppCompatActivity {
                 listagemGerenciarNomes, new RecyclerItemClickListener.OnItemClickListener() {
             @Override
             public void onItemClick(View view, int position) {
-                String matricula = listaFiltrada.get(position).getMatricula();
+                if (position >= 0 && position < listaFiltrada.size()) {
+                    Log.d("posicao", "onItemClick " + position );
+                    String matricula = listaFiltrada.get(position).getMatricula();
 
-                String primeiraParte = matricula.substring(0);
+                    String[] partes = matricula.split(" ");
+                    String primeiraParte = partes.length > 0 ? partes[0] : "Erro na matrícula";
 
-                Intent intent = new Intent(getApplicationContext(), MostrarDadosPorMatricula.class);
+                    Intent intent = new Intent(getApplicationContext(), MostrarDadosPorMatricula.class);
 
-                intent.putExtra("matricula", primeiraParte);
+                    intent.putExtra("matricula", primeiraParte);
 
-                startActivity(intent);
+                    startActivity(intent);
+                } else {
+                    // Handle the case where the position is out of bounds
+                    Log.e("GerenciarAluno", "Position out of bounds: " + position);
+                }
             }
 
             @Override
@@ -106,6 +122,7 @@ public class GerenciarAluno extends AppCompatActivity {
     }
 
     private void filtrar(String texto) {
+        progressBarGrafico.setVisibility(View.VISIBLE);
         if (!texto.isEmpty()){
                 listaFiltrada.clear();
                 String filtro = texto.toLowerCase().trim();
@@ -116,7 +133,10 @@ public class GerenciarAluno extends AppCompatActivity {
                     }
                     adapter = new AdapterGerenciarAluno(listaFiltrada);
                 listagemGerenciarNomes.setAdapter(adapter);
+            progressBarGrafico.setVisibility(View.INVISIBLE);
 
+        } else {
+            progressBarGrafico.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -125,7 +145,7 @@ public class GerenciarAluno extends AppCompatActivity {
 
             editTextBusca.setHint("Nome ou matrícula - " + nomesAlunos.size());
 
-            if (nomesAlunos.size() == turmasAlunos.size()) {
+           // if (nomesAlunos.size() == turmasAlunos.size()) {
                 for (Map.Entry<String, String> entry : nomesAlunos.entrySet()) {
                     String matricula = entry.getKey();
                     String nome = entry.getValue();
@@ -139,7 +159,9 @@ public class GerenciarAluno extends AppCompatActivity {
                     modelGerenciarAluno.setMatricula(matriculaTurma);
                     listagem.add(modelGerenciarAluno);
                 }
-            }
+            //} else {
+            //    Log.d("nomes", "tam " + nomesAlunos.size() + " " + turmasAlunos.size());
+            //}
 
             adapter = new AdapterGerenciarAluno(listagem);
 
@@ -149,6 +171,7 @@ public class GerenciarAluno extends AppCompatActivity {
             listagemGerenciarNomes.setHasFixedSize(true);
             listagemGerenciarNomes.addItemDecoration(new DividerItemDecoration(this, LinearLayout.VERTICAL));
             listagemGerenciarNomes.setAdapter(adapter);
+            progressBarGrafico.setVisibility(View.INVISIBLE);
 
 
         } else {
